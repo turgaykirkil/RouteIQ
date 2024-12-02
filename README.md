@@ -1,79 +1,94 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# RouteIQ Mobile CRM
 
-# Getting Started
+RouteIQ, müşteri ilişkilerini ve satış takibini yönetmek için tasarlanmış bir Enterprise mobil CRM uygulamasıdır. Bu uygulama, kullanıcıların müşteri bilgilerini, görevlerini ve satış süreçlerini etkili bir şekilde yönetmelerine olanak tanır.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Kullanılan Teknolojiler
+- **React Native**: Mobil uygulama geliştirme için kullanılan ana platform.
+- **TypeScript**: Daha güvenli ve hatasız kod yazmayı sağlayan statik tip kontrolü.
+- **Redux Toolkit**: Uygulama durumunu yönetmek için kullanılan güçlü bir araç.
+- **React Navigation**: Uygulama içinde gezinti yapmayı sağlayan kütüphane.
+- **React Native Paper**: Modern ve dinamik kullanıcı arayüzleri oluşturmak için kullanılan UI bileşenleri.
 
-## Step 1: Start the Metro Server
+## Yaklaşımlar
+- **Dinamik Tema Kullanımı**: Kullanıcı arayüzünün dinamik olarak tema değiştirmesine olanak tanır.
+- **Güvenli Veri İşleme**: Seri hale getirilemeyen değerlerle ilgili sorunları önlemek için güvenli veri işleme yöntemleri.
+- **Modüler Mimari**: Kodun daha yönetilebilir ve sürdürülebilir olmasını sağlar.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## Gelecek Özellikler
+- **Tema Değiştirme Fonksiyonu**: Kullanıcıların uygulamanın temasını değiştirmelerine olanak tanıyacak.
+- **Performans Optimizasyonu**: Uygulamanın daha hızlı ve verimli çalışmasını sağlamak için çeşitli optimizasyonlar.
+- **Hata Yönetimi**: Uygulama genelinde kapsamlı hata yönetimi ve kullanıcı geri bildirim mekanizmaları.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Başlarken
+
+>**Not**: Devam etmeden önce [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) talimatlarını tamamladığınızdan emin olun.
+
+### Adım 1: Metro Sunucusunu Başlatın
+
+Metro'yu başlatmak için, React Native projenizin kök dizininden aşağıdaki komutu çalıştırın:
 
 ```bash
-# using npm
+# npm kullanarak
 npm start
 
-# OR using Yarn
+# YA DA Yarn kullanarak
 yarn start
 ```
 
-## Step 2: Start your Application
+### Adım 2: Uygulamanızı Başlatın
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+Metro Bundler kendi terminalinde çalışmaya devam etsin. React Native projenizin kök dizininden yeni bir terminal açın ve aşağıdaki komutu çalıştırarak Android veya iOS uygulamanızı başlatın:
 
-### For Android
+#### Android için
 
 ```bash
-# using npm
+# npm kullanarak
 npm run android
 
-# OR using Yarn
+# YA DA Yarn kullanarak
 yarn android
 ```
 
-### For iOS
+#### iOS için
 
 ```bash
-# using npm
+# npm kullanarak
 npm run ios
 
-# OR using Yarn
+# YA DA Yarn kullanarak
 yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+Bu adımlar, uygulamanızı geliştirme ortamında çalıştırmanıza yardımcı olacaktır. Gelecekteki güncellemeler ve yeni özellikler için bizi takip edin!
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+## Uygulamanızı Değiştirme
 
-## Step 3: Modifying your App
+Artık uygulamanızı başarıyla çalıştırdınız ve değiştirmeye hazırsınız.
 
-Now that you have successfully run the app, let's modify it.
+1. `App.tsx` dosyasını tercih ettiğiniz metin düzenleyicisinde açın ve bazı satırları düzenleyin.
+2. **Android için**: Değişikliklerinizi görmek için <kbd>R</kbd> tuşuna iki kez basın veya **Geliştirici Menüsü**nden (**Ctrl** + **M** (Windows ve Linux'ta) veya **Cmd ⌘** + **M** (macOS'ta)) **"Yenile"**yi seçin!
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+   **iOS için**: Değişikliklerinizi görmek için iOS simülatörünüzde **Cmd ⌘** + **R** tuşlarına basın!
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+## Tebrikler! :tada:
 
-## Congratulations! :tada:
+Başarıyla React Native uygulamanızı çalıştırdınız ve değiştirdiniz. :partying_face:
 
-You've successfully run and modified your React Native App. :partying_face:
+### Şimdi ne yapmalı?
 
-### Now what?
+- Mevcut bir uygulamaya bu yeni React Native kodunu eklemek istiyorsanız, [Entegrasyon Kılavuzu](https://reactnative.dev/docs/integration-with-existing-apps)'nu inceleyin.
+- React Native hakkında daha fazla bilgi edinmek istiyorsanız, [React Native Giriş](https://reactnative.dev/docs/getting-started)'e bakın.
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+# Sorun Giderme
 
-# Troubleshooting
+Uygulamayı çalıştıramıyorsanız, [Sorun Giderme](https://reactnative.dev/docs/troubleshooting) sayfasını ziyaret edin.
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+# Daha Fazla Bilgi Edinin
 
-# Learn More
+React Native hakkında daha fazla bilgi edinmek için aşağıdaki kaynaklara bakın:
 
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- [React Native Web Sitesi](https://reactnative.dev) - React Native hakkında daha fazla bilgi edinin.
+- [Başlarken](https://reactnative.dev/docs/environment-setup) - React Native ve ortamınızı kurma hakkında genel bir bakış.
+- [Temel Bilgiler](https://reactnative.dev/docs/getting-started) - React Native temel bilgilerine yönelik rehberli bir tur.
+- [Blog](https://reactnative.dev/blog) - En son resmi React Native blog gönderilerini okuyun.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - React Native'nin açık kaynak GitHub deposu.
