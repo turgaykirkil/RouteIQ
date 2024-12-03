@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  SafeAreaView,
 } from 'react-native';
 import {
   Text,
@@ -18,13 +19,22 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootState } from '../../store';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
+import { spacing, typography, shadows } from '../../theme';
+import theme from '../../theme';
+import { useNavigation } from '@react-navigation/native';
+import { MainScreenNavigationProp } from '../../navigation/types';
 
 const screenWidth = Dimensions.get('window').width;
 
 const HomeScreen = () => {
-  const theme = useTheme();
+  const themeWithCustom = useTheme();
   const user = useSelector((state: RootState) => state.auth.user);
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<MainScreenNavigationProp>();
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile', { screen: 'ProfileMain' });
+  };
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -46,239 +56,271 @@ const HomeScreen = () => {
   const styles = React.useMemo(
     () =>
       StyleSheet.create({
+        safeArea: {
+          flex: 1,
+          backgroundColor: themeWithCustom.colors.background,
+        },
         container: {
           flex: 1,
-          backgroundColor: theme.colors.background,
+          backgroundColor: themeWithCustom.colors.background,
         },
         header: {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: theme.spacing.lg,
+          padding: themeWithCustom.spacing.lg,
         },
         welcomeText: {
-          ...theme.typography.body,
-          color: theme.colors.text,
+          ...themeWithCustom.typography.body,
+          color: themeWithCustom.colors.onSurface,
         },
         nameText: {
-          ...theme.typography.h2,
-          color: theme.colors.primary,
+          ...themeWithCustom.typography.h2,
+          color: themeWithCustom.colors.primary,
+          fontWeight: "bold",
         },
         statsContainer: {
           flexDirection: 'row',
           justifyContent: 'space-between',
-          padding: theme.spacing.md,
+          paddingHorizontal: themeWithCustom.spacing.md,
+          paddingVertical: themeWithCustom.spacing.sm,
         },
         statsCard: {
           flex: 1,
-          margin: theme.spacing.xs,
-          ...theme.shadows.small,
+          marginHorizontal: themeWithCustom.spacing.xs,
+          minHeight: 140,
+          height: '100%',
+          ...themeWithCustom.shadows.small,
+        },
+        statsCardContent: {
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: themeWithCustom.spacing.md,
+          height: '100%',
+        },
+        statsIconContainer: {
+          marginBottom: themeWithCustom.spacing.sm,
+          alignItems: 'center',
+          paddingTop: themeWithCustom.spacing.xs,
         },
         statsNumber: {
-          ...theme.typography.h2,
-          marginVertical: theme.spacing.xs,
+          ...themeWithCustom.typography.h2,
+          fontWeight: "bold",
+          textAlign: 'center',
+          marginVertical: themeWithCustom.spacing.sm,
         },
         statsLabel: {
-          ...theme.typography.caption,
-          color: theme.colors.text,
+          ...themeWithCustom.typography.caption,
+          color: themeWithCustom.colors.onSurface,
+          textAlign: 'center',
+          marginBottom: themeWithCustom.spacing.xs,
         },
         chartCard: {
-          margin: theme.spacing.md,
-          ...theme.shadows.small,
+          margin: themeWithCustom.spacing.md,
+          ...themeWithCustom.shadows.small,
         },
         chart: {
-          marginVertical: theme.spacing.md,
+          marginVertical: themeWithCustom.spacing.md,
           borderRadius: 16,
         },
         tasksCard: {
-          margin: theme.spacing.md,
-          ...theme.shadows.small,
+          margin: themeWithCustom.spacing.md,
+          ...themeWithCustom.shadows.small,
         },
         cardHeader: {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: theme.spacing.md,
+          marginBottom: themeWithCustom.spacing.md,
         },
         cardTitle: {
-          ...theme.typography.h2,
-          color: theme.colors.text,
+          ...themeWithCustom.typography.h2,
+          color: themeWithCustom.colors.onSurface,
+          fontWeight: "bold",
         },
         seeAllText: {
-          color: theme.colors.primary,
-          ...theme.typography.body,
+          color: themeWithCustom.colors.primary,
+          ...themeWithCustom.typography.body,
         },
         taskItem: {
-          marginBottom: theme.spacing.md,
+          marginBottom: themeWithCustom.spacing.md,
         },
         taskInfo: {
           flexDirection: 'row',
           justifyContent: 'space-between',
-          marginBottom: theme.spacing.xs,
+          marginBottom: themeWithCustom.spacing.xs,
         },
         taskTitle: {
-          ...theme.typography.body,
-          color: theme.colors.text,
+          ...themeWithCustom.typography.body,
+          color: themeWithCustom.colors.onSurface,
         },
         taskTime: {
-          ...theme.typography.caption,
-          color: theme.colors.placeholder,
+          ...themeWithCustom.typography.caption,
+          color: themeWithCustom.colors.onSurfaceVariant,
         },
         progressBar: {
           height: 6,
           borderRadius: 3,
         },
         recentActivitiesCard: {
-          margin: theme.spacing.md,
-          marginBottom: theme.spacing.xl,
-          ...theme.shadows.small,
+          margin: themeWithCustom.spacing.md,
+          marginBottom: themeWithCustom.spacing.xl,
+          ...themeWithCustom.shadows.small,
         },
         activityItem: {
           flexDirection: 'row',
           alignItems: 'center',
-          marginTop: theme.spacing.md,
+          marginTop: themeWithCustom.spacing.md,
         },
         activityInfo: {
-          marginLeft: theme.spacing.md,
+          marginLeft: themeWithCustom.spacing.md,
           flex: 1,
         },
         activityTitle: {
-          ...theme.typography.body,
-          color: theme.colors.text,
+          ...themeWithCustom.typography.body,
+          color: themeWithCustom.colors.onSurface,
         },
         activityTime: {
-          ...theme.typography.caption,
-          color: theme.colors.placeholder,
+          ...themeWithCustom.typography.caption,
+          color: themeWithCustom.colors.onSurfaceVariant,
         },
       }),
-    [theme]
+    [themeWithCustom]
   );
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.welcomeText}>Welcome back,</Text>
-          <Text style={styles.nameText}>{user?.name}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.nameText}>{user?.name}</Text>
+          </View>
+          <TouchableOpacity onPress={handleProfilePress}>
+            <Avatar.Image
+              size={50}
+              source={{ uri: 'https://i.pravatar.cc/150' }}
+            />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity>
-          <Avatar.Image
-            size={50}
-            source={{ uri: 'https://i.pravatar.cc/150' }}
-          />
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.statsContainer}>
-        <Card style={styles.statsCard}>
+        <View style={styles.statsContainer}>
+          <Card style={styles.statsCard}>
+            <Card.Content style={styles.statsCardContent}>
+              <View style={styles.statsIconContainer}>
+                <Icon name="account-group" size={24} color={themeWithCustom.colors.primary} />
+              </View>
+              <Text style={styles.statsNumber}>150</Text>
+              <Text style={styles.statsLabel}>Total Customers</Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={styles.statsCard}>
+            <Card.Content style={styles.statsCardContent}>
+              <View style={styles.statsIconContainer}>
+                <Icon name="calendar-check" size={24} color={themeWithCustom.colors.primary} />
+              </View>
+              <Text style={styles.statsNumber}>28</Text>
+              <Text style={styles.statsLabel}>Tasks Done</Text>
+            </Card.Content>
+          </Card>
+
+          <Card style={styles.statsCard}>
+            <Card.Content style={styles.statsCardContent}>
+              <View style={styles.statsIconContainer}>
+                <Icon name="currency-usd" size={24} color={themeWithCustom.colors.primary} />
+              </View>
+              <Text style={styles.statsNumber}>$12.5K</Text>
+              <Text style={styles.statsLabel}>Revenue</Text>
+            </Card.Content>
+          </Card>
+        </View>
+
+        <Card style={styles.chartCard}>
           <Card.Content>
-            <Icon name="account-group" size={24} color={theme.colors.primary} />
-            <Text style={styles.statsNumber}>150</Text>
-            <Text style={styles.statsLabel}>Total Customers</Text>
-          </Card.Content>
-        </Card>
-
-        <Card style={styles.statsCard}>
-          <Card.Content>
-            <Icon name="calendar-check" size={24} color={theme.colors.success} />
-            <Text style={styles.statsNumber}>28</Text>
-            <Text style={styles.statsLabel}>Tasks Done</Text>
-          </Card.Content>
-        </Card>
-
-        <Card style={styles.statsCard}>
-          <Card.Content>
-            <Icon name="currency-usd" size={24} color={theme.colors.accent} />
-            <Text style={styles.statsNumber}>$12.5K</Text>
-            <Text style={styles.statsLabel}>Revenue</Text>
-          </Card.Content>
-        </Card>
-      </View>
-
-      <Card style={styles.chartCard}>
-        <Card.Content>
-          <Text style={styles.cardTitle}>Sales Overview</Text>
-          <LineChart
-            data={chartData}
-            width={screenWidth - 48}
-            height={220}
-            chartConfig={{
-              backgroundColor: theme.colors.background,
-              backgroundGradientFrom: theme.colors.background,
-              backgroundGradientTo: theme.colors.background,
-              decimalPlaces: 0,
-              color: (opacity = 1) => `rgba(30, 144, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-            }}
-            bezier
-            style={styles.chart}
-          />
-        </Card.Content>
-      </Card>
-
-      <Card style={styles.tasksCard}>
-        <Card.Content>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Today's Tasks</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.taskItem}>
-            <View style={styles.taskInfo}>
-              <Text style={styles.taskTitle}>Meet with John Doe</Text>
-              <Text style={styles.taskTime}>10:00 AM</Text>
-            </View>
-            <ProgressBar
-              progress={0.7}
-              color={theme.colors.primary}
-              style={styles.progressBar}
+            <Text style={styles.cardTitle}>Sales Overview</Text>
+            <LineChart
+              data={chartData}
+              width={screenWidth - 48}
+              height={220}
+              chartConfig={{
+                backgroundColor: themeWithCustom.colors.background,
+                backgroundGradientFrom: themeWithCustom.colors.background,
+                backgroundGradientTo: themeWithCustom.colors.background,
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(30, 144, 255, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                },
+              }}
+              bezier
+              style={styles.chart}
             />
-          </View>
+          </Card.Content>
+        </Card>
 
-          <View style={styles.taskItem}>
-            <View style={styles.taskInfo}>
-              <Text style={styles.taskTitle}>Product Presentation</Text>
-              <Text style={styles.taskTime}>2:30 PM</Text>
+        <Card style={styles.tasksCard}>
+          <Card.Content>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Today's Tasks</Text>
+              <TouchableOpacity>
+                <Text style={styles.seeAllText}>See All</Text>
+              </TouchableOpacity>
             </View>
-            <ProgressBar
-              progress={0.3}
-              color={theme.colors.primary}
-              style={styles.progressBar}
-            />
-          </View>
-        </Card.Content>
-      </Card>
 
-      <Card style={styles.recentActivitiesCard}>
-        <Card.Content>
-          <Text style={styles.cardTitle}>Recent Activities</Text>
-          <View style={styles.activityItem}>
-            <Icon name="account-plus" size={24} color={theme.colors.primary} />
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityTitle}>New Customer Added</Text>
-              <Text style={styles.activityTime}>2 hours ago</Text>
+            <View style={styles.taskItem}>
+              <View style={styles.taskInfo}>
+                <Text style={styles.taskTitle}>Meet with John Doe</Text>
+                <Text style={styles.taskTime}>10:00 AM</Text>
+              </View>
+              <ProgressBar
+                progress={0.7}
+                color={themeWithCustom.colors.primary}
+                style={styles.progressBar}
+              />
             </View>
-          </View>
 
-          <View style={styles.activityItem}>
-            <Icon name="sale" size={24} color={theme.colors.success} />
-            <View style={styles.activityInfo}>
-              <Text style={styles.activityTitle}>Sale Completed</Text>
-              <Text style={styles.activityTime}>5 hours ago</Text>
+            <View style={styles.taskItem}>
+              <View style={styles.taskInfo}>
+                <Text style={styles.taskTitle}>Product Presentation</Text>
+                <Text style={styles.taskTime}>2:30 PM</Text>
+              </View>
+              <ProgressBar
+                progress={0.3}
+                color={themeWithCustom.colors.primary}
+                style={styles.progressBar}
+              />
             </View>
-          </View>
-        </Card.Content>
-      </Card>
-    </ScrollView>
+          </Card.Content>
+        </Card>
+
+        <Card style={styles.recentActivitiesCard}>
+          <Card.Content>
+            <Text style={styles.cardTitle}>Recent Activities</Text>
+            <View style={styles.activityItem}>
+              <Icon name="account-plus" size={24} color={themeWithCustom.colors.primary} />
+              <View style={styles.activityInfo}>
+                <Text style={styles.activityTitle}>New Customer Added</Text>
+                <Text style={styles.activityTime}>2 hours ago</Text>
+              </View>
+            </View>
+
+            <View style={styles.activityItem}>
+              <Icon name="sale" size={24} color={themeWithCustom.colors.primary} />
+              <View style={styles.activityInfo}>
+                <Text style={styles.activityTitle}>Sale Completed</Text>
+                <Text style={styles.activityTime}>5 hours ago</Text>
+              </View>
+            </View>
+          </Card.Content>
+        </Card>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

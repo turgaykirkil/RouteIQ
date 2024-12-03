@@ -1,12 +1,13 @@
 import { MD3LightTheme as DefaultTheme } from 'react-native-paper';
 
 export const colors = {
-  primary: '#1E90FF',
+  primary: '#673AB7',  // Material Design default purple
+  secondary: '#03dac6',
+  error: '#b00020',
   white: '#FFFFFF',
   accent: '#FFA500',
   background: '#F5F5F5',
   text: '#333333',
-  error: '#FF0000',
   success: '#4CAF50',
   border: '#E0E0E0',
   placeholder: '#9E9E9E',
@@ -52,22 +53,23 @@ export const shadows = {
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 3,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.29,
     shadowRadius: 4.65,
-    elevation: 4,
+    elevation: 3,
   },
 };
 
-export const defaultTheme = {
+export const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: colors.primary,
-    accent: colors.accent,
-    background: colors.background,
-    error: colors.error,
-    text: colors.text,
+    ...colors,
   },
+  spacing,
+  shadows,
+  typography,
 };
+
+export default theme;

@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  SafeAreaView,
+  Dimensions,
+} from 'react-native';
 import { Text, TextInput, Button, useTheme } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
+import { StatusBar } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
 
 type ForgotPasswordScreenProps = {
   navigation: NativeStackNavigationProp<AuthStackParamList, 'ForgotPassword'>;
@@ -12,8 +24,8 @@ type ForgotPasswordScreenProps = {
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
-    .email('Invalid email address')
-    .required('Email is required'),
+    .email('Geçersiz e-posta adresi')
+    .required('E-posta adresi gerekli'),
 });
 
 const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) => {
@@ -23,64 +35,84 @@ const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) => {
   const styles = React.useMemo(
     () =>
       StyleSheet.create({
+        safeArea: {
+          flex: 1,
+          backgroundColor: theme.colors.background,
+        },
         container: {
           flex: 1,
           backgroundColor: theme.colors.background,
         },
         scrollContainer: {
           flexGrow: 1,
-          padding: theme.spacing.lg,
+          paddingHorizontal: width * 0.06,
+          paddingVertical: height * 0.04,
         },
         headerContainer: {
           alignItems: 'center',
-          marginVertical: theme.spacing.xl,
+          marginVertical: height * 0.04,
         },
         headerText: {
-          fontSize: 24,
+          fontSize: 28,
           fontWeight: 'bold',
-          marginBottom: theme.spacing.sm,
+          marginBottom: height * 0.02,
           textAlign: 'center',
           color: theme.colors.primary,
         },
         subHeaderText: {
           fontSize: 16,
-          marginBottom: theme.spacing.lg,
+          marginBottom: height * 0.04,
           textAlign: 'center',
           color: theme.colors.onSurfaceVariant,
+          paddingHorizontal: width * 0.08,
         },
         formContainer: {
-          marginTop: theme.spacing.lg,
+          marginTop: height * 0.02,
         },
         input: {
-          marginBottom: theme.spacing.sm,
+          marginBottom: height * 0.02,
+          backgroundColor: 'transparent',
         },
         errorText: {
           color: theme.colors.error,
-          marginBottom: theme.spacing.sm,
+          marginBottom: height * 0.02,
           fontSize: 12,
         },
         button: {
-          marginVertical: theme.spacing.md,
-          paddingVertical: theme.spacing.sm,
+          marginVertical: height * 0.02,
+          padding: 6,
+          borderRadius: 8,
+        },
+        buttonLabel: {
+          fontSize: 16,
+          fontWeight: 'bold',
         },
         loginContainer: {
           flexDirection: 'row',
           justifyContent: 'center',
-          marginTop: theme.spacing.lg,
+          marginTop: height * 0.04,
         },
-        linkText: {
+        loginText: {
+          color: theme.colors.onSurfaceVariant,
+          fontSize: 14,
+        },
+        loginLink: {
           color: theme.colors.primary,
-          fontSize: 16,
+          marginLeft: 4,
+          fontSize: 14,
+          fontWeight: 'bold',
         },
         successContainer: {
-          marginTop: theme.spacing.xl,
+          marginTop: height * 0.04,
           alignItems: 'center',
+          paddingHorizontal: width * 0.08,
         },
         successText: {
           fontSize: 16,
-          color: theme.colors.success,
+          color: '#4CAF50',
           textAlign: 'center',
-          marginBottom: theme.spacing.lg,
+          marginBottom: height * 0.04,
+          lineHeight: 24,
         },
       }),
     [theme]
@@ -97,87 +129,97 @@ const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle={theme.dark ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.background}
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
       >
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Reset Password</Text>
-          <Text style={styles.subHeaderText}>
-            Enter your email address and we'll send you instructions to reset your password.
-          </Text>
-        </View>
-
-        {!isEmailSent ? (
-          <Formik
-            initialValues={{ email: '' }}
-            validationSchema={validationSchema}
-            onSubmit={handleResetPassword}
-          >
-            {({
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              values,
-              errors,
-              touched,
-            }) => (
-              <View style={styles.formContainer}>
-                <TextInput
-                  mode="outlined"
-                  label="Email"
-                  value={values.email}
-                  onChangeText={handleChange('email')}
-                  onBlur={handleBlur('email')}
-                  error={touched.email && !!errors.email}
-                  style={styles.input}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-                {touched.email && errors.email && (
-                  <Text style={styles.errorText}>{errors.email}</Text>
-                )}
-
-                <Button
-                  mode="contained"
-                  onPress={() => handleSubmit()}
-                  style={styles.button}
-                  buttonColor={theme.colors.primary}
-                >
-                  Send Reset Instructions
-                </Button>
-              </View>
-            )}
-          </Formik>
-        ) : (
-          <View style={styles.successContainer}>
-            <Text style={styles.successText}>
-              Password reset instructions have been sent to your email address.
-              Please check your inbox.
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>Şifrenizi mi Unuttunuz?</Text>
+            <Text style={styles.subHeaderText}>
+              E-posta adresinizi girin, şifrenizi sıfırlamanız için size talimatları gönderelim.
             </Text>
-            <Button
-              mode="contained"
-              onPress={() => navigation.navigate('Login')}
-              style={styles.button}
-              buttonColor={theme.colors.primary}
-            >
-              Return to Login
-            </Button>
           </View>
-        )}
 
-        <View style={styles.loginContainer}>
-          <Text>Remember your password? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.linkText}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {!isEmailSent ? (
+            <Formik
+              initialValues={{ email: '' }}
+              validationSchema={validationSchema}
+              onSubmit={handleResetPassword}
+            >
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+                isSubmitting,
+              }) => (
+                <View style={styles.formContainer}>
+                  <TextInput
+                    mode="flat"
+                    label="E-posta Adresi"
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    error={touched.email && !!errors.email}
+                    style={styles.input}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    left={<TextInput.Icon icon="email" />}
+                  />
+                  {touched.email && errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+
+                  <Button
+                    mode="contained"
+                    onPress={() => handleSubmit()}
+                    style={styles.button}
+                    labelStyle={styles.buttonLabel}
+                    loading={isSubmitting}
+                  >
+                    Şifre Sıfırlama Talimatlarını Gönder
+                  </Button>
+                </View>
+              )}
+            </Formik>
+          ) : (
+            <View style={styles.successContainer}>
+              <Text style={styles.successText}>
+                Şifre sıfırlama talimatları e-posta adresinize gönderildi.
+                Lütfen gelen kutunuzu kontrol edin.
+              </Text>
+              <Button
+                mode="contained"
+                onPress={() => navigation.navigate('Login')}
+                style={styles.button}
+                labelStyle={styles.buttonLabel}
+              >
+                Giriş Ekranına Dön
+              </Button>
+            </View>
+          )}
+
+          <View style={styles.loginContainer}>
+            <Text style={styles.loginText}>Şifrenizi hatırladınız mı? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.loginLink}>Giriş Yap</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

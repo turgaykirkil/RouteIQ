@@ -1,72 +1,66 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store';
+import { checkAuth } from '../store/slices/authSlice';
+import { ActivityIndicator, View } from 'react-native';
 
-import TaskNavigator from './TaskNavigator';
-import CustomerNavigator from './CustomerNavigator';
-import SettingsScreen from '../screens/settings/SettingsScreen';
-
-import { RootStackParamList, MainTabParamList } from './types';
+import AuthNavigator from './AuthNavigator';
+import MainNavigator from './MainNavigator';
+import ProfileNavigator from './ProfileNavigator';
+import { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
-
-const MainTabs = () => {
-  const theme = useTheme();
-
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.outline,
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.outline,
-        },
-      }}
-    >
-      <Tab.Screen
-        name="Tasks"
-        component={TaskNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="checkbox-marked-outline" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Customers"
-        component={CustomerNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account-group" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="cog" size={size} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
 
 const RootNavigator = () => {
+  const dispatch = useDispatch();
+  const { isAuthenticated, loading } = useSelector((state: RootState) => state.auth);
+  const theme = useTheme();
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        await dispatch(checkAuth()).unwrap();
+      } catch (error) {
+        console.log('No valid auth token found');
+      }
+    };
+    checkAuthStatus();
+  }, [dispatch]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
   return (
-    <Stack.Navigator
-      screenOptions={{
+    <Stack.Navigator 
+      screenOptions={{ 
         headerShown: false,
+        animation: 'slide_from_right'
       }}
     >
-      <Stack.Screen name="Main" component={MainTabs} />
+      {!isAuthenticated ? (
+        <Stack.Group screenOptions={{ gestureEnabled: false }}>
+          <Stack.Screen name="Auth" component={AuthNavigator} />
+        </Stack.Group>
+      ) : (
+        <Stack.Group screenOptions={{ gestureEnabled: false }}>
+          <Stack.Screen name="Main" component={MainNavigator} />
+          <Stack.Screen 
+            name="Profile" 
+            component={ProfileNavigator} 
+            options={{ 
+              presentation: 'modal',
+              animation: 'slide_from_bottom' 
+            }}
+          />
+        </Stack.Group>
+      )}
     </Stack.Navigator>
   );
 };

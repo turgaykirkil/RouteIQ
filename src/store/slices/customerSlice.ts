@@ -207,4 +207,7 @@ const customerSlice = createSlice({
 
 export const { setFilters, clearFilters, clearSelectedCustomer } = customerSlice.actions;
 
+export const selectCustomers = (state: RootState) => state.customers.customers;
+export const selectLoading = (state: RootState) => state.customers.loading;
+
 export default customerSlice.reducer;

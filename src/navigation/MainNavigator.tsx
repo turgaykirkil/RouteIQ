@@ -1,13 +1,15 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'react-native-paper';
-import { MainTabParamList } from './types';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import HomeScreen from '../screens/main/HomeScreen';
+import TaskNavigator from './TaskNavigator';
 import CustomerNavigator from './CustomerNavigator';
 import MapScreen from '../screens/main/MapScreen';
-import TaskNavigator from './TaskNavigator';
-import ProfileScreen from '../screens/main/ProfileScreen';
+import SettingsScreen from '../screens/settings/SettingsScreen';
+
+import { MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -16,59 +18,70 @@ const MainNavigator = () => {
 
   return (
     <Tab.Navigator
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
+        tabBarInactiveTintColor: theme.colors.disabled,
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.background,
         },
-      }}
+        tabBarIcon: ({ color, size, focused }) => {
+          let iconName: string;
+          switch (route.name) {
+            case 'Home':
+              iconName = 'home';
+              break;
+            case 'Tasks':
+              iconName = 'list';
+              break;
+            case 'Customers':
+              iconName = 'people';
+              break;
+            case 'Map':
+              iconName = 'map';
+              break;
+            case 'Settings':
+              iconName = 'settings';
+              break;
+            default:
+              iconName = 'circle';
+          }
+          return <Icon name={iconName} size={size} color={color} />;
+        },
+      })}
     >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="home" size={size} color={color} />
-          ),
-        }}
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ title: 'Ana Sayfa' }} 
       />
-      <Tab.Screen
-        name="Customers"
-        component={CustomerNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account-group" size={size} color={color} />
-          ),
-        }}
+      <Tab.Screen 
+        name="Tasks" 
+        component={TaskNavigator} 
+        options={{ title: 'Görevler' }} 
       />
-      <Tab.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="map-marker" size={size} color={color} />
-          ),
-        }}
+      <Tab.Screen 
+        name="Map" 
+        component={MapScreen} 
+        options={{ 
+          title: 'Harita',
+          tabBarItemStyle: { 
+            position: 'absolute', 
+            left: '50%', 
+            transform: [{ translateX: -24 }] 
+          } 
+        }} 
       />
-      <Tab.Screen
-        name="Tasks"
-        component={TaskNavigator}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="clipboard-check" size={size} color={color} />
-          ),
-        }}
+      <Tab.Screen 
+        name="Customers" 
+        component={CustomerNavigator} 
+        options={{ title: 'Müşteriler' }} 
       />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="account-circle" size={size} color={color} />
-          ),
-        }}
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsScreen} 
+        options={{ title: 'Ayarlar' }} 
       />
     </Tab.Navigator>
   );

@@ -19,7 +19,7 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: { email: string; password: string; rememberMe: boolean }) => {
+  async (credentials: { email: string; password: string; rememberMe?: boolean }) => {
     try {
       // TODO: Replace with actual API call
       const response = await new Promise((resolve) => {
@@ -28,7 +28,7 @@ export const login = createAsyncThunk(
             user: {
               id: '1',
               email: credentials.email,
-              name: 'John Doe',
+              name: 'Test User',
             },
             token: 'dummy-token',
           });
@@ -36,39 +36,58 @@ export const login = createAsyncThunk(
       });
 
       if (credentials.rememberMe) {
-        await AsyncStorage.setItem('token', 'dummy-token');
+        await AsyncStorage.setItem('userToken', 'dummy-token');
       }
 
       return response;
     } catch (error) {
-      throw new Error('Login failed');
+      throw new Error('Giriş başarısız oldu');
     }
   }
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await AsyncStorage.removeItem('token');
+  try {
+    await AsyncStorage.removeItem('userToken');
+    return true;
+  } catch (error) {
+    throw new Error('Çıkış yapılırken bir hata oluştu');
+  }
 });
 
 export const checkAuth = createAsyncThunk('auth/check', async () => {
-  const token = await AsyncStorage.getItem('token');
-  if (!token) throw new Error('No token found');
-  
-  // TODO: Validate token with API
-  return {
-    user: {
-      id: '1',
-      email: 'john@example.com',
-      name: 'John Doe',
-    },
-    token,
-  };
+  try {
+    const token = await AsyncStorage.getItem('userToken');
+    if (!token) {
+      throw new Error('Token bulunamadı');
+    }
+    
+    // TODO: Validate token with API
+    return {
+      user: {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+      },
+      token,
+    };
+  } catch (error) {
+    throw error;
+  }
 });
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    resetAuth: (state) => {
+      state.isAuthenticated = false;
+      state.user = null;
+      state.token = null;
+      state.loading = false;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(login.pending, (state) => {
@@ -80,27 +99,45 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.loading = false;
+        state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message || 'Giriş başarısız oldu';
+      })
+      .addCase(logout.pending, (state) => {
+        state.loading = true;
       })
       .addCase(logout.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Çıkış yapılırken bir hata oluştu';
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.loading = true;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.loading = false;
+        state.error = null;
       })
       .addCase(checkAuth.rejected, (state) => {
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
+        state.loading = false;
+        state.error = null;
       });
   },
 });
 
+export const { resetAuth } = authSlice.actions;
 export default authSlice.reducer;

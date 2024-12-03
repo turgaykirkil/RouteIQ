@@ -1,19 +1,30 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { 
+  persistStore, 
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER 
+} from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { combineReducers } from 'redux';
+
+import authReducer from './slices/authSlice';
 import taskReducer from './slices/taskSlice';
 import customerReducer from './slices/customerSlice';
-import authReducer from './slices/authSlice';
 import networkReducer from './slices/networkSlice';
 import syncReducer from './slices/syncSlice';
+import themeReducer from './slices/themeSlice';
 import { networkMiddleware } from './middleware/networkMiddleware';
 import { syncMiddleware } from './middleware/syncMiddleware';
 
 const persistConfig = {
   key: 'root',
+  version: 1,
   storage: AsyncStorage,
-  whitelist: ['tasks', 'customers'], // Sadece bu reducer'lar persist edilecek
+  whitelist: ['auth', 'theme'] // Add theme to whitelist
 };
 
 const rootReducer = combineReducers({
@@ -22,6 +33,7 @@ const rootReducer = combineReducers({
   customers: customerReducer,
   network: networkReducer,
   sync: syncReducer,
+  theme: themeReducer, // Add theme reducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -31,7 +43,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }).concat(networkMiddleware, syncMiddleware),
 });

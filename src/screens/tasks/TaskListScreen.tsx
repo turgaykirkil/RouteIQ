@@ -2,14 +2,11 @@ import React, {useState, useEffect, useMemo} from 'react';
 import {
   View,
   StyleSheet,
-  FlatList,
-  RefreshControl,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {
   Text,
-  Card,
-  Button,
   FAB,
   useTheme,
   MD3Theme,
@@ -33,11 +30,14 @@ const TaskListScreen: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   const styles = useMemo(
     () =>
       StyleSheet.create({
+        safeArea: {
+          flex: 1,
+          backgroundColor: theme.colors.background,
+        },
         container: {
           flex: 1,
           backgroundColor: theme.colors.background,
@@ -52,28 +52,19 @@ const TaskListScreen: React.FC = () => {
         },
         filterContainer: {
           flexDirection: 'row',
-          marginTop: 8,
+          paddingHorizontal: 16,
+          paddingBottom: 8,
         },
         filterChip: {
           marginRight: 8,
         },
-        loadingContainer: {
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        },
-        listContainer: {
+        taskItem: {
+          backgroundColor: theme.colors.surface,
+          marginHorizontal: 16,
+          marginVertical: 8,
           padding: 16,
-        },
-        taskCard: {
-          marginBottom: 16,
+          borderRadius: 8,
           elevation: 2,
-        },
-        taskHeader: {
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 8,
         },
         taskTitle: {
           fontSize: 18,
@@ -103,7 +94,7 @@ const TaskListScreen: React.FC = () => {
           flexDirection: 'row',
           alignItems: 'center',
         },
-        statusIndicator: {
+        statusDot: {
           width: 8,
           height: 8,
           borderRadius: 4,
@@ -117,7 +108,7 @@ const TaskListScreen: React.FC = () => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          paddingVertical: 32,
+          padding: 16,
         },
         emptyText: {
           fontSize: 16,
@@ -146,12 +137,6 @@ const TaskListScreen: React.FC = () => {
     }
   };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadTasks();
-    setRefreshing(false);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -172,103 +157,98 @@ const TaskListScreen: React.FC = () => {
         const matchesFilter = !selectedFilter || task.status === selectedFilter;
         return matchesSearch && matchesFilter;
       })
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
+      .sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
   }, [tasks, searchQuery, selectedFilter]);
 
-  const renderTaskCard = ({item}: {item: Task}) => (
-    <Card
-      style={styles.taskCard}
-      onPress={() => navigation.navigate('TaskDetail', {taskId: item.id})}>
-      <Card.Content>
-        <View style={styles.taskHeader}>
-          <Text style={styles.taskTitle}>{item.title}</Text>
-          <Chip
-            style={[
-              styles.priorityChip,
-              {backgroundColor: getPriorityColor(item.priority)},
-            ]}>
-            {item.priority.toUpperCase()}
-          </Chip>
-        </View>
-        <Text style={styles.taskDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.taskFooter}>
-          <Text style={styles.taskDate}>
-            Due: {formatDate(item.dueDate)}
-          </Text>
-          <View style={styles.statusContainer}>
-            <View
-              style={[
-                styles.statusIndicator,
-                {backgroundColor: getStatusColor(item.status)},
-              ]}
-            />
-            <Text style={styles.statusText}>
-              {item.status.replace('_', ' ').toUpperCase()}
-            </Text>
-          </View>
-        </View>
-      </Card.Content>
-    </Card>
-  );
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.emptyContainer]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Searchbar
-          placeholder="Search tasks"
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={styles.searchBar}
-        />
-        <View style={styles.filterContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {['todo', 'in_progress', 'completed'].map(filter => (
-              <Chip
-                key={filter}
-                selected={selectedFilter === filter}
-                onPress={() =>
-                  setSelectedFilter(selectedFilter === filter ? null : filter)
-                }
-                style={styles.filterChip}>
-                {filter.replace('_', ' ').toUpperCase()}
-              </Chip>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Searchbar
+            placeholder="Search tasks"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+          />
+          <View style={styles.filterContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {['todo', 'in_progress', 'completed'].map(filter => (
+                <Chip
+                  key={filter}
+                  selected={selectedFilter === filter}
+                  onPress={() =>
+                    setSelectedFilter(selectedFilter === filter ? null : filter)
+                  }
+                  style={styles.filterChip}>
+                  {filter.replace('_', ' ').toUpperCase()}
+                </Chip>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+
+        {loading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          </View>
+        ) : filteredTasks.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No tasks found</Text>
+          </View>
+        ) : (
+          <ScrollView>
+            {filteredTasks.map(task => (
+              <View key={task.id} style={styles.taskItem}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text style={styles.taskTitle}>{task.title}</Text>
+                  <Chip
+                    mode="outlined"
+                    style={[
+                      styles.priorityChip,
+                      {borderColor: getPriorityColor(task.priority)},
+                    ]}>
+                    {task.priority}
+                  </Chip>
+                </View>
+                {task.description && (
+                  <Text style={styles.taskDescription}>{task.description}</Text>
+                )}
+                <View style={styles.taskFooter}>
+                  <Text style={styles.taskDate}>
+                    Due: {formatDate(task.dueDate)}
+                  </Text>
+                  <View style={styles.statusContainer}>
+                    <View
+                      style={[
+                        styles.statusDot,
+                        {backgroundColor: getStatusColor(task.status)},
+                      ]}
+                    />
+                    <Text style={styles.statusText}>
+                      {task.status.replace('_', ' ').toUpperCase()}
+                    </Text>
+                  </View>
+                </View>
+              </View>
             ))}
           </ScrollView>
-        </View>
-      </View>
+        )}
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
-        </View>
-      ) : (
-        <FlatList
-          data={filteredTasks}
-          renderItem={renderTaskCard}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No tasks found</Text>
-            </View>
-          }
+        <FAB
+          style={styles.fab}
+          icon="plus"
+          onPress={() => navigation.navigate('NewTask')}
         />
-      )}
-
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => navigation.navigate('NewTask')}
-      />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 
