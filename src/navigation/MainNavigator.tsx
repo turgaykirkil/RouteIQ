@@ -7,7 +7,7 @@ import HomeScreen from '../screens/main/HomeScreen';
 import TaskNavigator from './TaskNavigator';
 import CustomerNavigator from './CustomerNavigator';
 import MapScreen from '../screens/main/MapScreen';
-import SettingsScreen from '../screens/settings/SettingsScreen';
+import SettingsNavigator from './SettingsNavigator';
 
 import { MainTabParamList } from './types';
 
@@ -64,14 +64,7 @@ const MainNavigator = () => {
       <Tab.Screen 
         name="Map" 
         component={MapScreen} 
-        options={{ 
-          title: 'Harita',
-          tabBarItemStyle: { 
-            position: 'absolute', 
-            left: '50%', 
-            transform: [{ translateX: -24 }] 
-          } 
-        }} 
+        options={{ title: 'Harita' }} 
       />
       <Tab.Screen 
         name="Customers" 
@@ -80,7 +73,7 @@ const MainNavigator = () => {
       />
       <Tab.Screen 
         name="Settings" 
-        component={SettingsScreen} 
+        component={SettingsNavigator}
         options={{ title: 'Ayarlar' }} 
       />
     </Tab.Navigator>

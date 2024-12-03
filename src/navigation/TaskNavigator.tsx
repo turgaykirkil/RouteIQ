@@ -4,6 +4,7 @@ import { useTheme } from 'react-native-paper';
 import TaskListScreen from '../screens/tasks/TaskListScreen';
 import TaskDetailScreen from '../screens/tasks/TaskDetailScreen';
 import NewTaskScreen from '../screens/tasks/NewTaskScreen';
+import EditTaskScreen from '../screens/tasks/EditTaskScreen';
 import { TaskStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<TaskStackParamList>();
@@ -27,21 +28,28 @@ const TaskNavigator = () => {
         name="TaskList"
         component={TaskListScreen}
         options={{
-          title: 'Tasks',
+          title: 'Görevler',
         }}
       />
       <Stack.Screen
         name="TaskDetail"
         component={TaskDetailScreen}
         options={{
-          title: 'Task Details',
+          title: 'Görev Detayı',
         }}
       />
       <Stack.Screen
         name="NewTask"
         component={NewTaskScreen}
         options={{
-          title: 'New Task',
+          title: 'Yeni Görev',
+        }}
+      />
+      <Stack.Screen
+        name="EditTask"
+        component={EditTaskScreen}
+        options={{
+          title: 'Görevi Düzenle',
         }}
       />
     </Stack.Navigator>

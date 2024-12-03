@@ -41,7 +41,7 @@ const validationSchema = Yup.object().shape({
   notes: Yup.string(),
 });
 
-const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
+const EditCustomerScreen: React.FC<EditCustomerScreenProps> = ({ navigation, route }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const { customerId } = route.params;
@@ -49,6 +49,67 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
     (state: RootState) => state.customers
   );
   const [discardDialogVisible, setDiscardDialogVisible] = React.useState(false);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    form: {
+      padding: 16,
+    },
+    section: {
+      marginBottom: 24,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.onSurface,
+      marginBottom: 16,
+    },
+    input: {
+      marginBottom: 8,
+      backgroundColor: theme.colors.surface,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 16,
+    },
+    halfInput: {
+      flex: 1,
+    },
+    divider: {
+      marginVertical: 24,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 24,
+      gap: 16,
+    },
+    button: {
+      flex: 1,
+    },
+    saveButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    cancelButton: {
+      borderColor: theme.colors.error,
+    },
+    cancelButtonText: {
+      color: theme.colors.error,
+    },
+    errorText: {
+      color: theme.colors.error,
+      marginTop: 4,
+    },
+  });
 
   const handleSubmit = async (values: Partial<Customer>) => {
     try {
@@ -96,7 +157,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.name && errors.name && (
-                <HelperText type="error">{errors.name}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.name}</HelperText>
               )}
 
               <TextInput
@@ -109,7 +170,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.company && errors.company && (
-                <HelperText type="error">{errors.company}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.company}</HelperText>
               )}
             </View>
 
@@ -129,7 +190,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.email && errors.email && (
-                <HelperText type="error">{errors.email}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.email}</HelperText>
               )}
 
               <TextInput
@@ -143,7 +204,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.phone && errors.phone && (
-                <HelperText type="error">{errors.phone}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.phone}</HelperText>
               )}
             </View>
 
@@ -161,7 +222,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.address?.street && errors.address?.street && (
-                <HelperText type="error">{errors.address.street}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.address.street}</HelperText>
               )}
 
               <TextInput
@@ -174,7 +235,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.address?.city && errors.address?.city && (
-                <HelperText type="error">{errors.address.city}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.address.city}</HelperText>
               )}
 
               <View style={styles.row}>
@@ -189,7 +250,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                     style={styles.input}
                   />
                   {touched.address?.state && errors.address?.state && (
-                    <HelperText type="error">{errors.address.state}</HelperText>
+                    <HelperText type="error" style={styles.errorText}>{errors.address.state}</HelperText>
                   )}
                 </View>
 
@@ -204,7 +265,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                     style={styles.input}
                   />
                   {touched.address?.zipCode && errors.address?.zipCode && (
-                    <HelperText type="error">{errors.address.zipCode}</HelperText>
+                    <HelperText type="error" style={styles.errorText}>{errors.address.zipCode}</HelperText>
                   )}
                 </View>
               </View>
@@ -219,7 +280,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                 style={styles.input}
               />
               {touched.address?.country && errors.address?.country && (
-                <HelperText type="error">{errors.address.country}</HelperText>
+                <HelperText type="error" style={styles.errorText}>{errors.address.country}</HelperText>
               )}
             </View>
 
@@ -243,7 +304,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
               <Button
                 mode="contained"
                 onPress={() => handleSubmit()}
-                style={styles.submitButton}
+                style={[styles.button, styles.saveButton]}
               >
                 Save Changes
               </Button>
@@ -256,9 +317,9 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                     navigation.goBack();
                   }
                 }}
-                style={styles.cancelButton}
+                style={[styles.button, styles.cancelButton]}
               >
-                Cancel
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </Button>
             </View>
 
@@ -275,9 +336,7 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
                   </Text>
                 </Dialog.Content>
                 <Dialog.Actions>
-                  <Button onPress={() => setDiscardDialogVisible(false)}>
-                    Keep Editing
-                  </Button>
+                  <Button onPress={() => setDiscardDialogVisible(false)}>Keep Editing</Button>
                   <Button
                     onPress={() => {
                       setDiscardDialogVisible(false);
@@ -295,56 +354,5 @@ const EditCustomerScreen = ({ navigation, route }: EditCustomerScreenProps) => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  form: {
-    padding: theme.spacing.md,
-  },
-  section: {
-    marginBottom: theme.spacing.md,
-  },
-  sectionTitle: {
-    ...theme.typography.titleMedium,
-    color: theme.colors.onSurface,
-    marginBottom: theme.spacing.sm,
-  },
-  input: {
-    marginBottom: theme.spacing.xs,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: -theme.spacing.xs,
-  },
-  halfInput: {
-    flex: 1,
-    marginHorizontal: theme.spacing.xs,
-  },
-  divider: {
-    marginVertical: theme.spacing.md,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: theme.spacing.lg,
-  },
-  submitButton: {
-    flex: 1,
-    marginRight: theme.spacing.xs,
-  },
-  cancelButton: {
-    flex: 1,
-    marginLeft: theme.spacing.xs,
-  },
-});
 
 export default EditCustomerScreen;

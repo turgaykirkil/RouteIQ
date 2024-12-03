@@ -18,7 +18,7 @@ export type MainTabParamList = {
   Tasks: NavigatorScreenParams<TaskStackParamList>;
   Customers: NavigatorScreenParams<CustomerStackParamList>;
   Map: undefined;
-  Settings: undefined;
+  Settings: NavigatorScreenParams<SettingsStackParamList>;
 };
 
 export type TaskStackParamList = {
@@ -34,6 +34,7 @@ export type CustomerStackParamList = {
   NewCustomer: undefined;
   EditCustomer: { customerId: string };
   CustomerMap: undefined;
+  CustomerAnalytics: undefined;
 };
 
 export type ProfileStackParamList = {
@@ -42,9 +43,18 @@ export type ProfileStackParamList = {
   ProfileSettings: undefined;
 };
 
+export type SettingsStackParamList = {
+  SettingsList: undefined;
+  // Daha sonra eklenecek diğer ayar ekranları buraya eklenebilir
+  // ProfileSettings: undefined;
+  // AppSettings: undefined;
+  // NotificationSettings: undefined;
+};
+
 export type TaskStackNavigationProp = NativeStackNavigationProp<TaskStackParamList>;
 export type CustomerStackNavigationProp = NativeStackNavigationProp<CustomerStackParamList>;
 export type ProfileStackNavigationProp = NativeStackNavigationProp<ProfileStackParamList>;
+export type SettingsStackNavigationProp = NativeStackNavigationProp<SettingsStackParamList>;
 export type MainScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // Nested navigation için composite types

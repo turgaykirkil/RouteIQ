@@ -1,10 +1,12 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from 'react-native-paper';
 import CustomerListScreen from '../screens/customers/CustomerListScreen';
 import CustomerDetailScreen from '../screens/customers/CustomerDetailScreen';
 import NewCustomerScreen from '../screens/customers/NewCustomerScreen';
+import EditCustomerScreen from '../screens/customers/EditCustomerScreen';
 import CustomerMapScreen from '../screens/customers/CustomerMapScreen';
-import { useTheme } from 'react-native-paper';
+import CustomerAnalyticsScreen from '../screens/analytics/CustomerAnalyticsScreen';
 import { CustomerStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -18,7 +20,7 @@ const CustomerNavigator = () => {
         headerStyle: {
           backgroundColor: theme.colors.primary,
         },
-        headerTintColor: theme.colors.surface,
+        headerTintColor: '#fff',
         headerTitleStyle: {
           fontWeight: 'bold',
         },
@@ -28,28 +30,42 @@ const CustomerNavigator = () => {
         name="CustomerList"
         component={CustomerListScreen}
         options={{
-          title: 'Customers',
+          title: 'Müşteriler',
         }}
       />
       <Stack.Screen
         name="CustomerDetail"
         component={CustomerDetailScreen}
         options={{
-          title: 'Customer Details',
+          title: 'Müşteri Detayı',
         }}
       />
       <Stack.Screen
         name="NewCustomer"
         component={NewCustomerScreen}
         options={{
-          title: 'New Customer',
+          title: 'Yeni Müşteri',
+        }}
+      />
+      <Stack.Screen
+        name="EditCustomer"
+        component={EditCustomerScreen}
+        options={{
+          title: 'Müşteri Düzenle',
         }}
       />
       <Stack.Screen
         name="CustomerMap"
         component={CustomerMapScreen}
         options={{
-          title: 'Customer Map',
+          title: 'Müşteri Haritası',
+        }}
+      />
+      <Stack.Screen
+        name="CustomerAnalytics"
+        component={CustomerAnalyticsScreen}
+        options={{
+          title: 'Müşteri Analitikleri',
         }}
       />
     </Stack.Navigator>

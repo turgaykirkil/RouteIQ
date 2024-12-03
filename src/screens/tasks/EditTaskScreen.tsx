@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
   ),
 });
 
-const EditTaskScreen = ({ navigation, route }: EditTaskScreenProps) => {
+const EditTaskScreen: React.FC<EditTaskScreenProps> = ({ navigation, route }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
   const { taskId } = route.params;
@@ -61,6 +61,68 @@ const EditTaskScreen = ({ navigation, route }: EditTaskScreenProps) => {
   const [itemToDelete, setItemToDelete] = React.useState<string | null>(null);
   const [newItemDialogVisible, setNewItemDialogVisible] = React.useState(false);
   const [newItemTitle, setNewItemTitle] = React.useState('');
+
+  const styles = StyleSheet.create({
+    scrollContainer: {
+      padding: 16,
+    },
+    form: {
+      padding: 16,
+    },
+    input: {
+      marginBottom: 16,
+      backgroundColor: theme.colors.surface,
+    },
+    dateContainer: {
+      marginBottom: 16,
+    },
+    dateButton: {
+      marginBottom: 16,
+    },
+    menuContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    menuButton: {
+      flex: 1,
+      marginHorizontal: 8,
+    },
+    divider: {
+      marginVertical: 16,
+    },
+    checklistSection: {
+      marginBottom: 16,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      color: theme.colors.onSurface,
+    },
+    buttonContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 16,
+    },
+    button: {
+      flex: 1,
+      marginHorizontal: 8,
+      backgroundColor: theme.colors.primary,
+    },
+    buttonText: {
+      color: theme.colors.surface,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });
 
   useEffect(() => {
     loadTask();
@@ -111,7 +173,7 @@ const EditTaskScreen = ({ navigation, route }: EditTaskScreenProps) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.scrollContainer}>
       <Formik
         initialValues={task}
         validationSchema={validationSchema}
@@ -274,16 +336,16 @@ const EditTaskScreen = ({ navigation, route }: EditTaskScreenProps) => {
               <Button
                 mode="contained"
                 onPress={() => handleSubmit()}
-                style={styles.submitButton}
+                style={styles.button}
               >
-                Save Changes
+                <Text style={styles.buttonText}>Save Changes</Text>
               </Button>
               <Button
                 mode="outlined"
                 onPress={() => navigation.goBack()}
-                style={styles.cancelButton}
+                style={styles.button}
               >
-                Cancel
+                <Text style={styles.buttonText}>Cancel</Text>
               </Button>
             </View>
 
@@ -339,67 +401,5 @@ const EditTaskScreen = ({ navigation, route }: EditTaskScreenProps) => {
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  form: {
-    padding: theme.spacing.md,
-  },
-  input: {
-    marginBottom: theme.spacing.sm,
-  },
-  dateContainer: {
-    marginBottom: theme.spacing.md,
-  },
-  dateButton: {
-    marginBottom: theme.spacing.sm,
-  },
-  menuContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.md,
-  },
-  menuButton: {
-    flex: 1,
-    marginHorizontal: theme.spacing.xs,
-  },
-  divider: {
-    marginVertical: theme.spacing.md,
-  },
-  checklistSection: {
-    marginBottom: theme.spacing.md,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  sectionTitle: {
-    ...theme.typography.titleMedium,
-    color: theme.colors.onSurface,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: theme.spacing.lg,
-  },
-  submitButton: {
-    flex: 1,
-    marginRight: theme.spacing.xs,
-  },
-  cancelButton: {
-    flex: 1,
-    marginLeft: theme.spacing.xs,
-  },
-});
 
 export default EditTaskScreen;
