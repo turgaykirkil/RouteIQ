@@ -1,64 +1,126 @@
 import { Task, NewTaskInput } from '../types/task';
-
-// Mock data
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Follow up with Tech Corp',
-    description: 'Schedule a meeting to discuss new requirements',
-    dueDate: new Date('2024-02-15').toISOString(), 
-    priority: 'high',
-    customerId: '1',
-    customerName: 'John Doe - Tech Corp',
-    assignedTo: '1',
-    assigneeName: 'Alice Johnson',
-    status: 'in_progress',
-    progress: 60,
-    checklist: [
-      { id: '1', title: 'Review previous meeting notes', completed: true },
-      { id: '2', title: 'Prepare presentation', completed: true },
-      { id: '3', title: 'Schedule meeting', completed: false },
-      { id: '4', title: 'Send agenda', completed: false },
-    ],
-    createdAt: new Date('2024-01-01').toISOString(),
-    updatedAt: new Date('2024-01-10').toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Prepare proposal for Design Co',
-    description: 'Create a detailed proposal for the new project',
-    dueDate: new Date('2024-02-20').toISOString(),
-    priority: 'medium',
-    customerId: '2',
-    customerName: 'Jane Smith - Design Co',
-    assignedTo: '2',
-    assigneeName: 'Bob Smith',
-    status: 'todo',
-    progress: 0,
-    checklist: [
-      { id: '1', title: 'Gather requirements', completed: false },
-      { id: '2', title: 'Create timeline', completed: false },
-      { id: '3', title: 'Calculate budget', completed: false },
-    ],
-    createdAt: new Date('2024-01-05').toISOString(),
-    updatedAt: new Date('2024-01-05').toISOString(),
-  },
-];
+import db from '../../db.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Simulated delay for async operations
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const taskService = {
-  // Get all tasks
-  getTasks: async (): Promise<Task[]> => {
+  // Get all tasks with optional filters
+  getTasks: async (params?: {
+    search?: string;
+    status?: string[];
+    priority?: string[];
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    userId?: string;
+    role?: 'admin' | 'supervisor' | 'sales_rep';
+  }) => {
+    console.log('🔍 TaskService: Fetching tasks');
+    console.log('🔑 Input Parameters:', JSON.stringify(params || {}, null, 2));
+
+    // Log the start of the operation with timestamp
+    const startTime = Date.now();
+    console.log(`⏱️ Operation started at: ${new Date().toISOString()}`);
+
     await delay(500);
-    return [...mockTasks];
+    
+    let tasks = [...db.tasks];
+    
+    console.log(`📋 Total tasks before filtering: ${tasks.length}`);
+
+    // Apply search filter
+    if (params?.search) {
+      const searchLower = params.search.toLowerCase();
+      const initialCount = tasks.length;
+      
+      tasks = tasks.filter(task => {
+        const matchTitle = task.title.toLowerCase().includes(searchLower);
+        const matchDescription = task.description.toLowerCase().includes(searchLower);
+        
+        return matchTitle || matchDescription;
+      });
+
+      console.log(`🔎 Search Filter: "${params.search}"`);
+      console.log(`   - Tasks before search: ${initialCount}`);
+      console.log(`   - Tasks after search: ${tasks.length}`);
+      console.log(`   - Matching fields: title, description`);
+    }
+
+    // Apply status filter
+    if (params?.status?.length) {
+      const initialCount = tasks.length;
+      
+      tasks = tasks.filter(task => {
+        const isStatusMatch = params.status.includes(task.status);
+        return isStatusMatch;
+      });
+
+      console.log(`📊 Status Filter: ${JSON.stringify(params.status)}`);
+      console.log(`   - Tasks before status filter: ${initialCount}`);
+      console.log(`   - Tasks after status filter: ${tasks.length}`);
+    }
+
+    // Apply priority filter
+    if (params?.priority?.length) {
+      const initialCount = tasks.length;
+      
+      tasks = tasks.filter(task => {
+        const isPriorityMatch = params.priority.includes(task.priority);
+        return isPriorityMatch;
+      });
+
+      console.log(`🚨 Priority Filter: ${JSON.stringify(params.priority)}`);
+      console.log(`   - Tasks before priority filter: ${initialCount}`);
+      console.log(`   - Tasks after priority filter: ${tasks.length}`);
+    }
+
+    // Apply sorting
+    if (params?.sortBy) {
+      console.log(`🔀 Sorting tasks by: ${params.sortBy}, Order: ${params.sortOrder}`);
+      
+      tasks.sort((a, b) => {
+        const aValue = a[params.sortBy as keyof Task];
+        const bValue = b[params.sortBy as keyof Task];
+        const order = params.sortOrder === 'desc' ? -1 : 1;
+        
+        return aValue < bValue ? -order : order;
+      });
+
+      console.log(`   - Sort completed successfully`);
+    }
+
+    // Log operation duration
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    
+    console.log(`✅ Final task list size: ${tasks.length}`);
+    console.log(`⏱️ Operation duration: ${duration}ms`);
+
+    return tasks;
   },
 
   // Get task by id
   getTaskById: async (id: string): Promise<Task | undefined> => {
     await delay(300);
-    return mockTasks.find(task => task.id === id);
+    const userStr = await AsyncStorage.getItem('user');
+    if (!userStr) {
+      throw new Error('Kullanıcı girişi yapılmamış!');
+    }
+    
+    const user = JSON.parse(userStr);
+    const task = db.tasks.find(t => t.id === id);
+    
+    if (!task) {
+      throw new Error('Görev bulunamadı!');
+    }
+    
+    // Eğer kullanıcı sales_rep ise ve görev kendisine ait değilse, erişimi engelle
+    if (user.role === 'sales_rep' && task.salesRepId !== user.id) {
+      throw new Error('Bu göreve erişim yetkiniz yok!');
+    }
+    
+    return task;
   },
 
   // Create new task
@@ -72,46 +134,31 @@ export const taskService = {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    mockTasks.push(task);
+    db.tasks.push(task);
     return task;
   },
 
   // Update task
   updateTask: async (id: string, updates: Partial<Task>): Promise<Task> => {
     await delay(500);
-    const index = mockTasks.findIndex(task => task.id === id);
+    const index = db.tasks.findIndex(task => task.id === id);
     if (index === -1) throw new Error('Task not found');
 
     const updatedTask = {
-      ...mockTasks[index],
+      ...db.tasks[index],
       ...updates,
       updatedAt: new Date().toISOString(),
     };
-    mockTasks[index] = updatedTask;
+    db.tasks[index] = updatedTask;
     return updatedTask;
   },
 
   // Delete task
   deleteTask: async (id: string): Promise<void> => {
     await delay(500);
-    const index = mockTasks.findIndex(task => task.id === id);
+    const index = db.tasks.findIndex(task => task.id === id);
     if (index === -1) throw new Error('Task not found');
-    mockTasks.splice(index, 1);
-  },
-
-  // Update task progress
-  updateTaskProgress: async (id: string, progress: number): Promise<Task> => {
-    await delay(500);
-    const index = mockTasks.findIndex(task => task.id === id);
-    if (index === -1) throw new Error('Task not found');
-
-    const updatedTask = {
-      ...mockTasks[index],
-      progress,
-      updatedAt: new Date().toISOString(),
-    };
-    mockTasks[index] = updatedTask;
-    return updatedTask;
+    db.tasks.splice(index, 1);
   },
 
   // Update checklist item
@@ -121,18 +168,15 @@ export const taskService = {
     completed: boolean
   ): Promise<Task> => {
     await delay(500);
-    const taskIndex = mockTasks.findIndex(task => task.id === taskId);
-    if (taskIndex === -1) throw new Error('Task not found');
+    const task = db.tasks.find(task => task.id === taskId);
+    if (!task) throw new Error('Task not found');
 
-    const checklistItemIndex = mockTasks[taskIndex].checklist.findIndex(
-      item => item.id === itemId
-    );
-    if (checklistItemIndex === -1) throw new Error('Checklist item not found');
+    const checklistItem = task.checklist.find(item => item.id === itemId);
+    if (!checklistItem) throw new Error('Checklist item not found');
 
-    mockTasks[taskIndex].checklist[checklistItemIndex].completed = completed;
-    mockTasks[taskIndex].updatedAt = new Date().toISOString();
-
-    return mockTasks[taskIndex];
+    checklistItem.completed = completed;
+    task.updatedAt = new Date().toISOString();
+    return task;
   },
 
   // Update task status
@@ -141,15 +185,25 @@ export const taskService = {
     status: Task['status']
   ): Promise<Task> => {
     await delay(500);
-    const index = mockTasks.findIndex(task => task.id === id);
-    if (index === -1) throw new Error('Task not found');
+    const task = db.tasks.find(task => task.id === id);
+    if (!task) throw new Error('Task not found');
 
-    const updatedTask = {
-      ...mockTasks[index],
-      status,
-      updatedAt: new Date().toISOString(),
-    };
-    mockTasks[index] = updatedTask;
-    return updatedTask;
+    task.status = status;
+    task.updatedAt = new Date().toISOString();
+    return task;
+  },
+
+  // Update task progress
+  updateTaskProgress: async (
+    id: string,
+    progress: number
+  ): Promise<Task> => {
+    await delay(500);
+    const task = db.tasks.find(task => task.id === id);
+    if (!task) throw new Error('Task not found');
+
+    task.progress = progress;
+    task.updatedAt = new Date().toISOString();
+    return task;
   },
 };

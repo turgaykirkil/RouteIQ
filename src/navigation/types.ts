@@ -8,9 +8,8 @@ export type AuthStackParamList = {
 };
 
 export type RootStackParamList = {
-  Auth: NavigatorScreenParams<AuthStackParamList>;
+  Login: undefined;
   Main: undefined;
-  Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 
 export type MainTabParamList = {
@@ -45,10 +44,6 @@ export type ProfileStackParamList = {
 
 export type SettingsStackParamList = {
   SettingsList: undefined;
-  // Daha sonra eklenecek diğer ayar ekranları buraya eklenebilir
-  // ProfileSettings: undefined;
-  // AppSettings: undefined;
-  // NotificationSettings: undefined;
 };
 
 export type TaskStackNavigationProp = NativeStackNavigationProp<TaskStackParamList>;
@@ -57,7 +52,6 @@ export type ProfileStackNavigationProp = NativeStackNavigationProp<ProfileStackP
 export type SettingsStackNavigationProp = NativeStackNavigationProp<SettingsStackParamList>;
 export type MainScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-// Nested navigation için composite types
 export type TaskScreenNavigationProp = NativeStackNavigationProp<
   MainTabParamList & TaskStackParamList & CustomerStackParamList
 >;

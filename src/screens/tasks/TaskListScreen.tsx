@@ -1,9 +1,10 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import {
   Text,
@@ -14,22 +15,38 @@ import {
   Searchbar,
   Chip,
 } from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation} from '@react-navigation/native';
-import {TaskStackNavigationProp} from '../../navigation/types';
-import {fetchTasks} from '../../store/slices/taskSlice';
-import {RootState} from '../../store';
-import {Task, formatDate, getPriorityColor} from '../../types/task';
-import {AppDispatch} from '../../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { TaskStackNavigationProp } from '../../navigation/types';
+import { fetchTasks } from '../../store/slices/taskSlice';
+import { RootState } from '../../store';
+import { Task, formatDate, getPriorityColor } from '../../types/task';
+import { AppDispatch } from '../../store';
+import { taskAPI } from '../../services/api';
 
 const TaskListScreen: React.FC = () => {
   const theme = useTheme();
   const navigation = useNavigation<TaskStackNavigationProp>();
   const dispatch = useDispatch<AppDispatch>();
-  const {tasks, loading} = useSelector((state: RootState) => state.tasks);
+  const { tasks, loading } = useSelector((state: RootState) => state.tasks);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [localTasks, setLocalTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const tasks = await taskAPI.getAll();
+        console.log('Tasks fetched:', tasks);
+        setLocalTasks(tasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const styles = useMemo(
     () =>
@@ -125,18 +142,6 @@ const TaskListScreen: React.FC = () => {
     [theme]
   );
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  const loadTasks = async () => {
-    try {
-      await dispatch(fetchTasks()).unwrap();
-    } catch (error) {
-      console.error('Error loading tasks:', error);
-    }
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -149,7 +154,7 @@ const TaskListScreen: React.FC = () => {
   };
 
   const filteredTasks = useMemo(() => {
-    return tasks
+    return localTasks
       .filter(task => {
         const matchesSearch = task.title
           .toLowerCase()
@@ -158,7 +163,7 @@ const TaskListScreen: React.FC = () => {
         return matchesSearch && matchesFilter;
       })
       .sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
-  }, [tasks, searchQuery, selectedFilter]);
+  }, [localTasks, searchQuery, selectedFilter]);
 
   if (loading) {
     return (
@@ -195,18 +200,17 @@ const TaskListScreen: React.FC = () => {
           </View>
         </View>
 
-        {loading ? (
-          <View style={styles.emptyContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-          </View>
-        ) : filteredTasks.length === 0 ? (
+        {filteredTasks.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No tasks found</Text>
           </View>
         ) : (
           <ScrollView>
             {filteredTasks.map(task => (
-              <View key={task.id} style={styles.taskItem}>
+              <TouchableOpacity
+                key={task.id}
+                style={styles.taskItem}
+                onPress={() => navigation.navigate('TaskDetail', { taskId: task.id })}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={styles.taskTitle}>{task.title}</Text>
                   <Chip
@@ -237,7 +241,7 @@ const TaskListScreen: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         )}

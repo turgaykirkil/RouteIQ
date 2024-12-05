@@ -12,7 +12,6 @@ import {
   Card,
   Avatar,
   ProgressBar,
-  useTheme,
 } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,15 +21,16 @@ import { Dimensions } from 'react-native';
 import { spacing, typography, shadows } from '../../theme';
 import theme from '../../theme';
 import { useNavigation } from '@react-navigation/native';
-import { MainScreenNavigationProp } from '../../navigation/types';
+import { MainTabParamList } from '../../navigation/types';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 const screenWidth = Dimensions.get('window').width;
 
 const HomeScreen = () => {
-  const themeWithCustom = useTheme();
+  const themeWithCustom = theme;
   const user = useSelector((state: RootState) => state.auth.user);
   const [refreshing, setRefreshing] = useState(false);
-  const navigation = useNavigation<MainScreenNavigationProp>();
+  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
 
   const handleProfilePress = () => {
     navigation.navigate('Profile', { screen: 'ProfileMain' });

@@ -12,8 +12,9 @@ import {
 } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from 'react-redux';
-import { logout } from '../../store/slices/authSlice';
+import { logoutAsync } from '../../store/slices/authSlice';
 import { useNavigation } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -55,7 +56,8 @@ const SettingsScreen = () => {
 
   const handleLogout = async () => {
     try {
-      await dispatch(logout()).unwrap();
+      await dispatch(logoutAsync()).unwrap();
+      // Navigation'a gerek yok, state değişimi ile otomatik yönlenecek
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

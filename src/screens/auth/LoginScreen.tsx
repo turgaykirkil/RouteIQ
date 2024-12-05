@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  Alert
 } from 'react-native';
 import {
   Text,
@@ -19,18 +20,17 @@ import {
 } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AuthStackParamList } from '../../navigation/types';
-import { login } from '../../store/slices/authSlice';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'react-native';
+import { authAPI } from '../../services/api';
+import { RootStackParamList } from '../../navigation/types';
+import { useDispatch } from 'react-redux';
+import { login } from '../../store/authSlice';
 
 const { width, height } = Dimensions.get('window');
 
-type LoginScreenProps = {
-  navigation: NativeStackNavigationProp<AuthStackParamList, 'Login'>;
-};
+type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Geçersiz e-posta adresi').required('E-posta adresi gerekli'),
@@ -38,20 +38,43 @@ const LoginSchema = Yup.object().shape({
 });
 
 const LoginScreen = ({ navigation }: LoginScreenProps) => {
-  const theme = useTheme();
   const dispatch = useDispatch();
+  const theme = useTheme();
   const [rememberMe, setRememberMe] = useState(false);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   useEffect(() => {
     const checkUserSession = async () => {
-      const userToken = await AsyncStorage.getItem('userToken');
+      const userToken = await AsyncStorage.getItem('userData');
       if (userToken) {
-        navigation.navigate('Main');
+        navigation.replace('Main');
       }
     };
-    checkUserSession();
+    
+    // checkUserSession(); // Bu kontrolü kaldırıyoruz
   }, [navigation]);
+
+  const handleLogin = async (values: { email: string; password: string }) => {
+    try {
+      console.log('Login attempt with values:', values);
+      
+      const result = await authAPI.login(values.email, values.password);
+      
+      if (result.user) {
+        // Kullanıcı bilgilerini AsyncStorage'a kaydet
+        await AsyncStorage.setItem('user', JSON.stringify(result.user));
+        console.log('👤 Kullanıcı bilgileri AsyncStorage\'a kaydedildi');
+
+        dispatch(login(result.user));
+        navigation.replace('Main');  // Ana ekrana yönlendir
+      } else {
+        Alert.alert('Giriş Başarısız', 'Kullanıcı bilgileri alınamadı.');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      Alert.alert('Giriş Başarısız', 'Lütfen e-posta adresinizi ve şifrenizi kontrol edin.');
+    }
+  };
 
   const styles = React.useMemo(
     () =>
@@ -77,12 +100,13 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
         },
         logoContainer: {
           alignItems: 'center',
-          marginBottom: height * 0.04,
+          justifyContent: 'center',
+          marginTop: height * 0.05,
+          marginBottom: height * 0.03,
         },
         logo: {
-          width: width * 0.3,
-          height: width * 0.3,
-          marginBottom: height * 0.02,
+          width: width * 0.5,
+          height: height * 0.15,
         },
         welcomeContainer: {
           alignItems: 'center',
@@ -155,18 +179,28 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
           marginTop: 4,
           marginBottom: height * 0.01,
         },
+        keyboardContainer: {
+          flex: 1,
+          justifyContent: 'center',
+          backgroundColor: theme.colors.background,
+        },
+        scrollContainer: {
+          flexGrow: 1,
+          justifyContent: 'center',
+          backgroundColor: theme.colors.background,
+        },
+        rememberContainer: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: height * 0.02,
+        },
+        loginButton: {
+          padding: 6,
+          borderRadius: 8,
+        },
       }),
     [theme]
   );
-
-  const handleLogin = async (values: { email: string; password: string }) => {
-    try {
-      await dispatch(login({ email: values.email.toLowerCase(), password: values.password, rememberMe })).unwrap();
-      navigation.navigate('Main');
-    } catch (error) {
-      console.error('Login error:', error);
-    }
-  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -174,11 +208,11 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
         backgroundColor={theme.colors.background}
       />
-      <KeyboardAvoidingView
+      <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+        style={styles.keyboardContainer}
       >
-        <ScrollView
+        <ScrollView 
           contentContainerStyle={styles.scrollView}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -198,95 +232,97 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
             </Text>
           </View>
 
-          <View style={styles.formContainer}>
-            <Formik
-              initialValues={{ email: '', password: '' }}
-              validationSchema={LoginSchema}
-              onSubmit={handleLogin}
-            >
-              {({
-                handleChange,
-                handleBlur,
-                handleSubmit,
-                values,
-                errors,
-                touched,
-                isSubmitting,
-              }) => (
-                <View>
-                  <TextInput
-                    mode="flat"
-                    label="E-posta Adresi"
-                    style={styles.input}
-                    onChangeText={handleChange('email')}
-                    onBlur={handleBlur('email')}
-                    value={values.email}
-                    error={touched.email && !!errors.email}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    left={<TextInput.Icon icon="email" />}
-                  />
-                  {touched.email && errors.email && (
-                    <Text style={styles.errorText}>{errors.email}</Text>
-                  )}
+          <Formik
+            initialValues={{ email: 'admin@routeiq.com', password: '123456' }}
+            validationSchema={LoginSchema}
+            onSubmit={handleLogin}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              isSubmitting,
+            }) => (
+              <View style={styles.formContainer}>
+                <TextInput
+                  mode="outlined"
+                  label="E-posta"
+                  value={values.email}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  error={touched.email && !!errors.email}
+                  style={styles.input}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  textContentType="emailAddress"
+                  autoComplete="email"
+                  contextMenuHidden={false}
+                />
+                {touched.email && errors.email && (
+                  <Text style={styles.errorText}>{errors.email}</Text>
+                )}
 
-                  <TextInput
-                    mode="flat"
-                    label="Şifre"
-                    style={styles.input}
-                    secureTextEntry={secureTextEntry}
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                    error={touched.password && !!errors.password}
-                    left={<TextInput.Icon icon="lock" />}
-                    right={
-                      <TextInput.Icon
-                        icon={secureTextEntry ? 'eye-off' : 'eye'}
-                        onPress={() => setSecureTextEntry(!secureTextEntry)}
-                      />
-                    }
-                  />
-                  {touched.password && errors.password && (
-                    <Text style={styles.errorText}>{errors.password}</Text>
-                  )}
-
-                  <View style={styles.checkboxContainer}>
-                    <Checkbox
-                      status={rememberMe ? 'checked' : 'unchecked'}
-                      onPress={() => setRememberMe(!rememberMe)}
+                <TextInput
+                  mode="outlined"
+                  label="Şifre"
+                  value={values.password}
+                  onChangeText={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  error={touched.password && !!errors.password}
+                  secureTextEntry={secureTextEntry}
+                  right={
+                    <TextInput.Icon
+                      icon={secureTextEntry ? 'eye-off' : 'eye'}
+                      onPress={() => setSecureTextEntry(!secureTextEntry)}
                     />
-                    <Text style={styles.checkboxLabel}>Beni Hatırla</Text>
-                  </View>
+                  }
+                  style={styles.input}
+                  textContentType="password"
+                  autoComplete="password"
+                  contextMenuHidden={false}
+                />
+                {touched.password && errors.password && (
+                  <Text style={styles.errorText}>{errors.password}</Text>
+                )}
 
-                  <Button
-                    mode="contained"
-                    onPress={handleSubmit}
-                    style={styles.button}
-                    labelStyle={styles.buttonLabel}
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
-                  >
-                    Giriş Yap
-                  </Button>
-
-                  <TouchableOpacity
-                    style={styles.forgotPasswordContainer}
-                    onPress={() => navigation.navigate('ForgotPassword')}
-                  >
-                    <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
-                  </TouchableOpacity>
-
-                  <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>Hesabınız yok mu?</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                      <Text style={styles.registerLink}>Kayıt Ol</Text>
-                    </TouchableOpacity>
-                  </View>
+                <View style={styles.rememberContainer}>
+                  <Checkbox
+                    status={rememberMe ? 'checked' : 'unchecked'}
+                    onPress={() => setRememberMe(!rememberMe)}
+                  />
+                  <Text>Beni Hatırla</Text>
                 </View>
-              )}
-            </Formik>
-          </View>
+
+                <Button
+                  mode="contained"
+                  onPress={handleSubmit}
+                  style={styles.loginButton}
+                  labelStyle={styles.buttonLabel}
+                  loading={isSubmitting}
+                  disabled={isSubmitting}
+                >
+                  Giriş Yap
+                </Button>
+
+                <TouchableOpacity
+                  style={styles.forgotPasswordContainer}
+                  onPress={() => navigation.navigate('Login')}
+                >
+                  <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
+                </TouchableOpacity>
+
+                <View style={styles.registerContainer}>
+                  <Text style={styles.registerText}>Hesabınız yok mu?</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.registerLink}>Kayıt Ol</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

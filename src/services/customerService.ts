@@ -1,134 +1,129 @@
 import { Customer } from '../types/customer';
+import db from '../../db.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock data
-const mockCustomers: Customer[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    company: 'Tech Corp',
-    email: 'john@techcorp.com',
-    phone: '(555) 123-4567',
-    status: 'active',
-    lastVisit: '2024-01-15',
-    address: {
-      street: '123 Main St',
-      city: 'San Francisco',
-      state: 'CA',
-      zipCode: '94105',
-      country: 'USA',
-    },
-    location: {
-      latitude: 37.7749,
-      longitude: -122.4194,
-    },
-    tags: ['VIP', 'Tech'],
-    notes: 'Key account in the tech sector',
-    statistics: {
-      totalOrders: 25,
-      totalRevenue: 50000,
-      averageOrderValue: 2000,
-      lastOrderDate: '2024-01-10',
-    },
-  },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    company: 'Innovation Labs',
-    email: 'jane@innovationlabs.com',
-    phone: '(555) 987-6543',
-    status: 'active',
-    lastVisit: '2024-01-20',
-    address: {
-      street: '456 Market St',
-      city: 'New York',
-      state: 'NY',
-      zipCode: '10001',
-      country: 'USA',
-    },
-    location: {
-      latitude: 40.7128,
-      longitude: -74.0060,
-    },
-    tags: ['Innovation', 'Labs'],
-    notes: 'Interested in new product line',
-    statistics: {
-      totalOrders: 10,
-      totalRevenue: 10000,
-      averageOrderValue: 1000,
-      lastOrderDate: '2024-01-05',
-    },
-  },
-];
+const mockCustomers: Customer[] = db.customers;
 
 // Simulate API delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const customerService = {
   // Fetch all customers with optional filters
-  getCustomers: async (filters?: {
+  getCustomers: async (params?: {
     search?: string;
     status?: string[];
     tags?: string[];
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    userId?: string;
+    role?: 'admin' | 'supervisor' | 'sales_rep';
   }) => {
+    console.log('🔍 CustomerService: Fetching customers');
+    console.log('🔑 Input Parameters:', JSON.stringify(params || {}, null, 2));
+
+    // Log the start of the operation with timestamp
+    const startTime = Date.now();
+    console.log(`⏱️ Operation started at: ${new Date().toISOString()}`);
+
     await delay(500);
-    let filteredCustomers = [...mockCustomers];
+    
+    let customers = [...mockCustomers];
+    
+    console.log(`📋 Total customers before filtering: ${customers.length}`);
 
-    if (filters) {
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        filteredCustomers = filteredCustomers.filter(
-          customer =>
-            customer.name.toLowerCase().includes(searchLower) ||
-            customer.company.toLowerCase().includes(searchLower) ||
-            customer.email.toLowerCase().includes(searchLower)
-        );
-      }
+    // Apply search filter
+    if (params?.search) {
+      const searchLower = params.search.toLowerCase();
+      const initialCount = customers.length;
+      
+      customers = customers.filter(customer => {
+        const matchName = customer.name.toLowerCase().includes(searchLower);
+        const matchCompany = customer.company.toLowerCase().includes(searchLower);
+        const matchEmail = customer.email.toLowerCase().includes(searchLower);
+        
+        return matchName || matchCompany || matchEmail;
+      });
 
-      if (filters.status && filters.status.length > 0) {
-        filteredCustomers = filteredCustomers.filter(customer =>
-          filters.status?.includes(customer.status)
-        );
-      }
-
-      if (filters.tags && filters.tags.length > 0) {
-        filteredCustomers = filteredCustomers.filter(customer =>
-          customer.tags.some(tag => filters.tags?.includes(tag))
-        );
-      }
-
-      if (filters.sortBy) {
-        const sortOrder = filters.sortOrder === 'desc' ? -1 : 1;
-        filteredCustomers.sort((a, b) => {
-          if (filters.sortBy === 'name') {
-            return a.name.localeCompare(b.name) * sortOrder;
-          }
-          if (filters.sortBy === 'lastVisit') {
-            return (
-              (new Date(a.lastVisit).getTime() -
-                new Date(b.lastVisit).getTime()) *
-              sortOrder
-            );
-          }
-          if (filters.sortBy === 'company') {
-            return a.company.localeCompare(b.company) * sortOrder;
-          }
-          return 0;
-        });
-      }
+      console.log(`🔎 Search Filter: "${params.search}"`);
+      console.log(`   - Customers before search: ${initialCount}`);
+      console.log(`   - Customers after search: ${customers.length}`);
+      console.log(`   - Matching fields: name, company, email`);
     }
 
-    return filteredCustomers;
+    // Apply status filter
+    if (params?.status?.length) {
+      const initialCount = customers.length;
+      
+      customers = customers.filter(customer => {
+        const isStatusMatch = params.status.includes(customer.status);
+        return isStatusMatch;
+      });
+
+      console.log(`📊 Status Filter: ${JSON.stringify(params.status)}`);
+      console.log(`   - Customers before status filter: ${initialCount}`);
+      console.log(`   - Customers after status filter: ${customers.length}`);
+    }
+
+    // Apply tags filter
+    if (params?.tags?.length) {
+      const initialCount = customers.length;
+      
+      customers = customers.filter(customer => {
+        const isTagMatch = params.tags.some(tag => customer.tags.includes(tag));
+        return isTagMatch;
+      });
+
+      console.log(`🏷️ Tags Filter: ${JSON.stringify(params.tags)}`);
+      console.log(`   - Customers before tags filter: ${initialCount}`);
+      console.log(`   - Customers after tags filter: ${customers.length}`);
+    }
+
+    // Apply sorting
+    if (params?.sortBy) {
+      console.log(`🔀 Sorting customers by: ${params.sortBy}, Order: ${params.sortOrder}`);
+      
+      customers.sort((a, b) => {
+        const aValue = a[params.sortBy as keyof Customer];
+        const bValue = b[params.sortBy as keyof Customer];
+        const order = params.sortOrder === 'desc' ? -1 : 1;
+        
+        return aValue < bValue ? -order : order;
+      });
+
+      console.log(`   - Sort completed successfully`);
+    }
+
+    // Log operation duration
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    
+    console.log(`✅ Final customer list size: ${customers.length}`);
+    console.log(`⏱️ Operation duration: ${duration}ms`);
+
+    return customers;
   },
 
   // Get customer by ID
   getCustomerById: async (id: string) => {
     await delay(300);
-    const customer = mockCustomers.find(c => c.id === id);
-    if (!customer) {
-      throw new Error('Customer not found');
+    const userStr = await AsyncStorage.getItem('user');
+    if (!userStr) {
+      throw new Error('Kullanıcı girişi yapılmamış!');
     }
+    
+    const user = JSON.parse(userStr);
+    const customer = mockCustomers.find(c => c.id === id);
+    
+    if (!customer) {
+      throw new Error('Müşteri bulunamadı!');
+    }
+    
+    // Eğer kullanıcı sales_rep ise ve müşteri kendisine ait değilse, erişimi engelle
+    if (user.role === 'sales_rep' && customer.salesRepId !== user.id) {
+      throw new Error('Bu müşteriye erişim yetkiniz yok!');
+    }
+    
     return customer;
   },
 

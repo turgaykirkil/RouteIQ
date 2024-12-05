@@ -25,347 +25,80 @@ import {
 } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomerStackParamList } from '../../navigation/types';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchCustomers, selectCustomers, selectLoading } from '../../store/slices/customerSlice';
+import { customerAPI } from '../../services/api';
 import theme from '../../theme';
 
 type CustomerListScreenProps = {
   navigation: NativeStackNavigationProp<CustomerStackParamList, 'CustomerList'>;
 };
 
-type FilterOptions = {
-  status: ('active' | 'inactive' | 'pending')[];
-  sortBy: 'name' | 'lastVisit' | 'company';
-  sortOrder: 'asc' | 'desc';
+type Customer = {
+  id: number;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
 };
 
-const CustomerListScreen = ({ navigation }: CustomerListScreenProps) => {
+const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) => {
   const themeWithCustom = useTheme();
-  const dispatch = useAppDispatch();
-  const customers = useAppSelector(selectCustomers);
-  const loading = useAppSelector(selectLoading);
-
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [filters, setFilters] = useState<FilterOptions>({
+  const [filters, setFilters] = useState({
     status: ['active', 'inactive', 'pending'],
-    sortBy: 'name',
-    sortOrder: 'asc',
   });
-
-  const styles = React.useMemo(
-    () =>
-      StyleSheet.create({
-        safeArea: {
-          flex: 1,
-          backgroundColor: themeWithCustom.colors.background,
-        },
-        container: {
-          flex: 1,
-          backgroundColor: themeWithCustom.colors.background,
-        },
-        header: {
-          padding: 16,
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: themeWithCustom.colors.surface,
-          elevation: 4,
-        },
-        searchBar: {
-          flex: 1,
-          marginRight: 8,
-        },
-        list: {
-          padding: 16,
-        },
-        card: {
-          marginBottom: 16,
-          elevation: 2,
-        },
-        cardRight: {
-          flexDirection: 'row',
-          alignItems: 'center',
-        },
-        statusChip: {
-          marginRight: 8,
-        },
-        lastVisit: {
-          marginTop: 8,
-          color: themeWithCustom.colors.onSurfaceVariant,
-        },
-        fab: {
-          position: 'absolute',
-          margin: 16,
-          right: 0,
-          bottom: 0,
-          backgroundColor: themeWithCustom.colors.primary,
-        },
-        modalContent: {
-          backgroundColor: themeWithCustom.colors.surface,
-          padding: 20,
-          margin: 20,
-          borderRadius: 8,
-        },
-        divider: {
-          marginVertical: 16,
-        },
-        chipContainer: {
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          marginTop: 8,
-        },
-        filterChip: {
-          margin: 4,
-        },
-        sortSection: {
-          marginTop: 16,
-        },
-        buttonContainer: {
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          marginTop: 24,
-        },
-        button: {
-          marginLeft: 8,
-        },
-      }),
-    [themeWithCustom]
-  );
 
   useEffect(() => {
-    loadCustomers();
+    const fetchCustomers = async () => {
+      setLoading(true);
+      try {
+        const customers = await customerAPI.getAll();
+        console.log('Customers fetched:', customers);
+        setCustomers(customers);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomers();
   }, []);
-
-  const loadCustomers = async () => {
-    dispatch(fetchCustomers());
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadCustomers();
-    setRefreshing(false);
-  };
-
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesSearch =
-      customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      customer.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = filters.status.includes(customer.status);
-
-    return matchesSearch && matchesStatus;
-  }).sort((a, b) => {
-    const sortValue = filters.sortBy;
-    const modifier = filters.sortOrder === 'asc' ? 1 : -1;
-
-    if (sortValue === 'lastVisit') {
-      return (new Date(a.lastVisit).getTime() - new Date(b.lastVisit).getTime()) * modifier;
-    }
-
-    return a[sortValue].localeCompare(b[sortValue]) * modifier;
-  });
-
-  const renderCustomerCard = ({ item: customer }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('CustomerDetail', { customerId: customer.id })}
-    >
-      <Card style={styles.card}>
-        <Card.Title
-          title={customer.name}
-          subtitle={customer.company}
-          left={(props) => (
-            <Avatar.Text
-              {...props}
-              label={customer.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')}
-            />
-          )}
-          right={(props) => (
-            <View style={styles.cardRight}>
-              <Chip
-                mode="outlined"
-                style={[
-                  styles.statusChip,
-                  {
-                    borderColor:
-                      customer.status === 'active'
-                        ? themeWithCustom.colors.primary
-                        : customer.status === 'inactive'
-                        ? themeWithCustom.colors.error
-                        : themeWithCustom.colors.warning,
-                  },
-                ]}
-              >
-                {customer.status}
-              </Chip>
-              <IconButton
-                {...props}
-                icon="dots-vertical"
-                onPress={() => navigation.navigate('CustomerDetail', { customerId: customer.id })}
-              />
-            </View>
-          )}
-        />
-        <Card.Content>
-          <Text>{customer.email}</Text>
-          <Text>{customer.phone}</Text>
-          <Text style={styles.lastVisit}>Last Visit: {new Date(customer.lastVisit).toLocaleDateString()}</Text>
-        </Card.Content>
-      </Card>
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Searchbar
-            placeholder="Search customers..."
-            onChangeText={setSearchQuery}
-            value={searchQuery}
-            style={styles.searchBar}
-            iconColor={themeWithCustom.colors.primary}
-            theme={{
-              colors: {
-                primary: themeWithCustom.colors.primary,
-              }
-            }}
-          />
-          <IconButton
-            icon="filter-variant"
-            onPress={() => setFilterModalVisible(true)}
-            iconColor={themeWithCustom.colors.primary}
-          />
-        </View>
-
-        <FlatList
-          data={filteredCustomers}
-          renderItem={renderCustomerCard}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-
-        <FAB
-          icon="plus"
-          onPress={() => navigation.navigate('NewCustomer')}
-          style={styles.fab}
-        />
-
-        <Portal>
-          <Modal
-            visible={filterModalVisible}
-            onDismiss={() => setFilterModalVisible(false)}
-            contentContainerStyle={styles.modalContent}
-          >
-            <Text variant="headlineSmall">Filters</Text>
-            <Divider style={styles.divider} />
-
-            <List.Section>
-              <List.Subheader>Status</List.Subheader>
-              <View style={styles.chipContainer}>
-                {(['active', 'inactive', 'pending'] as const).map((status) => (
-                  <Chip
-                    key={status}
-                    selected={filters.status.includes(status)}
-                    onPress={() => {
-                      setFilters((prev) => ({
-                        ...prev,
-                        status: prev.status.includes(status)
-                          ? prev.status.filter((s) => s !== status)
-                          : [...prev.status, status],
-                      }));
-                    }}
-                    style={styles.filterChip}
-                  >
-                    {status}
-                  </Chip>
-                ))}
-              </View>
-            </List.Section>
-
-            <List.Section>
-              <List.Subheader>Sort By</List.Subheader>
-              <View style={styles.chipContainer}>
-                {[
-                  { label: 'Name', value: 'name' },
-                  { label: 'Last Visit', value: 'lastVisit' },
-                  { label: 'Company', value: 'company' },
-                ].map(({ label, value }) => (
-                  <Chip
-                    key={value}
-                    selected={filters.sortBy === value}
-                    onPress={() => {
-                      setFilters((prev) => ({
-                        ...prev,
-                        sortBy: value as FilterOptions['sortBy'],
-                      }));
-                    }}
-                    style={styles.filterChip}
-                  >
-                    {label}
-                  </Chip>
-                ))}
-              </View>
-            </List.Section>
-
-            <List.Section>
-              <List.Subheader>Sort Order</List.Subheader>
-              <View style={styles.chipContainer}>
-                {[
-                  { label: 'Ascending', value: 'asc' },
-                  { label: 'Descending', value: 'desc' },
-                ].map(({ label, value }) => (
-                  <Chip
-                    key={value}
-                    selected={filters.sortOrder === value}
-                    onPress={() => {
-                      setFilters((prev) => ({
-                        ...prev,
-                        sortOrder: value as FilterOptions['sortOrder'],
-                      }));
-                    }}
-                    style={styles.filterChip}
-                  >
-                    {label}
-                  </Chip>
-                ))}
-              </View>
-            </List.Section>
-
-            <View style={styles.buttonContainer}>
-              <Button
-                mode="outlined"
-                onPress={() => {
-                  setFilters({
-                    status: ['active', 'inactive', 'pending'],
-                    sortBy: 'name',
-                    sortOrder: 'asc',
-                  });
-                }}
-                style={styles.button}
-              >
-                Reset
-              </Button>
-              <Button
-                mode="contained"
-                onPress={() => setFilterModalVisible(false)}
-                style={styles.button}
-              >
-                Apply
-              </Button>
-            </View>
-          </Modal>
-        </Portal>
-      </View>
+      <FlatList
+        data={customers}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CustomerDetail', { customerId: item.id })}>
+            <Card style={styles.card}>
+              <Card.Title
+                title={item.name}
+                subtitle={item.company}
+                //left={(props) => <Avatar.Text {...props} label={item.name.charAt(0)} />}
+              />
+            </Card>
+          </TouchableOpacity>
+        )}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {}} />}
+      />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  card: {
+    margin: 8,
+  },
+});
 
 export default CustomerListScreen;

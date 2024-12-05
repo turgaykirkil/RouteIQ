@@ -1,143 +1,158 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Temporarily import db.json content for testing
+const db = {
+  "users": [
+    {
+      "id": "1",
+      "email": "admin@routeiq.com",
+      "password": "123456",
+      "name": "Admin User",
+      "role": "admin",
+      "canViewAll": true
+    },
+    {
+      "id": "2",
+      "email": "supervisor@routeiq.com",
+      "password": "123456",
+      "name": "Supervisor User",
+      "role": "supervisor",
+      "canViewAll": true
+    },
+    {
+      "id": "3",
+      "email": "marmara@routeiq.com",
+      "password": "123456",
+      "name": "Ahmet Yılmaz",
+      "role": "sales_rep",
+      "region": "Marmara",
+      "canViewAll": false
+    },
+    {
+      "id": "4",
+      "email": "ege@routeiq.com",
+      "password": "123456",
+      "name": "Mehmet Demir",
+      "role": "sales_rep",
+      "region": "Ege",
+      "canViewAll": false
+    },
+    {
+      "id": "5",
+      "email": "anadolu@routeiq.com",
+      "password": "123456",
+      "name": "Ayşe Kaya",
+      "role": "sales_rep",
+      "region": "İç Anadolu",
+      "canViewAll": false
+    }
+  ]
+};
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
 interface AuthState {
+  user: User | null;
   isAuthenticated: boolean;
-  user: any | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
 }
 
 const initialState: AuthState = {
-  isAuthenticated: false,
   user: null,
-  token: null,
-  loading: false,
-  error: null,
+  isAuthenticated: false,
 };
 
-export const login = createAsyncThunk(
-  'auth/login',
+export const loginAsync = createAsyncThunk(
+  'auth/loginAsync',
   async (credentials: { email: string; password: string; rememberMe?: boolean }) => {
     try {
-      // TODO: Replace with actual API call
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            user: {
-              id: '1',
-              email: credentials.email,
-              name: 'Test User',
-            },
-            token: 'dummy-token',
-          });
-        }, 1000);
-      });
+      // Simulate fetching user data from db.json
+      const user = db.users.find(
+        (u) => u.email === credentials.email && u.password === credentials.password
+      );
+
+      if (!user) throw new Error('Giriş başarısız oldu');
 
       if (credentials.rememberMe) {
         await AsyncStorage.setItem('userToken', 'dummy-token');
       }
 
-      return response;
+      return user;
     } catch (error) {
       throw new Error('Giriş başarısız oldu');
     }
   }
 );
 
-export const logout = createAsyncThunk('auth/logout', async () => {
-  try {
+export const logoutAsync = createAsyncThunk(
+  'auth/logoutAsync',
+  async (_, { dispatch }) => {
     await AsyncStorage.removeItem('userToken');
+    console.log('User token removed from AsyncStorage');
+    dispatch(logout()); // Logout reducer'ını çağırarak state güncellemesi
     return true;
-  } catch (error) {
-    throw new Error('Çıkış yapılırken bir hata oluştu');
   }
-});
+);
 
-export const checkAuth = createAsyncThunk('auth/check', async () => {
-  try {
-    const token = await AsyncStorage.getItem('userToken');
-    if (!token) {
-      throw new Error('Token bulunamadı');
+export const checkAuthAsync = createAsyncThunk(
+  'auth/checkAuthAsync',
+  async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      if (!token) {
+        throw new Error('Token bulunamadı');
+      }
+      
+      // TODO: Validate token with API
+      return {
+        user: {
+          id: '1',
+          email: 'test@example.com',
+          name: 'Test User',
+          role: 'test',
+        },
+      };
+    } catch (error) {
+      throw error;
     }
-    
-    // TODO: Validate token with API
-    return {
-      user: {
-        id: '1',
-        email: 'test@example.com',
-        name: 'Test User',
-      },
-      token,
-    };
-  } catch (error) {
-    throw error;
   }
-});
+);
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    resetAuth: (state) => {
-      state.isAuthenticated = false;
+    login: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+    },
+    logout: (state) => {
       state.user = null;
-      state.token = null;
-      state.loading = false;
-      state.error = null;
+      state.isAuthenticated = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(loginAsync.fulfilled, (state, action) => {
+        state.user = action.payload;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.loading = false;
-        state.error = null;
       })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Giriş başarısız oldu';
-      })
-      .addCase(logout.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(logout.fulfilled, (state) => {
-        state.isAuthenticated = false;
+      .addCase(logoutAsync.fulfilled, (state) => {
         state.user = null;
-        state.token = null;
-        state.loading = false;
-        state.error = null;
+        state.isAuthenticated = false;
+        console.log('User logged out, state updated'); 
       })
-      .addCase(logout.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Çıkış yapılırken bir hata oluştu';
-      })
-      .addCase(checkAuth.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(checkAuth.fulfilled, (state, action) => {
+      .addCase(checkAuthAsync.fulfilled, (state, action) => {
+        state.user = action.payload.user;
         state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(checkAuth.rejected, (state) => {
-        state.isAuthenticated = false;
-        state.user = null;
-        state.token = null;
-        state.loading = false;
-        state.error = null;
       });
   },
 });
 
-export const { resetAuth } = authSlice.actions;
+export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;

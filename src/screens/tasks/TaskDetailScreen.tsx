@@ -37,11 +37,15 @@ import {
 import {RootState} from '../../store';
 import {Task, formatDate, getPriorityColor} from '../../types/task';
 import {AppDispatch} from '../../store';
+import taskService from '../../services/taskService'; // Import taskService
 
-type TaskDetailScreenRouteProp = RouteProp<TaskStackParamList, 'TaskDetail'>;
-type CompositeNavigationProp = TaskStackNavigationProp & {
+// Define route prop types
+interface TaskDetailScreenRouteProp extends RouteProp<TaskStackParamList, 'TaskDetail'> {}
+
+// Define composite navigation prop
+interface CompositeNavigationProp extends TaskStackNavigationProp {
   navigate: (screen: keyof MainTabParamList, params: any) => void;
-};
+}
 
 const TaskDetailScreen: React.FC = () => {
   const theme = useTheme();
@@ -52,6 +56,7 @@ const TaskDetailScreen: React.FC = () => {
   const {selectedTask: task, loading} = useSelector(
     (state: RootState) => state.tasks,
   );
+  const loggedInUser = useSelector((state: RootState) => state.user);
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
@@ -59,13 +64,67 @@ const TaskDetailScreen: React.FC = () => {
   const [progress, setProgress] = useState('0');
 
   useEffect(() => {
-    dispatch(fetchTaskById(taskId));
-  }, [dispatch, taskId]);
+    if (loggedInUser) {
+      console.log('Logged in user:', loggedInUser);
+      console.log('Fetching task with ID:', taskId);
+      dispatch(fetchTaskById(taskId));
+      // API call with userId parameter
+      taskService.getTasks({ userId: loggedInUser.id }).then(response => {
+        console.log('API Response:', response);
+        // Update tasks
+        // setTasks(response); // Commented out because setTasks is not defined
+      }).catch(error => {
+        console.error('API Error:', error);
+      });
+    }
+  }, [dispatch, taskId, loggedInUser]);
+
+  useEffect(() => {
+    console.log('Selected Task:', task);
+  }, [task]);
+
+  useEffect(() => {
+    if (loggedInUser) {
+      console.log('Logged in user:', loggedInUser);
+      const filteredTasks = task && (loggedInUser.canViewAll || task.salesRepId === loggedInUser.id) ? [task] : [];
+      console.log('Filtered tasks:', filteredTasks);
+      const fetchedTask = filteredTasks[0] || null;
+      console.log('Fetched task:', fetchedTask);
+    } else {
+      console.log('No logged in user found');
+    }
+  }, [route.params.taskId, loggedInUser, task]);
+
+  if (loading) {
+    return (
+      <View style={styles(theme).loadingContainer}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!task) {
+    return (
+      <View style={styles(theme).errorContainer}>
+        <Text>Task not found</Text>
+      </View>
+    );
+  }
+
+  const fetchedTask = task && (loggedInUser.canViewAll || task.salesRepId === loggedInUser.id) ? task : null;
+
+  if (!fetchedTask) {
+    return (
+      <View style={styles(theme).errorContainer}>
+        <Text>Task not found for the logged-in user</Text>
+      </View>
+    );
+  }
 
   const handleStatusChange = async (newStatus: TaskStatus) => {
     try {
       await dispatch(
-        updateTaskStatus({id: task?.id || '', status: newStatus}),
+        updateTaskStatus({id: fetchedTask?.id || '', status: newStatus}),
       ).unwrap();
       setMenuVisible(false);
     } catch (error) {
@@ -82,7 +141,7 @@ const TaskDetailScreen: React.FC = () => {
 
     try {
       await dispatch(
-        updateTaskProgress({id: task?.id || '', progress: progressValue}),
+        updateTaskProgress({id: fetchedTask?.id || '', progress: progressValue}),
       ).unwrap();
       setProgressDialogVisible(false);
     } catch (error) {
@@ -93,7 +152,7 @@ const TaskDetailScreen: React.FC = () => {
   const handleChecklistItemToggle = async (itemId: string) => {
     try {
       await dispatch(
-        updateChecklistItem({taskId: task?.id || '', itemId, completed: true}),
+        updateChecklistItem({taskId: fetchedTask?.id || '', itemId, completed: true}),
       ).unwrap();
     } catch (error) {
       Alert.alert('Error', 'Failed to update checklist item');
@@ -102,7 +161,7 @@ const TaskDetailScreen: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      await dispatch(deleteTask(task?.id || '')).unwrap();
+      await dispatch(deleteTask(fetchedTask?.id || '')).unwrap();
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to delete task');
@@ -116,14 +175,6 @@ const TaskDetailScreen: React.FC = () => {
     });
   };
 
-  if (!task || loading) {
-    return (
-      <View style={styles(theme).loadingContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <>
       <ScrollView style={styles(theme).container}>
@@ -131,41 +182,41 @@ const TaskDetailScreen: React.FC = () => {
           <Card.Content>
             <View style={styles(theme).header}>
               <View style={styles(theme).titleContainer}>
-                <Text style={styles(theme).title}>{task.title}</Text>
+                <Text style={styles(theme).title}>{fetchedTask.title || 'N/A'}</Text>
                 <Chip
                   style={[
                     styles(theme).priorityChip,
-                    {backgroundColor: getPriorityColor(task.priority)},
+                    {backgroundColor: getPriorityColor(fetchedTask.priority)},
                   ]}
                   textStyle={styles(theme).chipText}>
-                  {task.priority.toUpperCase()}
+                  {fetchedTask.priority ? fetchedTask.priority.toUpperCase() : 'N/A'}
                 </Chip>
               </View>
             </View>
 
-            <Text style={styles(theme).description}>{task.description}</Text>
+            <Text style={styles(theme).description}>{fetchedTask.description || 'N/A'}</Text>
 
             <View style={styles(theme).infoContainer}>
               <View style={styles(theme).infoItem}>
                 <Text style={styles(theme).infoLabel}>Due Date</Text>
                 <Text style={styles(theme).infoValue}>
-                  {formatDate(task.dueDate)}
+                  {fetchedTask.dueDate ? formatDate(fetchedTask.dueDate) : 'N/A'}
                 </Text>
               </View>
 
               <View style={styles(theme).infoItem}>
                 <Text style={styles(theme).infoLabel}>Customer</Text>
                 <TouchableOpacity
-                  onPress={() => handleCustomerPress(task.customerId)}>
+                  onPress={() => handleCustomerPress(fetchedTask.customerId)}>
                   <Text style={[styles(theme).infoValue, styles(theme).link]}>
-                    {task.customerName}
+                    {fetchedTask.customerName || 'N/A'}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles(theme).infoItem}>
                 <Text style={styles(theme).infoLabel}>Assigned To</Text>
-                <Text style={styles(theme).infoValue}>{task.assigneeName}</Text>
+                <Text style={styles(theme).infoValue}>{fetchedTask.assigneeName || 'N/A'}</Text>
               </View>
             </View>
 
@@ -180,7 +231,7 @@ const TaskDetailScreen: React.FC = () => {
                       mode="outlined"
                       onPress={() => setMenuVisible(true)}
                       style={styles(theme).statusButton}>
-                      {task.status.replace('_', ' ').toUpperCase()}
+                      {fetchedTask.status ? fetchedTask.status.replace('_', ' ').toUpperCase() : 'N/A'}
                     </Button>
                   }>
                   <Menu.Item
@@ -202,14 +253,14 @@ const TaskDetailScreen: React.FC = () => {
                       style={[
                         styles(theme).progressBar,
                         {
-                          width: `${task.progress}%`,
+                          width: `${fetchedTask.progress || 0}%`,
                           backgroundColor: theme.colors.primary,
                         },
                       ]}
                     />
                   </View>
                   <Text style={styles(theme).progressText}>
-                    {task.progress}%
+                    {fetchedTask.progress !== undefined ? `${fetchedTask.progress}%` : 'N/A'}
                   </Text>
                 </View>
               </View>
@@ -217,23 +268,27 @@ const TaskDetailScreen: React.FC = () => {
 
             <View style={styles(theme).section}>
               <Text style={styles(theme).sectionTitle}>Checklist</Text>
-              {task.checklist.map(item => (
-                <View key={item.id} style={styles(theme).checklistItem}>
-                  <Text style={styles(theme).infoValue}>{item.title}</Text>
-                  <TouchableOpacity
-                    onPress={() => handleChecklistItemToggle(item.id)}>
-                    <Text
-                      style={[
-                        styles(theme).infoValue,
-                        item.completed
-                          ? styles(theme).link
-                          : {textDecorationLine: 'none'},
-                      ]}>
-                      {item.completed ? 'Completed' : 'Not Completed'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
+              {fetchedTask.checklist && fetchedTask.checklist.length > 0 ? (
+                fetchedTask.checklist.map(item => (
+                  <View key={item.id} style={styles(theme).checklistItem}>
+                    <Text style={styles(theme).infoValue}>{item.title || 'N/A'}</Text>
+                    <TouchableOpacity
+                      onPress={() => handleChecklistItemToggle(item.id)}>
+                      <Text
+                        style={[
+                          styles(theme).infoValue,
+                          item.completed
+                            ? styles(theme).link
+                            : {textDecorationLine: 'none'},
+                        ]}>
+                        {item.completed ? 'Completed' : 'Not Completed'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles(theme).infoValue}>No checklist items</Text>
+              )}
             </View>
           </Card.Content>
         </Card>
@@ -279,6 +334,7 @@ const TaskDetailScreen: React.FC = () => {
   );
 };
 
+// Define styles for the component
 const styles = (theme: MD3Theme) =>
   StyleSheet.create({
     container: {
@@ -287,6 +343,11 @@ const styles = (theme: MD3Theme) =>
       padding: 16,
     },
     loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    errorContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
