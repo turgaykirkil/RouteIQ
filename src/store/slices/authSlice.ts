@@ -93,7 +93,6 @@ export const logoutAsync = createAsyncThunk(
   'auth/logoutAsync',
   async (_, { dispatch }) => {
     await AsyncStorage.removeItem('userToken');
-    console.log('User token removed from AsyncStorage');
     dispatch(logout()); // Logout reducer'ını çağırarak state güncellemesi
     return true;
   }
@@ -145,7 +144,6 @@ const authSlice = createSlice({
       .addCase(logoutAsync.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
-        console.log('User logged out, state updated'); 
       })
       .addCase(checkAuthAsync.fulfilled, (state, action) => {
         state.user = action.payload.user;

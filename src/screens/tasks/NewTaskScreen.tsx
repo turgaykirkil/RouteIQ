@@ -149,7 +149,6 @@ const NewTaskScreen = ({ navigation }: NewTaskScreenProps) => {
 
   const handleSubmit = (values: TaskFormValues) => {
     // TODO: Implement API call to create task
-    console.log('Creating task:', values);
     navigation.goBack();
   };
 

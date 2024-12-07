@@ -16,18 +16,14 @@ export const taskService = {
     userId?: string;
     role?: 'admin' | 'supervisor' | 'sales_rep';
   }) => {
-    console.log('🔍 TaskService: Fetching tasks');
-    console.log('🔑 Input Parameters:', JSON.stringify(params || {}, null, 2));
 
     // Log the start of the operation with timestamp
     const startTime = Date.now();
-    console.log(`⏱️ Operation started at: ${new Date().toISOString()}`);
 
     await delay(500);
     
     let tasks = [...db.tasks];
     
-    console.log(`📋 Total tasks before filtering: ${tasks.length}`);
 
     // Apply search filter
     if (params?.search) {
@@ -41,10 +37,6 @@ export const taskService = {
         return matchTitle || matchDescription;
       });
 
-      console.log(`🔎 Search Filter: "${params.search}"`);
-      console.log(`   - Tasks before search: ${initialCount}`);
-      console.log(`   - Tasks after search: ${tasks.length}`);
-      console.log(`   - Matching fields: title, description`);
     }
 
     // Apply status filter
@@ -56,9 +48,6 @@ export const taskService = {
         return isStatusMatch;
       });
 
-      console.log(`📊 Status Filter: ${JSON.stringify(params.status)}`);
-      console.log(`   - Tasks before status filter: ${initialCount}`);
-      console.log(`   - Tasks after status filter: ${tasks.length}`);
     }
 
     // Apply priority filter
@@ -70,14 +59,10 @@ export const taskService = {
         return isPriorityMatch;
       });
 
-      console.log(`🚨 Priority Filter: ${JSON.stringify(params.priority)}`);
-      console.log(`   - Tasks before priority filter: ${initialCount}`);
-      console.log(`   - Tasks after priority filter: ${tasks.length}`);
     }
 
     // Apply sorting
     if (params?.sortBy) {
-      console.log(`🔀 Sorting tasks by: ${params.sortBy}, Order: ${params.sortOrder}`);
       
       tasks.sort((a, b) => {
         const aValue = a[params.sortBy as keyof Task];
@@ -87,15 +72,12 @@ export const taskService = {
         return aValue < bValue ? -order : order;
       });
 
-      console.log(`   - Sort completed successfully`);
     }
 
     // Log operation duration
     const endTime = Date.now();
     const duration = endTime - startTime;
     
-    console.log(`✅ Final task list size: ${tasks.length}`);
-    console.log(`⏱️ Operation duration: ${duration}ms`);
 
     return tasks;
   },

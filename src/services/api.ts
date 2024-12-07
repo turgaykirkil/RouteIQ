@@ -22,15 +22,9 @@ api.interceptors.request.use(
   async (config) => {
     try {
       const userStr = await AsyncStorage.getItem('user');
-      console.log('📡 API Request Config:', {
-        method: config.method,
-        url: config.url,
-        headers: config.headers
-      });
       
       if (userStr) {
         const user = JSON.parse(userStr);
-        console.log('👤 User from AsyncStorage:', user);
         config.headers = {
           ...config.headers,
           'x-user-id': user.id,
@@ -51,11 +45,6 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response:', {
-      url: response.config.url,
-      status: response.status,
-      data: response.data
-    });
     return response;
   },
   (error) => {

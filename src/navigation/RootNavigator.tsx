@@ -23,7 +23,6 @@ const RootNavigator = () => {
       try {
         await dispatch(checkAuth()).unwrap();
       } catch (error) {
-        console.log('No valid auth token found');
       }
     };
     checkAuthStatus();

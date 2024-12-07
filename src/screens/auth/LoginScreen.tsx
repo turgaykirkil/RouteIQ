@@ -47,10 +47,8 @@ const LoginScreen = () => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   useEffect(() => {
-    console.log('LoginScreen mounted');
     const checkUserSession = async () => {
       const userToken = await AsyncStorage.getItem('userData');
-      console.log('🔍 Stored user:', userToken);
       // Burada navigation kaldırıyoruz çünkü bu AppNavigator'da kontrol ediliyor
     };
     checkUserSession();
@@ -58,7 +56,6 @@ const LoginScreen = () => {
 
   const handleLogin = async (values: { email: string; password: string }) => {
     try {
-      console.log('Login attempt with values:', values);
       
       const result = await authAPI.login(values.email, values.password);
       
@@ -70,10 +67,8 @@ const LoginScreen = () => {
           
           // Kullanıcı bilgilerini AsyncStorage'a kaydet
           await AsyncStorage.setItem('user', JSON.stringify(result.user));
-          console.log('👤 Kullanıcı bilgileri AsyncStorage\'a kaydedildi');
 
           dispatch(login(result.user));
-          console.log('Navigating to Main after login');
           navigation.navigate('Main');
         } catch (storageError) {
           console.error('Storage error:', storageError);
@@ -324,7 +319,6 @@ const LoginScreen = () => {
                 <TouchableOpacity
                   style={styles.forgotPasswordContainer}
                   onPress={() => {
-                    console.log('Navigating to ForgotPassword');
                     navigation.navigate('Auth', { screen: 'ForgotPassword' });
                   }}
                 >
@@ -334,7 +328,6 @@ const LoginScreen = () => {
                 <View style={styles.registerContainer}>
                   <Text style={styles.registerText}>Hesabınız yok mu?</Text>
                   <TouchableOpacity onPress={() => {
-                    console.log('Navigating to Register');
                     navigation.navigate('Auth', { screen: 'Register' });
                   }}>
                     <Text style={styles.registerLink}>Kayıt Ol</Text>

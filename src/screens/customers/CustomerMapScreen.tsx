@@ -48,7 +48,6 @@ const CustomerMapScreen = ({ navigation }) => {
           longitudeDelta: LONGITUDE_DELTA,
         });
       },
-      (error) => console.log(error),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     );
   };

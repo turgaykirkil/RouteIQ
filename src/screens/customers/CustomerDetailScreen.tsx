@@ -45,14 +45,11 @@ const CustomerDetailScreen: React.FC<CustomerDetailScreenProps> = ({ navigation,
 
   useEffect(() => {
     if (loggedInUser) {
-      console.log('Logged in user:', loggedInUser);
       const filteredCustomers = db.customers.filter(
         c => loggedInUser.canViewAll || c.salesRepId === loggedInUser.id
       );
-      console.log('Filtered customers:', filteredCustomers);
       // API çağrısı örneği
       customerService.getCustomers({ userId: loggedInUser.id }).then(response => {
-        console.log('API Response:', response);
         setCustomer(response);
       }).catch(error => {
         console.error('API Error:', error);

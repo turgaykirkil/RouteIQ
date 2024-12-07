@@ -26,11 +26,9 @@ export const checkAuthStatus = createAsyncThunk(
   async () => {
     try {
       const userStr = await AsyncStorage.getItem('user');
-      console.log('🔍 Stored user:', userStr);
       
       if (userStr) {
         const user = JSON.parse(userStr);
-        console.log('🔑 Kullanıcı bilgileri AsyncStorage\'dan okundu');
         return user;
       }
       
@@ -53,7 +51,6 @@ const authSlice = createSlice({
     logout: (state) => {
       // AsyncStorage'dan kullanıcı bilgilerini sil
       AsyncStorage.removeItem('user')
-        .then(() => console.log('👤 Kullanıcı bilgileri AsyncStorage\'dan silindi'))
         .catch((error) => console.error('❌ AsyncStorage silme hatası:', error));
 
       // State'i sıfırla

@@ -54,9 +54,6 @@ const HomeScreen = () => {
   const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
 
   const fetchData = async () => {
-    console.log('🔍 Fetching data started...');
-    console.log('👤 Current user:', user);
-
     try {
       // Müşterileri getir
       const data = await customerAPI.getAll();
@@ -361,18 +358,12 @@ const HomeScreen = () => {
 
   // Müşteri sayısını hesapla
   const customerCount = useMemo(() => {
-    console.log('🔢 Calculating customer count...');
-    console.log('👥 Current customers array:', customers);
-    console.log('👤 Current user:', user);
-
     if (!Array.isArray(customers) || customers.length === 0) {
-      console.log('❌ No customers found or invalid customers array');
       return 0;
     }
 
     // Artık customers array'i zaten kullanıcının rolüne göre filtrelenmiş durumda
     const count = customers.length;
-    console.log(`✅ Customer count for ${user?.role}: ${count}`);
     return count;
   }, [customers, user]);
 

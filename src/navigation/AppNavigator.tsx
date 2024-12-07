@@ -21,8 +21,6 @@ const AppNavigator: React.FC = () => {
     dispatch(checkAuthStatus());
   }, [dispatch]);
 
-  console.log('isAuthenticated:', isAuthenticated);
-  console.log('isLoading:', isLoading);
 
   if (isLoading) {
     return <LoadingScreen />;

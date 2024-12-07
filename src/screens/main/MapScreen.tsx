@@ -54,7 +54,6 @@ const MapScreen = () => {
   const onSearchLocation = () => {
     // Burada gerçek bir geocoding servisi kullanılabilir
     // Örnek: Google Places API, Mapbox Geocoding API
-    console.log('Searching for:', searchQuery);
   };
 
   const addLocation = () => {

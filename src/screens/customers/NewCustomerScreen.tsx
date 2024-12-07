@@ -78,7 +78,6 @@ const NewCustomerScreen = ({ navigation }: NewCustomerScreenProps) => {
 
   const handleSubmit = (values: CustomerFormValues) => {
     // TODO: Implement API call to create customer
-    console.log('Creating customer:', values);
     navigation.goBack();
   };
 

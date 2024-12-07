@@ -65,12 +65,9 @@ const TaskDetailScreen: React.FC = () => {
 
   useEffect(() => {
     if (loggedInUser) {
-      console.log('Logged in user:', loggedInUser);
-      console.log('Fetching task with ID:', taskId);
       dispatch(fetchTaskById(taskId));
       // API call with userId parameter
       taskService.getTasks({ userId: loggedInUser.id }).then(response => {
-        console.log('API Response:', response);
         // Update tasks
         // setTasks(response); // Commented out because setTasks is not defined
       }).catch(error => {
@@ -80,18 +77,13 @@ const TaskDetailScreen: React.FC = () => {
   }, [dispatch, taskId, loggedInUser]);
 
   useEffect(() => {
-    console.log('Selected Task:', task);
   }, [task]);
 
   useEffect(() => {
     if (loggedInUser) {
-      console.log('Logged in user:', loggedInUser);
       const filteredTasks = task && (loggedInUser.canViewAll || task.salesRepId === loggedInUser.id) ? [task] : [];
-      console.log('Filtered tasks:', filteredTasks);
       const fetchedTask = filteredTasks[0] || null;
-      console.log('Fetched task:', fetchedTask);
     } else {
-      console.log('No logged in user found');
     }
   }, [route.params.taskId, loggedInUser, task]);
 

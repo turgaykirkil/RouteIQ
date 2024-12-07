@@ -121,7 +121,6 @@ const ForgotPasswordScreen = ({ navigation }: ForgotPasswordScreenProps) => {
   const handleResetPassword = async (values: { email: string }) => {
     try {
       // TODO: Implement password reset logic
-      console.log('Reset password for:', values.email);
       setIsEmailSent(true);
     } catch (error) {
       console.error('Password reset failed:', error);
