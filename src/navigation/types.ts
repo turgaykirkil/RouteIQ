@@ -38,6 +38,7 @@ export type CustomerStackParamList = {
   EditCustomer: { customerId: string };
   CustomerMap: undefined;
   CustomerAnalytics: undefined;
+  Map: undefined;
 };
 
 export type ProfileStackParamList = {

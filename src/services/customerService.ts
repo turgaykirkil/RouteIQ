@@ -18,12 +18,19 @@ export const customerService = {
     sortOrder?: 'asc' | 'desc';
     userId?: string;
     role?: 'admin' | 'supervisor' | 'sales_rep';
+    customerId?: string;
+    includeCoordinates?: boolean;
   }) => {
     try {
       await delay(500);
       
       let customers = [...mockCustomers];
       
+      // Müşteri ID'sine göre filtreleme
+      if (params?.customerId) {
+        customers = customers.filter(customer => customer.id === params.customerId);
+      }
+
       // Apply search filter
       if (params?.search) {
         const searchLower = params.search.toLowerCase();
@@ -63,6 +70,13 @@ export const customerService = {
         });
       }
 
+      // Koordinatları olan müşterileri filtreleme
+      if (params?.includeCoordinates) {
+        customers = customers.filter((c: Customer) => 
+          c.address?.coordinates?.lat && c.address?.coordinates?.lng
+        );
+      }
+
       return customers;
     } catch (error) {
       throw error;
@@ -70,7 +84,9 @@ export const customerService = {
   },
 
   // Get customer by ID
-  getCustomerById: async (id: string) => {
+  getCustomerById: async (id: string): Promise<Customer | null> => {
+    console.log('CustomerService: getCustomerById called with ID', id);
+    
     try {
       await delay(300);
       const userStr = await AsyncStorage.getItem('user');
@@ -90,9 +106,12 @@ export const customerService = {
         throw new Error('Bu müşteriye erişim yetkiniz yok!');
       }
       
+      console.log('CustomerService: Found Customer', customer);
+      
       return customer;
     } catch (error) {
-      throw error;
+      console.error('CustomerService: Error in getCustomerById', error);
+      return null;
     }
   },
 

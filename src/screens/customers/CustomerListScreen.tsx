@@ -22,12 +22,15 @@ import {
   List,
   Divider,
   useTheme,
-  Alert
+  Alert,
+  Icon
 } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomerStackParamList } from '../../navigation/types';
 import { customerAPI } from '../../services/api';
 import theme from '../../theme';
+import { sortCustomersByDistance } from '../../utils/geoUtils';
+import Geolocation from '@react-native-community/geolocation';
 
 type CustomerListScreenProps = {
   navigation: NativeStackNavigationProp<CustomerStackParamList, 'CustomerList'>;
@@ -39,6 +42,7 @@ type Customer = {
   company: string;
   email: string;
   phone: string;
+  distance?: number;
 };
 
 const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) => {
@@ -51,13 +55,40 @@ const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) =
   const [filters, setFilters] = useState({
     status: ['active', 'inactive', 'pending'],
   });
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
 
   useEffect(() => {
+    // Kullanıcının konumunu al
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        });
+      },
+      (error) => {
+        console.log('Konum alınamadı', error);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+
+    // Müşterileri çek
     const fetchCustomers = async () => {
       try {
         setLoading(true);
-        const data = await customerAPI.getAll();
-        setCustomers(data);
+        const fetchedCustomers = await customerAPI.getAll();
+        
+        // Eğer kullanıcı konumu varsa sırala
+        if (userLocation) {
+          const sortedCustomers = sortCustomersByDistance(
+            fetchedCustomers, 
+            userLocation.lat, 
+            userLocation.lon
+          );
+          setCustomers(sortedCustomers);
+        } else {
+          setCustomers(fetchedCustomers);
+        }
       } catch (error) {
         Alert.alert('Error', 'Failed to fetch customers');
       } finally {
@@ -66,21 +97,47 @@ const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) =
     };
 
     fetchCustomers();
-  }, []);
+  }, [userLocation]);
+
+  const handleCustomerPress = (customer: Customer) => {
+    console.log('CustomerListScreen: Customer Pressed', customer);
+    
+    // Detay sayfasına geçiş
+    navigation.navigate('CustomerDetail', { 
+      customerId: customer.id,
+      customerData: customer  // Tüm müşteri verilerini de geçirelim
+    });
+    
+    console.log('CustomerListScreen: Navigation to CustomerDetail triggered', {
+      customerId: customer.id
+    });
+  };
+
+  const handleOpenMap = () => {
+    navigation.navigate('Map');
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>Müşteriler</Text>
+        <TouchableOpacity onPress={handleOpenMap}>
+          <Icon name="map" size={24} color={theme.colors.primary} />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={customers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('CustomerDetail', { customerId: item.id })}>
+          <TouchableOpacity onPress={() => handleCustomerPress(item)}>
             <Card style={styles.card}>
               <Card.Title
                 title={item.name}
-                subtitle={item.company}
-                //left={(props) => <Avatar.Text {...props} label={item.name.charAt(0)} />}
+                subtitle={
+                  item.distance !== undefined 
+                    ? `${item.distance.toFixed(1)} km uzaklıkta` 
+                    : item.company
+                }
               />
             </Card>
           </TouchableOpacity>
@@ -98,6 +155,16 @@ const styles = StyleSheet.create({
   },
   card: {
     margin: 8,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

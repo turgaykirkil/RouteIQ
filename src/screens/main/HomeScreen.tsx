@@ -232,11 +232,11 @@ const HomeScreen = () => {
       padding: themeWithCustom.spacing.lg,
     },
     welcomeText: {
-      ...themeWithCustom.typography.body,
+      ...themeWithCustom.typography.h2,
       color: themeWithCustom.colors.onSurface,
     },
     nameText: {
-      ...themeWithCustom.typography.h2,
+      ...themeWithCustom.typography.h1,
       color: themeWithCustom.colors.primary,
       fontWeight: 'bold',
     },
@@ -384,7 +384,7 @@ const HomeScreen = () => {
           </View>
           <TouchableOpacity onPress={handleProfilePress}>
             <Avatar.Image
-              size={50}
+              size={70}
               source={{uri: 'https://i.pravatar.cc/150'}}
             />
           </TouchableOpacity>

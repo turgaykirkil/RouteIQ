@@ -14,10 +14,65 @@ RouteIQ, müşteri ilişkilerini ve satış takibini yönetmek için tasarlanmı
 - **Güvenli Veri İşleme**: Seri hale getirilemeyen değerlerle ilgili sorunları önlemek için güvenli veri işleme yöntemleri.
 - **Modüler Mimari**: Kodun daha yönetilebilir ve sürdürülebilir olmasını sağlar.
 
+## Mevcut Özellikler
+
+### Müşteri Yönetimi
+- Detaylı müşteri listesi görüntüleme
+- Müşteri detay sayfası
+- Müşterileri konuma göre sıralama
+- Rol bazlı müşteri erişimi
+
+### Konum ve Harita Özellikleri
+- Kullanıcı konumuna göre müşteri mesafesi hesaplama
+- Müşteri listesini konuma göre sıralama
+- Konum izinleri yönetimi
+
+### Kullanıcı Yönetimi
+- Rol tabanlı erişim kontrolü
+- Kullanıcı kimlik doğrulama
+- Profil yönetimi
+
+### Performans ve Güvenlik
+- Hızlı ve optimize edilmiş veri yükleme
+- Güvenli API entegrasyonları
+- Hata yakalama ve log mekanizmaları
+
 ## Gelecek Özellikler
-- **Tema Değiştirme Fonksiyonu**: Kullanıcıların uygulamanın temasını değiştirmelerine olanak tanıyacak.
-- **Performans Optimizasyonu**: Uygulamanın daha hızlı ve verimli çalışmasını sağlamak için çeşitli optimizasyonlar.
-- **Hata Yönetimi**: Uygulama genelinde kapsamlı hata yönetimi ve kullanıcı geri bildirim mekanizmaları.
+
+### Müşteri Yönetimi
+- Müşteri not ekleme/düzenleme sistemi
+- Müşteri aktivite geçmişi detaylandırma
+- Gelişmiş müşteri segmentasyonu
+- Detaylı müşteri performans raporları
+- Müşteri etkileşim takip mekanizması
+
+### Konum ve Harita Geliştirmeleri
+- Rota optimizasyonu algoritması
+- Offline harita desteği
+- Gelişmiş konum filtreleme özellikleri
+- Hava durumu ve coğrafi veri entegrasyonu
+- Gerçek zamanlı konum paylaşımı
+
+### Performans ve Analitik
+- Yapay zeka destekli satış tahmin modelleri
+- Detaylı performans gösterge paneli
+- Müşteri davranış analizi
+- Otomatik raporlama sistemi
+- Performans karşılaştırmak araçları
+
+### Entegrasyonlar
+- CRM sistemleri ile çift yönlü entegrasyon
+- Ödeme sistemleri entegrasyonu
+- E-posta ve mesajlaşma entegrasyon araçları
+- Stok yönetim sistemleri bağlantısı
+- Bulut depolama çözümleri
+
+### Kullanıcı Deneyimi
+- Koyu/açık mod gelişmiş desteği
+- Özelleştirilebilir dashboard
+- Çoklu dil desteği
+- Gelişmiş bildirim sistemleri
+- Kullanıcı deneyimi iyileştirme anketleri
 
 ## Başlarken
 

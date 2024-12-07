@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useTheme, Text, Searchbar } from 'react-native-paper';
 import MapView, { 
@@ -9,6 +9,10 @@ import MapView, {
   Region
 } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import customerService from '../../services/customerService';
+import { Customer } from '../../types';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -50,6 +54,34 @@ const MapScreen = () => {
 
   const [selectedLocations, setSelectedLocations] = useState<Location[]>([]);
   const [routeCoordinates, setRouteCoordinates] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const loggedInUser = useSelector((state: RootState) => state.auth.user);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        // Kullanıcının rolüne göre müşterileri çek
+        const fetchedCustomers = await customerService.getCustomers({
+          userId: loggedInUser?.id
+        });
+
+        // Koordinatları olan müşterileri filtrele
+        const customersWithCoordinates = fetchedCustomers.filter(
+          customer => 
+            customer.address?.coordinates?.lat && 
+            customer.address?.coordinates?.lng
+        );
+
+        setCustomers(customersWithCoordinates);
+      } catch (error) {
+        console.error('Müşteri koordinatları çekilemedi:', error);
+      }
+    };
+
+    if (loggedInUser) {
+      fetchCustomers();
+    }
+  }, [loggedInUser]);
 
   const onSearchLocation = () => {
     // Burada gerçek bir geocoding servisi kullanılabilir
@@ -118,6 +150,18 @@ const MapScreen = () => {
         showsMyLocationButton={true}
         customMapStyle={mapStyle}
       >
+        {customers.map((customer) => (
+          <Marker
+            key={customer.id}
+            coordinate={{
+              latitude: customer.address.coordinates.lat,
+              longitude: customer.address.coordinates.lng
+            }}
+            title={customer.name}
+            description={customer.company}
+          />
+        ))}
+        
         {savedLocations.map((location) => (
           <Marker
             key={location.id}

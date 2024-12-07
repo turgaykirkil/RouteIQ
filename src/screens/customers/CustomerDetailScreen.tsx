@@ -28,6 +28,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import customerService from '../../services/customerService'; // Import customerService
+import { Linking, Platform } from 'react-native'; // Import Linking and Platform
 
 // Define props for the CustomerDetailScreen
 interface CustomerDetailScreenProps {
@@ -41,38 +42,85 @@ const CustomerDetailScreen: React.FC<CustomerDetailScreenProps> = ({ navigation,
   const [deleteDialogVisible, setDeleteDialogVisible] = React.useState(false);
   const [customer, setCustomer] = useState(null);
 
-  const loggedInUser = useSelector((state: RootState) => state.user);
+  const loggedInUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
+    console.log('CustomerDetailScreen: Logged In User', loggedInUser);
+    console.log('CustomerDetailScreen: Route Params', route.params);
+
     if (loggedInUser) {
-      const filteredCustomers = db.customers.filter(
-        c => loggedInUser.canViewAll || c.salesRepId === loggedInUser.id
-      );
-      // API çağrısı örneği
-      customerService.getCustomers({ userId: loggedInUser.id }).then(response => {
-        setCustomer(response);
-      }).catch(error => {
-        console.error('API Error:', error);
-      });
+      try {
+        const { customerId, customerData } = route.params;
+        console.log('CustomerDetailScreen: Extracted Customer ID', customerId);
+
+        // Eğer customerData varsa doğrudan onu kullan
+        if (customerData) {
+          console.log('CustomerDetailScreen: Using Route Customer Data', customerData);
+          setCustomer(customerData);
+          return;
+        }
+
+        if (!customerId) {
+          console.error('CustomerDetailScreen: No Customer ID provided');
+          return;
+        }
+        
+        // Müşteri detayını doğrudan ID ile çek
+        customerService.getCustomerById(customerId)
+          .then(response => {
+            console.log('CustomerDetailScreen: Customer Response', response);
+            setCustomer(response);
+          })
+          .catch(error => {
+            console.error('CustomerDetailScreen: Fetch Customer Error', error);
+            // Hata durumunda kullanıcıya bilgilendirme yapılabilir
+          });
+      } catch (error) {
+        console.error('CustomerDetailScreen: Unexpected Error', error);
+      }
+    } else {
+      console.warn('CustomerDetailScreen: No Logged In User');
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, route.params]);
 
   const handleCall = () => {
     if (customer && customer.phone) {
-      // Linking.openURL(`tel:${customer.phone}`);
+      Linking.openURL(`tel:${customer.phone}`);
     }
   };
 
   const handleEmail = () => {
     if (customer && customer.email) {
-      // Linking.openURL(`mailto:${customer.email}`);
+      Linking.openURL(`mailto:${customer.email}`);
     }
   };
 
-  const handleMap = () => {
+  const handleOpenMaps = () => {
     if (customer && customer.address) {
-      const address = encodeURIComponent(`${customer.address.street}, ${customer.address.city}, ${customer.address.state}, ${customer.address.zipCode}, ${customer.address.country}`);
-      // Linking.openURL(`https://maps.google.com/?q=${address}`);
+      console.log('Map Coordinates:', customer.address.coordinates);
+      
+      // Koordinatları kontrol et
+      const coordinates = customer.address.coordinates;
+      const lat = coordinates?.lat || coordinates?.[0];
+      const lng = coordinates?.lng || coordinates?.[1];
+
+      if (lat && lng) {
+        const url = Platform.select({
+          ios: `maps://maps.apple.com/?q=${customer.name}&ll=${lat},${lng}&z=16`,
+          android: `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(customer.name)})`,
+          default: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(customer.name)}`
+        });
+        
+        Linking.openURL(url).catch(err => {
+          console.error('Map açılamadı:', err);
+          // Fallback olarak Google Maps web linki
+          Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(customer.name)}`);
+        });
+      } else {
+        // Adres bilgisi ile arama
+        const addressString = `${customer.address.street}, ${customer.address.city}, ${customer.address.country}`;
+        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressString)}`);
+      }
     }
   };
 
@@ -121,7 +169,7 @@ const CustomerDetailScreen: React.FC<CustomerDetailScreenProps> = ({ navigation,
               <Button
                 mode="contained"
                 icon="map-marker"
-                onPress={handleMap}
+                onPress={handleOpenMaps}
                 style={styles.actionButton}
               >
                 Map

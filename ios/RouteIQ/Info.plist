@@ -31,10 +31,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Müşterilerinize olan mesafeyi hesaplamak ve size en yakın müşterileri göstermek için konumunuzu kullanıyoruz.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>RouteIQ uygulaması konumunuzu haritada göstermek için kullanır.</string>
+	<string>Müşterilerinize olan mesafeyi hesaplamak ve size en yakın müşterileri göstermek için konumunuzu kullanıyoruz.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>RouteIQ uygulaması konumunuzu haritada göstermek için kullanır.</string>
+	<string>Müşterilerinize olan mesafeyi hesaplamak ve size en yakın müşterileri göstermek için konumunuzu kullanıyoruz.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialCommunityIcons.ttf</string>
