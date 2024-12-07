@@ -484,6 +484,248 @@
       "notes": "Tekstil sektörü",
       "createdAt": "2024-03-15T10:00:00.000Z",
       "updatedAt": "2024-03-15T10:00:00.000Z"
+    },
+    {
+      "id": "21",
+      "name": "Selin Yıldız",
+      "company": "Yıldız Mobilya Ltd.",
+      "email": "selin@yildizmobilya.com",
+      "phone": "+90 540 123 4567",
+      "salesRepId": "5",
+      "address": {
+        "street": "Mobilya Sokak No:90",
+        "city": "Trabzon",
+        "state": "Ortahisar",
+        "zipCode": "61000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 41.00145,
+          "lng": 39.7178
+        }
+      },
+      "notes": "Mobilya sektörü",
+      "createdAt": "2024-03-09T10:00:00.000Z",
+      "updatedAt": "2024-03-09T10:00:00.000Z"
+    },
+    {
+      "id": "22",
+      "name": "Burak Şahin",
+      "company": "Şahin Lojistik A.Ş.",
+      "email": "burak@sahinlojistik.com",
+      "phone": "+90 541 234 5678",
+      "salesRepId": "3",
+      "address": {
+        "street": "Lojistik Mahallesi No:100",
+        "city": "Eskişehir",
+        "state": "Tepebaşı",
+        "zipCode": "26000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 39.77667,
+          "lng": 30.52056
+        }
+      },
+      "notes": "Lojistik sektörü",
+      "createdAt": "2024-03-10T10:00:00.000Z",
+      "updatedAt": "2024-03-10T10:00:00.000Z"
+    },
+    {
+      "id": "23",
+      "name": "Gül Yılmaz",
+      "company": "Yılmaz Gıda Ltd.",
+      "email": "gul@yilmazgida.com",
+      "phone": "+90 542 345 6789",
+      "salesRepId": "4",
+      "address": {
+        "street": "Gıda Mahallesi No:110",
+        "city": "Samsun",
+        "state": "İlkadım",
+        "zipCode": "55000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 41.28667,
+          "lng": 36.33
+        }
+      },
+      "notes": "Gıda sektörü",
+      "createdAt": "2024-03-11T10:00:00.000Z",
+      "updatedAt": "2024-03-11T10:00:00.000Z"
+    },
+    {
+      "id": "24",
+      "name": "Canan Demir",
+      "company": "Demir Metal A.Ş.",
+      "email": "canan@demirmetal.com",
+      "phone": "+90 543 456 7890",
+      "salesRepId": "5",
+      "address": {
+        "street": "Metal Sokak No:120",
+        "city": "Kayseri",
+        "state": "Melikgazi",
+        "zipCode": "38000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 38.7333333,
+          "lng": 35.4833333
+        }
+      },
+      "notes": "Metal sektörü",
+      "createdAt": "2024-03-12T10:00:00.000Z",
+      "updatedAt": "2024-03-12T10:00:00.000Z"
+    },
+    {
+      "id": "25",
+      "name": "Ege Yıldırım",
+      "company": "Yıldırım Elektrik Ltd.",
+      "email": "ege@yildirimelektrik.com",
+      "phone": "+90 544 567 8901",
+      "salesRepId": "3",
+      "address": {
+        "street": "Elektrik Mahallesi No:130",
+        "city": "Diyarbakır",
+        "state": "Bağlar",
+        "zipCode": "21000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 37.91441,
+          "lng": 40.23063
+        }
+      },
+      "notes": "Elektrik sektörü",
+      "createdAt": "2024-03-13T10:00:00.000Z",
+      "updatedAt": "2024-03-13T10:00:00.000Z"
+    },
+    {
+      "id": "26",
+      "name": "Hale Kaya",
+      "company": "Kaya İnşaat A.Ş.",
+      "email": "hale@kayainsaat.com",
+      "phone": "+90 545 678 9012",
+      "salesRepId": "4",
+      "address": {
+        "street": "İnşaat Caddesi No:140",
+        "city": "Mersin",
+        "state": "Yenişehir",
+        "zipCode": "33000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 36.8121,
+          "lng": 34.6415
+        }
+      },
+      "notes": "İnşaat sektörü",
+      "createdAt": "2024-03-14T10:00:00.000Z",
+      "updatedAt": "2024-03-14T10:00:00.000Z"
+    },
+    {
+      "id": "27",
+      "name": "Mert Özkan",
+      "company": "Özkan Tekstil Ltd.",
+      "email": "mert@ozkantekstil.com",
+      "phone": "+90 546 789 0123",
+      "salesRepId": "5",
+      "address": {
+        "street": "Tekstil Sokak No:150",
+        "city": "Adapazarı",
+        "state": "Sakarya",
+        "zipCode": "54000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 40.78056,
+          "lng": 30.40333
+        }
+      },
+      "notes": "Tekstil sektörü",
+      "createdAt": "2024-03-15T10:00:00.000Z",
+      "updatedAt": "2024-03-15T10:00:00.000Z"
+    },
+    {
+      "id": "28",
+      "name": "Selin Yıldız",
+      "company": "Yıldız Mobilya Ltd.",
+      "email": "selin@yildizmobilya.com",
+      "phone": "+90 540 123 4567",
+      "salesRepId": "5",
+      "address": {
+        "street": "Mobilya Sokak No:90",
+        "city": "Trabzon",
+        "state": "Ortahisar",
+        "zipCode": "61000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 41.00145,
+          "lng": 39.7178
+        }
+      },
+      "notes": "Mobilya sektörü",
+      "createdAt": "2024-03-09T10:00:00.000Z",
+      "updatedAt": "2024-03-09T10:00:00.000Z"
+    },
+    {
+      "id": "29",
+      "name": "Burak Şahin",
+      "company": "Şahin Lojistik A.Ş.",
+      "email": "burak@sahinlojistik.com",
+      "phone": "+90 541 234 5678",
+      "salesRepId": "3",
+      "address": {
+        "street": "Lojistik Mahallesi No:100",
+        "city": "Eskişehir",
+        "state": "Tepebaşı",
+        "zipCode": "26000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 39.77667,
+          "lng": 30.52056
+        }
+      },
+      "notes": "Lojistik sektörü",
+      "createdAt": "2024-03-10T10:00:00.000Z",
+      "updatedAt": "2024-03-10T10:00:00.000Z"
+    },
+    {
+      "id": "30",
+      "name": "Gül Yılmaz",
+      "company": "Yılmaz Gıda Ltd.",
+      "email": "gul@yilmazgida.com",
+      "phone": "+90 542 345 6789",
+      "salesRepId": "4",
+      "address": {
+        "street": "Gıda Mahallesi No:110",
+        "city": "Samsun",
+        "state": "İlkadım",
+        "zipCode": "55000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 41.28667,
+          "lng": 36.33
+        }
+      },
+      "notes": "Gıda sektörü",
+      "createdAt": "2024-03-11T10:00:00.000Z",
+      "updatedAt": "2024-03-11T10:00:00.000Z"
+    },
+    {
+      "id": "31",
+      "name": "Canan Demir",
+      "company": "Demir Metal A.Ş.",
+      "email": "canan@demirmetal.com",
+      "phone": "+90 543 456 7890",
+      "salesRepId": "5",
+      "address": {
+        "street": "Metal Sokak No:120",
+        "city": "Kayseri",
+        "state": "Melikgazi",
+        "zipCode": "38000",
+        "country": "Türkiye",
+        "coordinates": {
+          "lat": 38.7333333,
+          "lng": 35.4833333
+        }
+      },
+      "notes": "Metal sektörü",
+      "createdAt": "2024-03-12T10:00:00.000Z",
+      "updatedAt": "2024-03-12T10:00:00.000Z"
     }
   ],
   "tasks": [
@@ -1170,6 +1412,188 @@
           "createdAt": "2024-02-15T09:00:00.000Z"
         }
       ]
+    }
+  ],
+  "sales": [
+    {
+      "id": "1",
+      "salesRepId": "3",
+      "date": "2024-01-01",
+      "amount": 45000
+    },
+    {
+      "id": "2",
+      "salesRepId": "4",
+      "date": "2024-02-01",
+      "amount": 55000
+    },
+    {
+      "id": "3",
+      "salesRepId": "5",
+      "date": "2024-03-01",
+      "amount": 65000
+    },
+    {
+      "id": "4",
+      "salesRepId": "3",
+      "date": "2024-04-01",
+      "amount": 75000
+    },
+    {
+      "id": "5",
+      "salesRepId": "4",
+      "date": "2024-05-01",
+      "amount": 85000
+    },
+    {
+      "id": "6",
+      "salesRepId": "5",
+      "date": "2024-06-01",
+      "amount": 95000
+    },
+    {
+      "id": "7",
+      "salesRepId": "3",
+      "date": "2024-07-01",
+      "amount": 105000
+    },
+    {
+      "id": "8",
+      "salesRepId": "4",
+      "date": "2024-08-01",
+      "amount": 115000
+    },
+    {
+      "id": "9",
+      "salesRepId": "5",
+      "date": "2024-09-01",
+      "amount": 125000
+    },
+    {
+      "id": "10",
+      "salesRepId": "3",
+      "date": "2024-10-01",
+      "amount": 135000
+    },
+    {
+      "id": "11",
+      "salesRepId": "4",
+      "date": "2024-11-01",
+      "amount": 145000
+    },
+    {
+      "id": "12",
+      "salesRepId": "5",
+      "date": "2024-12-01",
+      "amount": 155000
+    },
+    {
+      "id": "13",
+      "salesRepId": "3",
+      "date": "2024-01-01",
+      "amount": 165000
+    },
+    {
+      "id": "14",
+      "salesRepId": "4",
+      "date": "2024-02-01",
+      "amount": 175000
+    },
+    {
+      "id": "15",
+      "salesRepId": "5",
+      "date": "2024-03-01",
+      "amount": 185000
+    },
+    {
+      "id": "16",
+      "salesRepId": "3",
+      "date": "2024-04-01",
+      "amount": 195000
+    },
+    {
+      "id": "17",
+      "salesRepId": "4",
+      "date": "2024-05-01",
+      "amount": 205000
+    },
+    {
+      "id": "18",
+      "salesRepId": "5",
+      "date": "2024-06-01",
+      "amount": 215000
+    },
+    {
+      "id": "19",
+      "salesRepId": "3",
+      "date": "2024-07-01",
+      "amount": 225000
+    },
+    {
+      "id": "20",
+      "salesRepId": "4",
+      "date": "2024-08-01",
+      "amount": 235000
+    },
+    {
+      "id": "21",
+      "salesRepId": "5",
+      "date": "2024-09-01",
+      "amount": 245000
+    },
+    {
+      "id": "22",
+      "salesRepId": "3",
+      "date": "2024-10-01",
+      "amount": 255000
+    },
+    {
+      "id": "23",
+      "salesRepId": "4",
+      "date": "2024-11-01",
+      "amount": 265000
+    },
+    {
+      "id": "24",
+      "salesRepId": "5",
+      "date": "2024-12-01",
+      "amount": 275000
+    },
+    {
+      "id": "25",
+      "salesRepId": "3",
+      "date": "2024-01-01",
+      "amount": 285000
+    },
+    {
+      "id": "26",
+      "salesRepId": "4",
+      "date": "2024-02-01",
+      "amount": 295000
+    },
+    {
+      "id": "27",
+      "salesRepId": "5",
+      "date": "2024-03-01",
+      "amount": 305000
+    },
+    {
+      "id": "28",
+      "salesRepId": "3",
+      "date": "2024-04-01",
+      "amount": 315000
+    },
+    {
+      "id": "29",
+      "salesRepId": "4",
+      "date": "2024-05-01",
+      "amount": 325000
+    },
+    {
+      "id": "30",
+      "salesRepId": "5",
+      "date": "2024-06-01",
+      "amount": 335000
     }
   ]
 }

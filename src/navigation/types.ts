@@ -8,9 +8,13 @@ export type AuthStackParamList = {
 };
 
 export type RootStackParamList = {
-  Login: undefined;
+  Auth: NavigatorScreenParams<AuthStackParamList>;
   Main: undefined;
+  Profile: undefined;
 };
+
+export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+export type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 export type MainTabParamList = {
   Home: undefined;

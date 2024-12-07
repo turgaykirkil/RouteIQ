@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import MainNavigator from './MainNavigator';
+import AuthNavigator from './AuthNavigator';
 import { RootStackParamList } from './types';
 import { RootState } from '../store/store';
 import { checkAuthStatus } from '../store/authSlice';
@@ -33,7 +34,7 @@ const AppNavigator: React.FC = () => {
         {isAuthenticated ? (
           <Stack.Screen name="Main" component={MainNavigator} />
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Auth" component={AuthNavigator} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

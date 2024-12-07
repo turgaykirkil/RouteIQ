@@ -12,20 +12,20 @@ app.use(bodyParser.json());
 
 // DB'yi oku
 const dbPath = path.join(__dirname, 'db.json');
+
 const readDatabase = () => {
   try {
     const rawData = fs.readFileSync(dbPath);
     return JSON.parse(rawData);
   } catch (error) {
     console.error('Database read error:', error);
-    return { users: [] };
+    return { users: [], customers: [], tasks: [] };
   }
 };
 
 // Login endpoint
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
-  console.log('Login attempt:', { email, password });
 
   const db = readDatabase();
   const user = db.users.find(u => 
@@ -34,7 +34,6 @@ app.post('/api/login', (req, res) => {
   );
 
   if (user) {
-    console.log('User authenticated:', user);
     res.json({
       success: true,
       user: {
@@ -45,7 +44,6 @@ app.post('/api/login', (req, res) => {
       }
     });
   } else {
-    console.log('Authentication failed');
     res.status(401).json({
       success: false,
       message: 'Invalid credentials'
@@ -58,36 +56,32 @@ const createRouter = (resource) => {
   return {
     get: (id, filters = {}) => {
       try {
-        console.log('EVRAKA - createRouter: Gelen filtreler', { resource, id, filters });
-        
         const db = readDatabase();
+        
+        // Eğer resource db'de yoksa boş array döndür
+        if (!db[resource]) {
+          console.warn(`Resource '${resource}' not found in database`);
+          return [];
+        }
+
         let items = id ? [db[resource].find(item => item.id === id)] : db[resource];
+        
+        // null değerleri filtrele
+        items = items.filter(Boolean);
         
         // Filtreleme mantığı
         if (!id && Object.keys(filters).length > 0) {
           items = items.filter(item => {
             return Object.entries(filters).every(([key, value]) => {
-              // Rol bazlı filtreleme için özel kontrol
-              if (key === 'salesRepId' && resource === 'customers') {
-                // salesRepId'yi string'e çevir
+              if (!item || value === undefined) return false;
+              
+              // salesRepId kontrolü
+              if (key === 'salesRepId') {
                 const itemSalesRepId = item.salesRepId ? item.salesRepId.toString() : null;
                 const filterSalesRepId = value ? value.toString() : null;
-                
-                console.log(`EVRAKA - Müşteri filtreleme: 
-                  item.salesRepId (${itemSalesRepId}) === value (${filterSalesRepId})`);
-                
                 return itemSalesRepId === filterSalesRepId;
               }
-              if (key === 'userId' && resource === 'tasks') {
-                // userId'yi string'e çevir
-                const itemUserId = item.userId ? item.userId.toString() : null;
-                const filterUserId = value ? value.toString() : null;
-                
-                console.log(`EVRAKA - Görev filtreleme: 
-                  item.userId (${itemUserId}) === value (${filterUserId})`);
-                
-                return itemUserId === filterUserId;
-              }
+              
               // Diğer filtreler için genel kontrol
               if (typeof item[key] === 'string' && typeof value === 'string') {
                 return item[key].toLowerCase() === value.toLowerCase();
@@ -98,35 +92,25 @@ const createRouter = (resource) => {
           });
         }
         
-        console.log('EVRAKA - Dönen items:', items.length);
-        
-        // id ile çağrılırsa ve bulunamazsa null döndür
         return id ? (items[0] || null) : items;
       } catch (error) {
-        console.error('EVRAKA - createRouter Error:', {
-          resource,
-          id,
-          filters,
-          errorMessage: error.message,
-          errorStack: error.stack
-        });
-        throw error;
+        console.error('Router Error:', error);
+        return [];
       }
     },
     post: (data) => {
       try {
         const db = readDatabase();
+        // Eğer resource db'de yoksa oluştur
+        if (!db[resource]) {
+          db[resource] = [];
+        }
         const newItem = { ...data, id: Date.now().toString() };
         db[resource].push(newItem);
         fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
         return newItem;
       } catch (error) {
-        console.error('EVRAKA - createRouter Post Error:', {
-          resource,
-          data,
-          errorMessage: error.message,
-          errorStack: error.stack
-        });
+        console.error('Router Post Error:', error);
         throw error;
       }
     }
@@ -138,39 +122,22 @@ const createRouter = (resource) => {
   app.get(`/api/${resource}`, (req, res) => {
     try {
       const router = createRouter(resource);
-      const { role, salesRepId, teamId, userId } = req.query;
-      
-      console.log('EVRAKA - Route Request:', { 
-        resource, 
-        role, 
-        salesRepId, 
-        teamId, 
-        userId,
-        queryParams: req.query 
-      });
+      const userRole = req.headers['x-user-role']?.toLowerCase();
+      const userId = req.headers['x-user-id'];
 
-      // Eğer salesRepId boş ise ve rol sales_rep ise hata döndür
-      if (role === 'sales_rep' && !salesRepId) {
-        console.error('EVRAKA - Sales Rep için salesRepId zorunludur');
-        return res.status(400).json({ error: 'Sales Rep için salesRepId gereklidir' });
+      // Admin ve supervisor için tüm verileri döndür
+      if (userRole === 'admin' || userRole === 'supervisor') {
+        const items = router.get();
+        return res.json(items);
       }
 
-      let items = router.get(null, { role, salesRepId, teamId, userId });
-
-      console.log('EVRAKA - Route Response:', { 
-        resource, 
-        itemCount: items.length,
-        firstItem: items[0]
-      });
-
+      // Diğer roller için filtreleme yap
+      const items = router.get(null, { salesRepId: userId });
       res.json(items);
+
     } catch (error) {
-      console.error('EVRAKA - Route Error:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
-        message: error.message,
-        stack: error.stack 
-      });
+      console.error('Route Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 
@@ -180,12 +147,8 @@ const createRouter = (resource) => {
       const item = router.get(req.params.id);
       item ? res.json(item) : res.status(404).json({ message: 'Not found' });
     } catch (error) {
-      console.error('EVRAKA - Route Error:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
-        message: error.message,
-        stack: error.stack 
-      });
+      console.error('Route Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 
@@ -195,12 +158,8 @@ const createRouter = (resource) => {
       const newItem = router.post(req.body);
       res.status(201).json(newItem);
     } catch (error) {
-      console.error('EVRAKA - Route Error:', error);
-      res.status(500).json({ 
-        error: 'Internal Server Error', 
-        message: error.message,
-        stack: error.stack 
-      });
+      console.error('Route Error:', error);
+      res.status(500).json({ error: error.message });
     }
   });
 });

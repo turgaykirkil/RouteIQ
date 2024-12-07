@@ -22,6 +22,7 @@ import {
   List,
   Divider,
   useTheme,
+  Alert
 } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomerStackParamList } from '../../navigation/types';
@@ -53,13 +54,12 @@ const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) =
 
   useEffect(() => {
     const fetchCustomers = async () => {
-      setLoading(true);
       try {
-        const customers = await customerAPI.getAll();
-        console.log('Customers fetched:', customers);
-        setCustomers(customers);
+        setLoading(true);
+        const data = await customerAPI.getAll();
+        setCustomers(data);
       } catch (error) {
-        console.error('Error fetching customers:', error);
+        Alert.alert('Error', 'Failed to fetch customers');
       } finally {
         setLoading(false);
       }

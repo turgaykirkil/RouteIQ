@@ -20,39 +20,41 @@ import {
 } from 'react-native-paper';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'react-native';
 import { authAPI } from '../../services/api';
 import { RootStackParamList } from '../../navigation/types';
 import { useDispatch } from 'react-redux';
 import { login } from '../../store/authSlice';
+import * as RNFS from 'react-native-fs';
 
 const { width, height } = Dimensions.get('window');
 
-type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email('Geçersiz e-posta adresi').required('E-posta adresi gerekli'),
   password: Yup.string().min(6, 'Şifre çok kısa!').required('Şifre gerekli'),
 });
 
-const LoginScreen = ({ navigation }: LoginScreenProps) => {
+const LoginScreen = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
+  const navigation = useNavigation<LoginScreenNavigationProp>();
   const [rememberMe, setRememberMe] = useState(false);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   useEffect(() => {
+    console.log('LoginScreen mounted');
     const checkUserSession = async () => {
       const userToken = await AsyncStorage.getItem('userData');
-      if (userToken) {
-        navigation.replace('Main');
-      }
+      console.log('🔍 Stored user:', userToken);
+      // Burada navigation kaldırıyoruz çünkü bu AppNavigator'da kontrol ediliyor
     };
-    
-    // checkUserSession(); // Bu kontrolü kaldırıyoruz
-  }, [navigation]);
+    checkUserSession();
+  }, []);
 
   const handleLogin = async (values: { email: string; password: string }) => {
     try {
@@ -61,12 +63,24 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
       const result = await authAPI.login(values.email, values.password);
       
       if (result.user) {
-        // Kullanıcı bilgilerini AsyncStorage'a kaydet
-        await AsyncStorage.setItem('user', JSON.stringify(result.user));
-        console.log('👤 Kullanıcı bilgileri AsyncStorage\'a kaydedildi');
+        try {
+          // Önce directory'nin var olduğundan emin ol
+          const directory = `${RNFS.DocumentDirectoryPath}/RCTAsyncLocalStorage_V1`;
+          await RNFS.mkdir(directory);
+          
+          // Kullanıcı bilgilerini AsyncStorage'a kaydet
+          await AsyncStorage.setItem('user', JSON.stringify(result.user));
+          console.log('👤 Kullanıcı bilgileri AsyncStorage\'a kaydedildi');
 
-        dispatch(login(result.user));
-        navigation.replace('Main');  // Ana ekrana yönlendir
+          dispatch(login(result.user));
+          console.log('Navigating to Main after login');
+          navigation.navigate('Main');
+        } catch (storageError) {
+          console.error('Storage error:', storageError);
+          // Storage hatası olsa bile kullanıcıyı yönlendir
+          dispatch(login(result.user));
+          navigation.navigate('Main');
+        }
       } else {
         Alert.alert('Giriş Başarısız', 'Kullanıcı bilgileri alınamadı.');
       }
@@ -309,14 +323,20 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
                 <TouchableOpacity
                   style={styles.forgotPasswordContainer}
-                  onPress={() => navigation.navigate('Login')}
+                  onPress={() => {
+                    console.log('Navigating to ForgotPassword');
+                    navigation.navigate('Auth', { screen: 'ForgotPassword' });
+                  }}
                 >
                   <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
                 </TouchableOpacity>
 
                 <View style={styles.registerContainer}>
                   <Text style={styles.registerText}>Hesabınız yok mu?</Text>
-                  <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                  <TouchableOpacity onPress={() => {
+                    console.log('Navigating to Register');
+                    navigation.navigate('Auth', { screen: 'Register' });
+                  }}>
                     <Text style={styles.registerLink}>Kayıt Ol</Text>
                   </TouchableOpacity>
                 </View>

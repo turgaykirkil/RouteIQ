@@ -14,6 +14,7 @@ import {
   ActivityIndicator,
   Searchbar,
   Chip,
+  Alert,
 } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -33,15 +34,18 @@ const TaskListScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const [localTasks, setLocalTasks] = useState<Task[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const tasks = await taskAPI.getAll();
-        console.log('Tasks fetched:', tasks);
-        setLocalTasks(tasks);
+        setIsLoading(true);
+        const data = await taskAPI.getAll();
+        setLocalTasks(data);
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        Alert.alert('Error', 'Failed to fetch tasks');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -165,7 +169,7 @@ const TaskListScreen: React.FC = () => {
       .sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
   }, [localTasks, searchQuery, selectedFilter]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={[styles.container, styles.emptyContainer]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

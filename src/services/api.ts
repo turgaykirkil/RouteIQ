@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = Platform.select({
-  android: 'http://10.0.2.2:3000',
-  ios: 'http://localhost:3000',
+  android: 'http://192.168.1.8:3000', // Bilgisayarınızın yerel IP adresi
+  ios: 'http://192.168.1.8:3000',     // Bilgisayarınızın yerel IP adresi
   default: 'http://localhost:3000'
 });
 
@@ -22,30 +22,28 @@ api.interceptors.request.use(
   async (config) => {
     try {
       const userStr = await AsyncStorage.getItem('user');
+      console.log('📡 API Request Config:', {
+        method: config.method,
+        url: config.url,
+        headers: config.headers
+      });
+      
       if (userStr) {
         const user = JSON.parse(userStr);
-        // Kullanıcı bilgilerini headers'a ekleyelim
+        console.log('👤 User from AsyncStorage:', user);
         config.headers = {
           ...config.headers,
-          'X-User-Id': user.id,
-          'X-User-Role': user.role
+          'x-user-id': user.id,
+          'x-user-role': user.role
         };
-        // Ayrıca query params olarak da ekleyelim
-        config.params = {
-          ...config.params,
-          userId: user.id,
-          role: user.role
-        };
-        console.log('Current User:', user);
       }
     } catch (error) {
-      console.error('Error getting user data:', error);
+      console.error('❌ Error getting user data:', error);
     }
-    console.log('API Request:', config.method, config.url, config.params);
     return config;
   },
   (error) => {
-    console.error('API Request Error:', error);
+    console.error('❌ Request Interceptor Error:', error);
     return Promise.reject(error);
   }
 );
@@ -53,11 +51,20 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.data);
+    console.log('✅ API Response:', {
+      url: response.config.url,
+      status: response.status,
+      data: response.data
+    });
     return response;
   },
   (error) => {
-    console.error('API Response Error:', error.response?.data || error.message);
+    console.error('❌ API Response Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     return Promise.reject(error);
   }
 );
@@ -65,7 +72,6 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
-      console.log('Login Request:', { email, password });
       const response = await api.post('/api/login', { email, password });
       
       if (response.data.success) {
@@ -76,7 +82,7 @@ export const authAPI = {
         throw new Error(response.data.message || 'Login failed');
       }
     } catch (error) {
-      console.error('Login Error:', error);
+      console.error('Login failed:', error);
       throw error;
     }
   },
@@ -86,7 +92,7 @@ export const authAPI = {
       await AsyncStorage.removeItem('userData');
       return true;
     } catch (error) {
-      console.error('Logout Error:', error);
+      console.error('Logout failed:', error);
       throw error;
     }
   }
@@ -99,52 +105,12 @@ export const customerAPI = {
     status?: string[];
     tags?: string[];
     sortBy?: string;
-    salesRepId?: string;
   }) => {
     try {
-      // Kullanıcı bilgisini AsyncStorage'dan al
-      const userStr = await AsyncStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-
-      console.log('EVRAKA - CustomerAPI getAll User:', user);
-      console.log('EVRAKA - CustomerAPI getAll Params:', params);
-      
-      let queryParams = { ...params };
-      
-      // Sadece admin ve supervisor tüm datayı görebilir
-      if (user?.role && !['admin', 'supervisor'].includes(user.role)) {
-        queryParams.salesRepId = user?.id;
-      }
-
-      console.log('EVRAKA - CustomerAPI Final Query Params:', queryParams);
-      
-      const response = await api.get('/api/customers', { 
-        params: queryParams
-      });
-      
-      console.log('EVRAKA - CustomerAPI getAll Response:', {
-        count: response.data.length,
-        firstCustomer: response.data[0]
-      });
-      
-      // Admin ve supervisor için filtreleme yapma
-      if (['admin', 'supervisor'].includes(user?.role)) {
-        return response.data;
-      }
-      
-      // Diğer roller için salesRepId'ye göre filtrele
-      const filteredCustomers = response.data.filter(
-        customer => customer.salesRepId === user?.id
-      );
-
-      console.log('EVRAKA - Filtered Customers:', {
-        count: filteredCustomers.length,
-        firstCustomer: filteredCustomers[0]
-      });
-      
-      return filteredCustomers;
+      const response = await api.get('/api/customers', { params });
+      return response.data;
     } catch (error) {
-      console.error('EVRAKA - CustomerAPI getAll Error:', error);
+      console.error('Failed to fetch customers:', error);
       throw error;
     }
   },
@@ -173,49 +139,10 @@ export const taskAPI = {
     sortOrder?: 'asc' | 'desc';
   }) => {
     try {
-      // Kullanıcı bilgisini AsyncStorage'dan al
-      const userStr = await AsyncStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-
-      console.log('EVRAKA - TaskAPI getAll User:', user);
-      console.log('EVRAKA - TaskAPI getAll Params:', params);
-      
-      let queryParams = { ...params };
-      
-      // Sadece admin ve supervisor tüm datayı görebilir
-      if (user?.role && !['admin', 'supervisor'].includes(user.role)) {
-        queryParams.salesRepId = user?.id;
-      }
-
-      console.log('EVRAKA - TaskAPI Final Query Params:', queryParams);
-      
-      const response = await api.get('/api/tasks', { 
-        params: queryParams
-      });
-      
-      console.log('EVRAKA - TaskAPI getAll Response:', {
-        count: response.data.length,
-        firstTask: response.data[0]
-      });
-      
-      // Admin ve supervisor için filtreleme yapma
-      if (['admin', 'supervisor'].includes(user?.role)) {
-        return response.data;
-      }
-      
-      // Diğer roller için salesRepId'ye göre filtrele
-      const filteredTasks = response.data.filter(
-        task => task.salesRepId === user?.id
-      );
-
-      console.log('EVRAKA - Filtered Tasks:', {
-        count: filteredTasks.length,
-        firstTask: filteredTasks[0]
-      });
-      
-      return filteredTasks;
+      const response = await api.get('/api/tasks', { params });
+      return response.data;
     } catch (error) {
-      console.error('EVRAKA - TaskAPI getAll Error:', error);
+      console.error('Failed to fetch tasks:', error);
       throw error;
     }
   },
