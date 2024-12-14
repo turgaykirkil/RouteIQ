@@ -10,20 +10,21 @@ export interface CustomerAddress {
   };
 }
 
-export interface Customer {
-  id: string;
+export type Customer = {
+  id: number;
   name: string;
   company: string;
   email: string;
   phone: string;
-  salesRepId: string;
   distance?: number;
   status: string;
-  address: CustomerAddress;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+  address: {
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
+  };
+};
 
 export interface CustomerState {
   customers: Customer[];
