@@ -4,6 +4,10 @@ export interface CustomerAddress {
   state: string;
   zipCode: string;
   country: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface Customer {
@@ -12,6 +16,9 @@ export interface Customer {
   company: string;
   email: string;
   phone: string;
+  salesRepId: string;
+  distance?: number;
+  status: string;
   address: CustomerAddress;
   notes?: string;
   createdAt: string;

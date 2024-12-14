@@ -10,80 +10,20 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const customerService = {
   // Fetch all customers with optional filters
-  getCustomers: async (params?: {
-    search?: string;
-    status?: string[];
-    tags?: string[];
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-    userId?: string;
-    role?: 'admin' | 'supervisor' | 'sales_rep';
-    customerId?: string;
-    includeCoordinates?: boolean;
-  }) => {
+  getCustomers: async (userRole?: string, userId?: string) => {
     try {
       await delay(500);
       
       let customers = [...mockCustomers];
       
       // Role ve kullanıcı ID'sine göre filtreleme
-      if (params?.role === 'sales_rep' && params?.userId) {
-        customers = customers.filter(customer => customer.salesRepId === params.userId);
-      }
-      
-      // Müşteri ID'sine göre filtreleme
-      if (params?.customerId) {
-        customers = customers.filter(customer => customer.id === params.customerId);
-      }
-
-      // Apply search filter
-      if (params?.search) {
-        const searchLower = params.search.toLowerCase();
-        customers = customers.filter(customer => {
-          const matchName = customer.name.toLowerCase().includes(searchLower);
-          const matchCompany = customer.company.toLowerCase().includes(searchLower);
-          const matchEmail = customer.email.toLowerCase().includes(searchLower);
-          
-          return matchName || matchCompany || matchEmail;
-        });
-      }
-
-      // Apply status filter
-      if (params?.status?.length) {
-        customers = customers.filter(customer => {
-          const isStatusMatch = params.status.includes(customer.status);
-          return isStatusMatch;
-        });
-      }
-
-      // Apply tags filter
-      if (params?.tags?.length) {
-        customers = customers.filter(customer => {
-          const isTagMatch = params.tags.some(tag => customer.tags.includes(tag));
-          return isTagMatch;
-        });
-      }
-
-      // Apply sorting
-      if (params?.sortBy) {
-        customers.sort((a, b) => {
-          const aValue = a[params.sortBy as keyof Customer];
-          const bValue = b[params.sortBy as keyof Customer];
-          const order = params.sortOrder === 'desc' ? -1 : 1;
-          
-          return aValue < bValue ? -order : order;
-        });
-      }
-
-      // Koordinatları olan müşterileri filtreleme
-      if (params?.includeCoordinates) {
-        customers = customers.filter((c: Customer) => 
-          c.address?.coordinates?.lat && c.address?.coordinates?.lng
-        );
+      if (userRole === 'sales_rep' && userId) {
+        customers = customers.filter(customer => customer.salesRepId === userId);
       }
 
       return customers;
     } catch (error) {
+      console.error('Error in getCustomers:', error);
       throw error;
     }
   },

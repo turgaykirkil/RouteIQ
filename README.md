@@ -1,149 +1,204 @@
 # RouteIQ Mobile CRM
 
+RouteIQ is an Enterprise mobile CRM application designed for managing customer relationships and sales tracking. This application enables users to effectively manage customer information, tasks, and sales processes.
+
 RouteIQ, müşteri ilişkilerini ve satış takibini yönetmek için tasarlanmış bir Enterprise mobil CRM uygulamasıdır. Bu uygulama, kullanıcıların müşteri bilgilerini, görevlerini ve satış süreçlerini etkili bir şekilde yönetmelerine olanak tanır.
 
-## Kullanılan Teknolojiler
-- **React Native**: Mobil uygulama geliştirme için kullanılan ana platform.
-- **TypeScript**: Daha güvenli ve hatasız kod yazmayı sağlayan statik tip kontrolü.
-- **Redux Toolkit**: Uygulama durumunu yönetmek için kullanılan güçlü bir araç.
-- **React Navigation**: Uygulama içinde gezinti yapmayı sağlayan kütüphane.
-- **React Native Paper**: Modern ve dinamik kullanıcı arayüzleri oluşturmak için kullanılan UI bileşenleri.
+## Technologies Used / Kullanılan Teknolojiler
+- **React Native**: Main platform for mobile app development
+- **TypeScript**: Static type checking for safer and error-free code
+- **Redux Toolkit**: Powerful tool for managing application state
+- **React Navigation**: Library for in-app navigation
+- **React Native Paper**: UI components for creating modern and dynamic user interfaces
+- **@react-native-community/geolocation**: For handling location services
 
-## Yaklaşımlar
-- **Dinamik Tema Kullanımı**: Kullanıcı arayüzünün dinamik olarak tema değiştirmesine olanak tanır.
-- **Güvenli Veri İşleme**: Seri hale getirilemeyen değerlerle ilgili sorunları önlemek için güvenli veri işleme yöntemleri.
-- **Modüler Mimari**: Kodun daha yönetilebilir ve sürdürülebilir olmasını sağlar.
+## Current Features / Mevcut Özellikler
 
-## Mevcut Özellikler
+### Customer Management / Müşteri Yönetimi
+- Detailed customer list view with search functionality
+- Customer detail page
+- Distance-based customer sorting
+- Role-based customer access (Admin, Supervisor, Sales Rep)
+- Search customers by name, company, or email
+- View distance to customers with location permissions
 
-### Müşteri Yönetimi
-- Detaylı müşteri listesi görüntüleme
+Detaylı müşteri listesi görüntüleme ve arama
 - Müşteri detay sayfası
-- Müşterileri konuma göre sıralama
-- Rol bazlı müşteri erişimi
+- Mesafeye göre müşteri sıralama
+- Rol tabanlı müşteri erişimi (Admin, Supervisor, Satış Temsilcisi)
+- İsim, şirket veya email ile müşteri arama
+- Konum izni ile müşterilere olan mesafeyi görüntüleme
 
-### Konum ve Harita Özellikleri
-- Kullanıcı konumuna göre müşteri mesafesi hesaplama
+### Location and Map Features / Konum ve Harita Özellikleri
+- Calculate customer distance based on user location
+- Sort customer list by location
+- Graceful location permission handling
+- Distance indicator with modern UI
+
+Kullanıcı konumuna göre müşteri mesafesi hesaplama
 - Müşteri listesini konuma göre sıralama
-- Konum izinleri yönetimi
+- Zarif konum izni yönetimi
+- Modern arayüzlü mesafe göstergesi
 
-### Kullanıcı Yönetimi
-- Rol tabanlı erişim kontrolü
+### User Management / Kullanıcı Yönetimi
+- Role-based access control
+- User authentication
+- Profile management
+- Sales representative specific customer filtering
+
+Rol tabanlı erişim kontrolü
 - Kullanıcı kimlik doğrulama
 - Profil yönetimi
+- Satış temsilcilerine özel müşteri filtreleme
 
-### Performans ve Güvenlik
-- Hızlı ve optimize edilmiş veri yükleme
+### Performance and Security / Performans ve Güvenlik
+- Fast and optimized data loading
+- Secure API integrations
+- Error handling and logging mechanisms
+- Efficient search and filtering
+
+Hızlı ve optimize edilmiş veri yükleme
 - Güvenli API entegrasyonları
 - Hata yakalama ve log mekanizmaları
+- Verimli arama ve filtreleme
 
-## Gelecek Özellikler
+## Future Features / Gelecek Özellikler
 
-### Müşteri Yönetimi
-- Müşteri not ekleme/düzenleme sistemi
-- Müşteri aktivite geçmişi detaylandırma
+### Customer Management / Müşteri Yönetimi
+- Customer note addition/editing system
+- Detailed customer activity history
+- Advanced customer segmentation
+- Detailed customer performance reports
+- Customer interaction tracking mechanism
+
+Müşteri not ekleme/düzenleme sistemi
+- Detaylı müşteri aktivite geçmişi
 - Gelişmiş müşteri segmentasyonu
 - Detaylı müşteri performans raporları
 - Müşteri etkileşim takip mekanizması
 
-### Konum ve Harita Geliştirmeleri
-- Rota optimizasyonu algoritması
+### Location and Map Enhancements / Konum ve Harita Geliştirmeleri
+- Route optimization algorithm
+- Offline map support
+- Advanced location filtering features
+- Weather and geographic data integration
+- Real-time location sharing
+
+Rota optimizasyonu algoritması
 - Offline harita desteği
 - Gelişmiş konum filtreleme özellikleri
 - Hava durumu ve coğrafi veri entegrasyonu
 - Gerçek zamanlı konum paylaşımı
 
-### Performans ve Analitik
-- Yapay zeka destekli satış tahmin modelleri
+### Performance and Analytics / Performans ve Analitik
+- AI-powered sales forecasting models
+- Detailed performance indicator dashboard
+- Customer behavior analysis
+- Automated reporting system
+- Performance comparison tools
+
+Yapay zeka destekli satış tahmin modelleri
 - Detaylı performans gösterge paneli
 - Müşteri davranış analizi
 - Otomatik raporlama sistemi
 - Performans karşılaştırmak araçları
 
-### Entegrasyonlar
-- CRM sistemleri ile çift yönlü entegrasyon
+### Integrations / Entegrasyonlar
+- Two-way integration with CRM systems
+- Payment system integrations
+- Email and messaging integration tools
+- Stock management system connections
+- Cloud storage solutions
+
+CRM sistemleri ile çift yönlü entegrasyon
 - Ödeme sistemleri entegrasyonu
 - E-posta ve mesajlaşma entegrasyon araçları
 - Stok yönetim sistemleri bağlantısı
 - Bulut depolama çözümleri
 
-### Kullanıcı Deneyimi
-- Koyu/açık mod gelişmiş desteği
+### User Experience / Kullanıcı Deneyimi
+- Advanced dark/light mode support
+- Customizable dashboard
+- Multi-language support
+- Advanced notification systems
+- User experience improvement surveys
+
+Koyu/açık mod gelişmiş desteği
 - Özelleştirilebilir dashboard
 - Çoklu dil desteği
 - Gelişmiş bildirim sistemleri
 - Kullanıcı deneyimi iyileştirme anketleri
 
-## Başlarken
+## Getting Started / Başlarken
 
->**Not**: Devam etmeden önce [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) talimatlarını tamamladığınızdan emin olun.
+>**Note**: Before proceeding, make sure to complete the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions.
 
-### Adım 1: Metro Sunucusunu Başlatın
+### Step 1: Start Metro Server
 
-Metro'yu başlatmak için, React Native projenizin kök dizininden aşağıdaki komutu çalıştırın:
+To start Metro, run the following command from your React Native project's root directory:
 
 ```bash
-# npm kullanarak
+# Using npm
 npm start
 
-# YA DA Yarn kullanarak
+# OR Using Yarn
 yarn start
 ```
 
-### Adım 2: Uygulamanızı Başlatın
+### Step 2: Start Your Application
 
-Metro Bundler kendi terminalinde çalışmaya devam etsin. React Native projenizin kök dizininden yeni bir terminal açın ve aşağıdaki komutu çalıştırarak Android veya iOS uygulamanızı başlatın:
+Keep Metro running in its own terminal. Open a new terminal in your React Native project's root directory and run the following command to start your Android or iOS application:
 
-#### Android için
+#### For Android
 
 ```bash
-# npm kullanarak
+# Using npm
 npm run android
 
-# YA DA Yarn kullanarak
+# OR Using Yarn
 yarn android
 ```
 
-#### iOS için
+#### For iOS
 
 ```bash
-# npm kullanarak
+# Using npm
 npm run ios
 
-# YA DA Yarn kullanarak
+# OR Using Yarn
 yarn ios
 ```
 
-Bu adımlar, uygulamanızı geliştirme ortamında çalıştırmanıza yardımcı olacaktır. Gelecekteki güncellemeler ve yeni özellikler için bizi takip edin!
+These steps will help you run your application in the development environment. Follow us for future updates and new features!
 
-## Uygulamanızı Değiştirme
+## Modifying Your Application
 
-Artık uygulamanızı başarıyla çalıştırdınız ve değiştirmeye hazırsınız.
+You have successfully run and modified your application.
 
-1. `App.tsx` dosyasını tercih ettiğiniz metin düzenleyicisinde açın ve bazı satırları düzenleyin.
-2. **Android için**: Değişikliklerinizi görmek için <kbd>R</kbd> tuşuna iki kez basın veya **Geliştirici Menüsü**nden (**Ctrl** + **M** (Windows ve Linux'ta) veya **Cmd ⌘** + **M** (macOS'ta)) **"Yenile"**yi seçin!
+1. Open the `App.tsx` file in your preferred text editor and modify some lines.
+2. **For Android**: Press the **R** key twice or select **"Reload"** from the **Developer Menu** (**Ctrl** + **M** on Windows and Linux or **Cmd ⌘** + **M** on macOS) to see your changes!
 
-   **iOS için**: Değişikliklerinizi görmek için iOS simülatörünüzde **Cmd ⌘** + **R** tuşlarına basın!
+   **For iOS**: Press **Cmd ⌘** + **R** in your iOS simulator to see your changes!
 
-## Tebrikler! :tada:
+## Congratulations! :tada:
 
-Başarıyla React Native uygulamanızı çalıştırdınız ve değiştirdiniz. :partying_face:
+You have successfully run and modified your React Native application. :partying_face:
 
-### Şimdi ne yapmalı?
+### What's Next?
 
-- Mevcut bir uygulamaya bu yeni React Native kodunu eklemek istiyorsanız, [Entegrasyon Kılavuzu](https://reactnative.dev/docs/integration-with-existing-apps)'nu inceleyin.
-- React Native hakkında daha fazla bilgi edinmek istiyorsanız, [React Native Giriş](https://reactnative.dev/docs/getting-started)'e bakın.
+- If you want to add this new React Native code to an existing application, check out the [Integration Guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- To learn more about React Native, visit [React Native Getting Started](https://reactnative.dev/docs/getting-started).
 
-# Sorun Giderme
+# Troubleshooting
 
-Uygulamayı çalıştıramıyorsanız, [Sorun Giderme](https://reactnative.dev/docs/troubleshooting) sayfasını ziyaret edin.
+If you can't run the application, visit the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
-# Daha Fazla Bilgi Edinin
+# Learn More
 
-React Native hakkında daha fazla bilgi edinmek için aşağıdaki kaynaklara bakın:
+For more information about React Native, check out the following resources:
 
-- [React Native Web Sitesi](https://reactnative.dev) - React Native hakkında daha fazla bilgi edinin.
-- [Başlarken](https://reactnative.dev/docs/environment-setup) - React Native ve ortamınızı kurma hakkında genel bir bakış.
-- [Temel Bilgiler](https://reactnative.dev/docs/getting-started) - React Native temel bilgilerine yönelik rehberli bir tur.
-- [Blog](https://reactnative.dev/blog) - En son resmi React Native blog gönderilerini okuyun.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - React Native'nin açık kaynak GitHub deposu.
+- [React Native Website](https://reactnative.dev) - Learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - A general overview of setting up React Native and your environment.
+- [Basic Concepts](https://reactnative.dev/docs/getting-started) - A guided tour of React Native basics.
+- [Blog](https://reactnative.dev/blog) - Read the latest official React Native blog posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - React Native's open-source GitHub repository.
