@@ -26,6 +26,11 @@ export const customerService = {
       
       let customers = [...mockCustomers];
       
+      // Role ve kullanıcı ID'sine göre filtreleme
+      if (params?.role === 'sales_rep' && params?.userId) {
+        customers = customers.filter(customer => customer.salesRepId === params.userId);
+      }
+      
       // Müşteri ID'sine göre filtreleme
       if (params?.customerId) {
         customers = customers.filter(customer => customer.id === params.customerId);

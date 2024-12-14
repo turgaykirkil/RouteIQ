@@ -41,47 +41,32 @@ const CustomerDetailScreen: React.FC<CustomerDetailScreenProps> = ({ navigation,
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [deleteDialogVisible, setDeleteDialogVisible] = React.useState(false);
   const [customer, setCustomer] = useState(null);
+  const [error, setError] = useState(null);
 
   const loggedInUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
-    console.log('CustomerDetailScreen: Logged In User', loggedInUser);
-    console.log('CustomerDetailScreen: Route Params', route.params);
-
-    if (loggedInUser) {
+    const loadCustomer = async () => {
       try {
-        const { customerId, customerData } = route.params;
-        console.log('CustomerDetailScreen: Extracted Customer ID', customerId);
-
-        // Eğer customerData varsa doğrudan onu kullan
-        if (customerData) {
-          console.log('CustomerDetailScreen: Using Route Customer Data', customerData);
-          setCustomer(customerData);
-          return;
-        }
-
-        if (!customerId) {
-          console.error('CustomerDetailScreen: No Customer ID provided');
-          return;
-        }
-        
-        // Müşteri detayını doğrudan ID ile çek
-        customerService.getCustomerById(customerId)
-          .then(response => {
-            console.log('CustomerDetailScreen: Customer Response', response);
+        if (route.params?.customerData) {
+          setCustomer(route.params.customerData);
+        } else if (route.params?.customerId) {
+          const response = await customerService.getCustomerById(route.params.customerId);
+          if (response) {
             setCustomer(response);
-          })
-          .catch(error => {
-            console.error('CustomerDetailScreen: Fetch Customer Error', error);
-            // Hata durumunda kullanıcıya bilgilendirme yapılabilir
-          });
-      } catch (error) {
-        console.error('CustomerDetailScreen: Unexpected Error', error);
+          } else {
+            setError('Müşteri bulunamadı');
+          }
+        } else {
+          setError('Müşteri ID bulunamadı');
+        }
+      } catch (err: any) {
+        setError(err?.message || 'Müşteri yüklenirken bir hata oluştu');
       }
-    } else {
-      console.warn('CustomerDetailScreen: No Logged In User');
-    }
-  }, [loggedInUser, route.params]);
+    };
+
+    loadCustomer();
+  }, [route.params]);
 
   const handleCall = () => {
     if (customer && customer.phone) {

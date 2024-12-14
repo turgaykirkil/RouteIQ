@@ -5,7 +5,10 @@ import {
   TouchableOpacity,
   RefreshControl,
   SafeAreaView,
-  StyleSheet
+  StyleSheet,
+  Alert,
+  Platform,
+  Linking
 } from 'react-native';
 import {
   Text,
@@ -22,15 +25,16 @@ import {
   List,
   Divider,
   useTheme,
-  Alert,
   Icon
 } from 'react-native-paper';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CustomerStackParamList } from '../../navigation/types';
-import { customerAPI } from '../../services/api';
+import { customerService } from '../../services/customerService';
 import theme from '../../theme';
 import { sortCustomersByDistance } from '../../utils/geoUtils';
 import Geolocation from '@react-native-community/geolocation';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 type CustomerListScreenProps = {
   navigation: NativeStackNavigationProp<CustomerStackParamList, 'CustomerList'>;
@@ -47,6 +51,7 @@ type Customer = {
 
 const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) => {
   const themeWithCustom = useTheme();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -58,27 +63,49 @@ const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) =
   const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
 
   useEffect(() => {
-    // Kullanıcının konumunu al
-    Geolocation.getCurrentPosition(
-      (position) => {
+    const checkLocationPermission = async () => {
+      try {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
+            });
+          },
+          (error) => {
+            Alert.alert(
+              'Konum Bilgisi',
+              'Konumunuza yakın firmaları görebilmeniz için konum ayarlarına izin vermeniz gerekmektedir.',
+              [
+                {
+                  text: 'Tamam',
+                  onPress: () => {
+                    setUserLocation({
+                      lat: 38.4192, // İzmir merkez koordinatları
+                      lon: 27.1287
+                    });
+                  }
+                }
+              ]
+            );
+          }
+        );
+      } catch (error) {
         setUserLocation({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude
+          lat: 38.4192,
+          lon: 27.1287
         });
-      },
-      (error) => {
-        console.log('Konum alınamadı', error);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    );
+      }
+    };
 
-    // Müşterileri çek
     const fetchCustomers = async () => {
       try {
         setLoading(true);
-        const fetchedCustomers = await customerAPI.getAll();
+        const fetchedCustomers = await customerService.getCustomers({
+          role: user.role,
+          userId: user.id
+        });
         
-        // Eğer kullanıcı konumu varsa sırala
         if (userLocation) {
           const sortedCustomers = sortCustomersByDistance(
             fetchedCustomers, 
@@ -90,26 +117,26 @@ const CustomerListScreen: React.FC<CustomerListScreenProps> = ({ navigation }) =
           setCustomers(fetchedCustomers);
         }
       } catch (error) {
-        Alert.alert('Error', 'Failed to fetch customers');
+        if (__DEV__) {
+          console.error('Müşteriler alınırken hata:', error);
+        }
+        Alert.alert(
+          'Hata',
+          'Müşteri listesi alınırken bir hata oluştu. Lütfen tekrar deneyin.'
+        );
       } finally {
         setLoading(false);
       }
     };
 
+    checkLocationPermission();
     fetchCustomers();
-  }, [userLocation]);
+  }, []);
 
   const handleCustomerPress = (customer: Customer) => {
-    console.log('CustomerListScreen: Customer Pressed', customer);
-    
-    // Detay sayfasına geçiş
-    navigation.navigate('CustomerDetail', { 
+    navigation.navigate('CustomerDetail', {
       customerId: customer.id,
-      customerData: customer  // Tüm müşteri verilerini de geçirelim
-    });
-    
-    console.log('CustomerListScreen: Navigation to CustomerDetail triggered', {
-      customerId: customer.id
+      customerData: customer
     });
   };
 

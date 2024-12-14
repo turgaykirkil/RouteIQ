@@ -17,9 +17,6 @@ export const taskService = {
     role?: 'admin' | 'supervisor' | 'sales_rep';
   }) => {
 
-    // Log the start of the operation with timestamp
-    const startTime = Date.now();
-
     await delay(500);
     
     let tasks = [...db.tasks];
@@ -28,7 +25,6 @@ export const taskService = {
     // Apply search filter
     if (params?.search) {
       const searchLower = params.search.toLowerCase();
-      const initialCount = tasks.length;
       
       tasks = tasks.filter(task => {
         const matchTitle = task.title.toLowerCase().includes(searchLower);
@@ -41,7 +37,6 @@ export const taskService = {
 
     // Apply status filter
     if (params?.status?.length) {
-      const initialCount = tasks.length;
       
       tasks = tasks.filter(task => {
         const isStatusMatch = params.status.includes(task.status);
@@ -52,7 +47,6 @@ export const taskService = {
 
     // Apply priority filter
     if (params?.priority?.length) {
-      const initialCount = tasks.length;
       
       tasks = tasks.filter(task => {
         const isPriorityMatch = params.priority.includes(task.priority);
@@ -74,35 +68,36 @@ export const taskService = {
 
     }
 
-    // Log operation duration
-    const endTime = Date.now();
-    const duration = endTime - startTime;
-    
-
     return tasks;
   },
 
   // Get task by id
   getTaskById: async (id: string): Promise<Task | undefined> => {
-    await delay(300);
-    const userStr = await AsyncStorage.getItem('user');
-    if (!userStr) {
-      throw new Error('Kullanıcı girişi yapılmamış!');
+    try {
+      await delay(300);
+
+      const userStr = await AsyncStorage.getItem('user');
+      if (!userStr) {
+        throw new Error('Kullanıcı girişi yapılmamış!');
+      }
+      
+      const user = JSON.parse(userStr);
+
+      const task = db.tasks.find(t => t.id === id);
+      
+      if (!task) {
+        throw new Error('Görev bulunamadı!');
+      }
+      
+      // Eğer kullanıcı sales_rep ise ve görev kendisine ait değilse, erişimi engelle
+      if (user.role === 'sales_rep' && task.salesRepId !== user.id) {
+        throw new Error('Bu göreve erişim yetkiniz yok!');
+      }
+      
+      return task;
+    } catch (error) {
+      throw error;
     }
-    
-    const user = JSON.parse(userStr);
-    const task = db.tasks.find(t => t.id === id);
-    
-    if (!task) {
-      throw new Error('Görev bulunamadı!');
-    }
-    
-    // Eğer kullanıcı sales_rep ise ve görev kendisine ait değilse, erişimi engelle
-    if (user.role === 'sales_rep' && task.salesRepId !== user.id) {
-      throw new Error('Bu göreve erişim yetkiniz yok!');
-    }
-    
-    return task;
   },
 
   // Create new task

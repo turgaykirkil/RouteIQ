@@ -11,10 +11,10 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		69D374C9BCF5420B4AC9BD49 /* libPods-RouteIQ.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 437F5C4E404A1F7139870FE4 /* libPods-RouteIQ.a */; };
+		1C673272353399A03ECCC6FF /* libPods-RouteIQ.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */; };
+		3349A6CC0C6078B6CCCF2BDC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8905A668ACF231F71562AF51 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
-		92BB4371B0927D4AA13A6531 /* libPods-RouteIQ-RouteIQTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 497565938596BD855DCAFC1E /* libPods-RouteIQ-RouteIQTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,7 +31,7 @@
 		00E356EE1AD99517003FC87E /* RouteIQTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteIQTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* RouteIQTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RouteIQTests.m; sourceTree = "<group>"; };
-		02024322FD9E2E275EE4B815 /* Pods-RouteIQ.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.debug.xcconfig"; sourceTree = "<group>"; };
+		0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RouteIQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteIQ.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RouteIQ/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = RouteIQ/AppDelegate.mm; sourceTree = "<group>"; };
@@ -39,12 +39,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RouteIQ/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RouteIQ/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = RouteIQ/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		437F5C4E404A1F7139870FE4 /* libPods-RouteIQ.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		497565938596BD855DCAFC1E /* libPods-RouteIQ-RouteIQTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ-RouteIQTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5BCF70EF08F7788D274CD6C7 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.debug.xcconfig"; sourceTree = "<group>"; };
-		617631E07E1A8C12B183A68D /* Pods-RouteIQ-RouteIQTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.release.xcconfig"; sourceTree = "<group>"; };
+		33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.release.xcconfig"; sourceTree = "<group>"; };
+		3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RouteIQ/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9198620ABFDE381ED1ADB0AB /* Pods-RouteIQ.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.release.xcconfig"; sourceTree = "<group>"; };
+		841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ-RouteIQTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92BB4371B0927D4AA13A6531 /* libPods-RouteIQ-RouteIQTests.a in Frameworks */,
+				3349A6CC0C6078B6CCCF2BDC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				69D374C9BCF5420B4AC9BD49 /* libPods-RouteIQ.a in Frameworks */,
+				1C673272353399A03ECCC6FF /* libPods-RouteIQ.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,8 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				437F5C4E404A1F7139870FE4 /* libPods-RouteIQ.a */,
-				497565938596BD855DCAFC1E /* libPods-RouteIQ-RouteIQTests.a */,
+				9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */,
+				841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -143,10 +143,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				02024322FD9E2E275EE4B815 /* Pods-RouteIQ.debug.xcconfig */,
-				9198620ABFDE381ED1ADB0AB /* Pods-RouteIQ.release.xcconfig */,
-				5BCF70EF08F7788D274CD6C7 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */,
-				617631E07E1A8C12B183A68D /* Pods-RouteIQ-RouteIQTests.release.xcconfig */,
+				0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */,
+				3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */,
+				9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */,
+				33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -158,12 +158,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RouteIQTests" */;
 			buildPhases = (
-				1AB5DDCECA269BFF6F8D2651 /* [CP] Check Pods Manifest.lock */,
+				E63A2B67F1CB33871727745B /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				783F4AFB7287A2B0D11ADC9F /* [CP] Embed Pods Frameworks */,
-				2FB403C81F8BA0C4646E253E /* [CP] Copy Pods Resources */,
+				21CF27EF3539B84868FDDFCB /* [CP] Embed Pods Frameworks */,
+				E01F32242F1D32A22B9F9D8C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -179,13 +179,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RouteIQ" */;
 			buildPhases = (
-				86494437CD21037584F98D3F /* [CP] Check Pods Manifest.lock */,
+				89E6F1DCD053CC99B6A5D96C /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				229C8EF196908FB92373D837 /* [CP] Embed Pods Frameworks */,
-				D0D8B2775F53FC3869B2310C /* [CP] Copy Pods Resources */,
+				00D255D88B1D556C1C5EAC5F /* [CP] Embed Pods Frameworks */,
+				B9065962D85F44B11C3838A5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -202,7 +202,8 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1210;
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -253,45 +254,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/.xcode.env.local",
-				"$(SRCROOT)/.xcode.env",
-			);
-			name = "Bundle React Native code and images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
-		};
-		1AB5DDCECA269BFF6F8D2651 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RouteIQ-RouteIQTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		229C8EF196908FB92373D837 /* [CP] Embed Pods Frameworks */ = {
+		00D255D88B1D556C1C5EAC5F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -308,24 +271,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2FB403C81F8BA0C4646E253E /* [CP] Copy Pods Resources */ = {
+		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			inputPaths = (
+				"$(SRCROOT)/.xcode.env.local",
+				"$(SRCROOT)/.xcode.env",
 			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			name = "Bundle React Native code and images";
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		783F4AFB7287A2B0D11ADC9F /* [CP] Embed Pods Frameworks */ = {
+		21CF27EF3539B84868FDDFCB /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -342,7 +304,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		86494437CD21037584F98D3F /* [CP] Check Pods Manifest.lock */ = {
+		89E6F1DCD053CC99B6A5D96C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -364,7 +326,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D0D8B2775F53FC3869B2310C /* [CP] Copy Pods Resources */ = {
+		B9065962D85F44B11C3838A5 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -379,6 +341,45 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E01F32242F1D32A22B9F9D8C /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E63A2B67F1CB33871727745B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RouteIQ-RouteIQTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -414,9 +415,10 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5BCF70EF08F7788D274CD6C7 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */;
+			baseConfigurationReference = 9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -441,10 +443,11 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 617631E07E1A8C12B183A68D /* Pods-RouteIQ-RouteIQTests.release.xcconfig */;
+			baseConfigurationReference = 33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = RouteIQTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -465,13 +468,14 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 02024322FD9E2E275EE4B815 /* Pods-RouteIQ.debug.xcconfig */;
+			baseConfigurationReference = 0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QZVGF95DGP;
 				ENABLE_BITCODE = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = RouteIQ/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -494,12 +498,13 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9198620ABFDE381ED1ADB0AB /* Pods-RouteIQ.release.xcconfig */;
+			baseConfigurationReference = 3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QZVGF95DGP;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = RouteIQ/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -523,6 +528,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -552,6 +558,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -605,6 +612,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -634,6 +642,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;

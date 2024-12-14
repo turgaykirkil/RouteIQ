@@ -1,43 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from 'react-native';
-import {
-  Text,
-  Card,
-  Chip,
-  Button,
-  IconButton,
-  Menu,
-  Dialog,
-  TextInput,
-  useTheme,
-  MD3Theme,
-  Portal,
-} from 'react-native-paper';
-import {useDispatch, useSelector} from 'react-redux';
-import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
-import type {
-  TaskStackNavigationProp,
-  TaskStackParamList,
-  MainTabParamList,
-} from '../../navigation/types';
-import {
-  fetchTaskById,
-  updateTaskStatus,
-  updateTaskProgress,
-  updateChecklistItem,
-  deleteTask,
-  TaskStatus,
-} from '../../store/slices/taskSlice';
-import {RootState} from '../../store';
-import {Task, formatDate, getPriorityColor} from '../../types/task';
-import {AppDispatch} from '../../store';
-import taskService from '../../services/taskService'; // Import taskService
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { Task, formatDate, getPriorityColor } from '../../types/task';
+import { taskService } from '../../services/taskService';
+import { Text, Button, Menu, Portal, Dialog, Card, Chip, TextInput, useTheme, MD3Theme, IconButton, ActivityIndicator, Surface, Divider } from 'react-native-paper';
+import { AppDispatch } from '../../store/store';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { TaskStackNavigationProp, TaskStackParamList } from '../../navigation/types';
+import { MainTabParamList } from '../../navigation/types';
 
 // Define route prop types
 interface TaskDetailScreenRouteProp extends RouteProp<TaskStackParamList, 'TaskDetail'> {}
@@ -47,68 +19,81 @@ interface CompositeNavigationProp extends TaskStackNavigationProp {
   navigate: (screen: keyof MainTabParamList, params: any) => void;
 }
 
-const TaskDetailScreen: React.FC = () => {
-  const theme = useTheme();
-  const navigation = useNavigation<CompositeNavigationProp>();
-  const route = useRoute<TaskDetailScreenRouteProp>();
-  const dispatch = useDispatch<AppDispatch>();
-  const {taskId} = route.params;
-  const {selectedTask: task, loading} = useSelector(
-    (state: RootState) => state.tasks,
-  );
-  const loggedInUser = useSelector((state: RootState) => state.user);
+interface TaskDetailScreenProps {
+  route: TaskDetailScreenRouteProp;
+}
 
+const TaskDetailScreen = ({ route }: TaskDetailScreenProps) => {
+  const theme = useTheme();
+  const { taskId } = route.params;
+  const navigation = useNavigation<CompositeNavigationProp>();
+  const dispatch = useDispatch<AppDispatch>();
+  const loggedInUser = useSelector((state: RootState) => state.auth.user);
+  const [localTask, setLocalTask] = useState<Task | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [progressDialogVisible, setProgressDialogVisible] = useState(false);
   const [progress, setProgress] = useState('0');
 
   useEffect(() => {
-    if (loggedInUser) {
-      dispatch(fetchTaskById(taskId));
-      // API call with userId parameter
-      taskService.getTasks({ userId: loggedInUser.id }).then(response => {
-        // Update tasks
-        // setTasks(response); // Commented out because setTasks is not defined
-      }).catch(error => {
-        console.error('API Error:', error);
-      });
-    }
-  }, [dispatch, taskId, loggedInUser]);
+    const loadTask = async () => {
+      if (!loggedInUser || !taskId) {
+        setError('Gerekli bilgiler eksik');
+        setLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-  }, [task]);
+      try {
+        setError(null);
+        const response = await taskService.getTaskById(taskId);
 
-  useEffect(() => {
-    if (loggedInUser) {
-      const filteredTasks = task && (loggedInUser.canViewAll || task.salesRepId === loggedInUser.id) ? [task] : [];
-      const fetchedTask = filteredTasks[0] || null;
-    } else {
+        if (!response) {
+          setError('Görev bulunamadı');
+          setLoading(false);
+          return;
+        }
+        
+        setLocalTask(response);
+        setLoading(false);
+      } catch (err: any) {
+        setError(err?.message || 'Görev yüklenirken bir hata oluştu');
+        setLoading(false);
+      }
+    };
+
+    loadTask();
+  }, [taskId, loggedInUser]);
+
+  // Yardımcı fonksiyon - eksik verileri kontrol etmek için
+  const getDisplayValue = (value: any, defaultValue: string = 'N/A') => {
+    if (value === null || value === undefined || value === '') {
+      return defaultValue;
     }
-  }, [route.params.taskId, loggedInUser, task]);
+    return value;
+  };
 
   if (loading) {
     return (
       <View style={styles(theme).loadingContainer}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles(theme).loadingText}>Görev yükleniyor...</Text>
       </View>
     );
   }
 
-  if (!task) {
+  if (error || !localTask) {
     return (
       <View style={styles(theme).errorContainer}>
-        <Text>Task not found</Text>
-      </View>
-    );
-  }
-
-  const fetchedTask = task && (loggedInUser.canViewAll || task.salesRepId === loggedInUser.id) ? task : null;
-
-  if (!fetchedTask) {
-    return (
-      <View style={styles(theme).errorContainer}>
-        <Text>Task not found for the logged-in user</Text>
+        <Text variant="headlineSmall" style={styles(theme).errorText}>{error || 'Görev bulunamadı'}</Text>
+        <Button 
+          mode="contained" 
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 16 }}
+        >
+          Geri Dön
+        </Button>
       </View>
     );
   }
@@ -116,7 +101,7 @@ const TaskDetailScreen: React.FC = () => {
   const handleStatusChange = async (newStatus: TaskStatus) => {
     try {
       await dispatch(
-        updateTaskStatus({id: fetchedTask?.id || '', status: newStatus}),
+        updateTaskStatus({id: localTask.id || '', status: newStatus}),
       ).unwrap();
       setMenuVisible(false);
     } catch (error) {
@@ -133,7 +118,7 @@ const TaskDetailScreen: React.FC = () => {
 
     try {
       await dispatch(
-        updateTaskProgress({id: fetchedTask?.id || '', progress: progressValue}),
+        updateTaskProgress({id: localTask.id || '', progress: progressValue}),
       ).unwrap();
       setProgressDialogVisible(false);
     } catch (error) {
@@ -144,7 +129,7 @@ const TaskDetailScreen: React.FC = () => {
   const handleChecklistItemToggle = async (itemId: string) => {
     try {
       await dispatch(
-        updateChecklistItem({taskId: fetchedTask?.id || '', itemId, completed: true}),
+        updateChecklistItem({taskId: localTask.id || '', itemId, completed: true}),
       ).unwrap();
     } catch (error) {
       Alert.alert('Error', 'Failed to update checklist item');
@@ -153,7 +138,7 @@ const TaskDetailScreen: React.FC = () => {
 
   const handleDelete = async () => {
     try {
-      await dispatch(deleteTask(fetchedTask?.id || '')).unwrap();
+      await dispatch(deleteTask(localTask.id || '')).unwrap();
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to delete task');
@@ -170,120 +155,88 @@ const TaskDetailScreen: React.FC = () => {
   return (
     <>
       <ScrollView style={styles(theme).container}>
-        <Card style={styles(theme).card}>
+        <Surface style={styles(theme).headerCard} elevation={2}>
+          <View style={styles(theme).headerContent}>
+            <Text variant="headlineMedium" style={styles(theme).title}>
+              {getDisplayValue(localTask.title)}
+            </Text>
+            <IconButton
+              icon="dots-vertical"
+              onPress={() => setMenuVisible(true)}
+              style={styles(theme).menuButton}
+            />
+          </View>
+          <Chip mode="outlined" style={[styles(theme).statusChip, { backgroundColor: getPriorityColor(localTask.priority, theme) }]}>
+            {getDisplayValue(localTask.status).toUpperCase()}
+          </Chip>
+        </Surface>
+
+        <Card style={styles(theme).contentCard}>
           <Card.Content>
-            <View style={styles(theme).header}>
-              <View style={styles(theme).titleContainer}>
-                <Text style={styles(theme).title}>{fetchedTask.title || 'N/A'}</Text>
-                <Chip
-                  style={[
-                    styles(theme).priorityChip,
-                    {backgroundColor: getPriorityColor(fetchedTask.priority)},
-                  ]}
-                  textStyle={styles(theme).chipText}>
-                  {fetchedTask.priority ? fetchedTask.priority.toUpperCase() : 'N/A'}
+            <Text variant="titleMedium" style={styles(theme).sectionTitle}>Detaylar</Text>
+            <Text variant="bodyLarge" style={styles(theme).description}>
+              {getDisplayValue(localTask.description)}
+            </Text>
+            
+            <Divider style={styles(theme).divider} />
+            
+            <View style={styles(theme).detailsGrid}>
+              <View style={styles(theme).detailItem}>
+                <Text variant="labelMedium" style={styles(theme).label}>Öncelik</Text>
+                <Chip mode="outlined" style={styles(theme).priorityChip}>
+                  {getDisplayValue(localTask.priority)}
                 </Chip>
               </View>
-            </View>
+              
+              <View style={styles(theme).detailItem}>
+                <Text variant="labelMedium" style={styles(theme).label}>Bitiş Tarihi</Text>
+                <Text variant="bodyMedium">{formatDate(localTask.dueDate)}</Text>
+              </View>
 
-            <Text style={styles(theme).description}>{fetchedTask.description || 'N/A'}</Text>
-
-            <View style={styles(theme).infoContainer}>
-              <View style={styles(theme).infoItem}>
-                <Text style={styles(theme).infoLabel}>Due Date</Text>
-                <Text style={styles(theme).infoValue}>
-                  {fetchedTask.dueDate ? formatDate(fetchedTask.dueDate) : 'N/A'}
+              <TouchableOpacity 
+                style={styles(theme).detailItem}
+                onPress={() => handleCustomerPress(localTask.customerId)}
+              >
+                <Text variant="labelMedium" style={styles(theme).label}>Müşteri</Text>
+                <Text variant="bodyMedium" style={styles(theme).linkText}>
+                  {getDisplayValue(localTask.customerName)}
                 </Text>
-              </View>
+              </TouchableOpacity>
 
-              <View style={styles(theme).infoItem}>
-                <Text style={styles(theme).infoLabel}>Customer</Text>
-                <TouchableOpacity
-                  onPress={() => handleCustomerPress(fetchedTask.customerId)}>
-                  <Text style={[styles(theme).infoValue, styles(theme).link]}>
-                    {fetchedTask.customerName || 'N/A'}
-                  </Text>
-                </TouchableOpacity>
+              <View style={styles(theme).detailItem}>
+                <Text variant="labelMedium" style={styles(theme).label}>Atanan</Text>
+                <Text variant="bodyMedium">{getDisplayValue(localTask.assigneeName)}</Text>
               </View>
-
-              <View style={styles(theme).infoItem}>
-                <Text style={styles(theme).infoLabel}>Assigned To</Text>
-                <Text style={styles(theme).infoValue}>{fetchedTask.assigneeName || 'N/A'}</Text>
-              </View>
-            </View>
-
-            <View style={styles(theme).section}>
-              <Text style={styles(theme).sectionTitle}>Status & Progress</Text>
-              <View style={styles(theme).statusContainer}>
-                <Menu
-                  visible={menuVisible}
-                  onDismiss={() => setMenuVisible(false)}
-                  anchor={
-                    <Button
-                      mode="outlined"
-                      onPress={() => setMenuVisible(true)}
-                      style={styles(theme).statusButton}>
-                      {fetchedTask.status ? fetchedTask.status.replace('_', ' ').toUpperCase() : 'N/A'}
-                    </Button>
-                  }>
-                  <Menu.Item
-                    onPress={() => handleStatusChange('todo')}
-                    title="To Do"
-                  />
-                  <Menu.Item
-                    onPress={() => handleStatusChange('in_progress')}
-                    title="In Progress"
-                  />
-                  <Menu.Item
-                    onPress={() => handleStatusChange('completed')}
-                    title="Completed"
-                  />
-                </Menu>
-                <View style={styles(theme).progressContainer}>
-                  <View style={styles(theme).progressBarContainer}>
-                    <View
-                      style={[
-                        styles(theme).progressBar,
-                        {
-                          width: `${fetchedTask.progress || 0}%`,
-                          backgroundColor: theme.colors.primary,
-                        },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles(theme).progressText}>
-                    {fetchedTask.progress !== undefined ? `${fetchedTask.progress}%` : 'N/A'}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles(theme).section}>
-              <Text style={styles(theme).sectionTitle}>Checklist</Text>
-              {fetchedTask.checklist && fetchedTask.checklist.length > 0 ? (
-                fetchedTask.checklist.map(item => (
-                  <View key={item.id} style={styles(theme).checklistItem}>
-                    <Text style={styles(theme).infoValue}>{item.title || 'N/A'}</Text>
-                    <TouchableOpacity
-                      onPress={() => handleChecklistItemToggle(item.id)}>
-                      <Text
-                        style={[
-                          styles(theme).infoValue,
-                          item.completed
-                            ? styles(theme).link
-                            : {textDecorationLine: 'none'},
-                        ]}>
-                        {item.completed ? 'Completed' : 'Not Completed'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles(theme).infoValue}>No checklist items</Text>
-              )}
             </View>
           </Card.Content>
         </Card>
+
+        {localTask.checklist && localTask.checklist.length > 0 && (
+          <Card style={styles(theme).contentCard}>
+            <Card.Content>
+              <Text variant="titleMedium" style={styles(theme).sectionTitle}>Kontrol Listesi</Text>
+              {localTask.checklist.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles(theme).checklistItem}
+                  onPress={() => handleChecklistItemToggle(item.id)}
+                >
+                  <IconButton
+                    icon={item.completed ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                    size={24}
+                    onPress={() => handleChecklistItemToggle(item.id)}
+                  />
+                  <Text variant="bodyMedium" style={[
+                    styles(theme).checklistText,
+                    item.completed && styles(theme).completedText
+                  ]}>
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </Card.Content>
+          </Card>
+        )}
       </ScrollView>
 
       <Portal>
@@ -326,122 +279,104 @@ const TaskDetailScreen: React.FC = () => {
   );
 };
 
-// Define styles for the component
-const styles = (theme: MD3Theme) =>
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-      padding: 16,
-    },
-    loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    errorContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    card: {
-      margin: 8,
-      elevation: 2,
-    },
-    header: {
-      marginBottom: 16,
-    },
-    titleContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: theme.colors.onSurface,
-      flex: 1,
-      marginRight: 8,
-    },
-    priorityChip: {
-      minWidth: 80,
-    },
-    chipText: {
-      color: theme.colors.surface,
-    },
-    description: {
-      fontSize: 16,
-      color: theme.colors.onSurface,
-      marginBottom: 16,
-    },
-    infoContainer: {
-      marginBottom: 16,
-    },
-    infoItem: {
-      marginBottom: 8,
-    },
-    infoLabel: {
-      fontSize: 12,
-      color: theme.colors.secondary,
-      marginBottom: 4,
-    },
-    infoValue: {
-      fontSize: 14,
-      color: theme.colors.onSurface,
-    },
-    link: {
-      color: theme.colors.primary,
-    },
-    section: {
-      marginVertical: 16,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: theme.colors.onSurface,
-      marginBottom: 8,
-    },
-    statusSection: {
-      marginBottom: 16,
-    },
-    statusContainer: {
-      flexDirection: 'column',
-      gap: 8,
-    },
-    statusButton: {
-      alignSelf: 'flex-start',
-      marginBottom: 8,
-    },
-    progressContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 8,
-    },
-    progressBarContainer: {
-      flex: 1,
-      height: 8,
-      backgroundColor: theme.colors.surfaceVariant,
-      borderRadius: 4,
-      marginHorizontal: 8,
-    },
-    progressBar: {
-      flex: 1,
-      height: 8,
-      borderRadius: 4,
-    },
-    progressText: {
-      fontSize: 12,
-      minWidth: 40,
-    },
-    checklistSection: {
-      marginBottom: 16,
-    },
-    checklistItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 8,
-    },
-  });
+const styles = (theme: MD3Theme) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  },
+  loadingText: {
+    marginTop: 16,
+    color: theme.colors.primary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: theme.colors.background,
+  },
+  errorText: {
+    textAlign: 'center',
+    marginBottom: 16,
+    color: theme.colors.error,
+  },
+  headerCard: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    flex: 1,
+    color: theme.colors.onSurface,
+  },
+  menuButton: {
+    margin: -8,
+  },
+  statusChip: {
+    marginTop: 12,
+    alignSelf: 'flex-start',
+  },
+  contentCard: {
+    margin: 16,
+    marginTop: 0,
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    color: theme.colors.primary,
+    marginBottom: 12,
+  },
+  description: {
+    color: theme.colors.onSurface,
+    marginBottom: 16,
+  },
+  divider: {
+    marginVertical: 16,
+  },
+  detailsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -8,
+  },
+  detailItem: {
+    width: '50%',
+    paddingHorizontal: 8,
+    marginBottom: 16,
+  },
+  label: {
+    color: theme.colors.onSurfaceVariant,
+    marginBottom: 4,
+  },
+  priorityChip: {
+    alignSelf: 'flex-start',
+  },
+  linkText: {
+    color: theme.colors.primary,
+  },
+  checklistItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 4,
+  },
+  checklistText: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  completedText: {
+    textDecorationLine: 'line-through',
+    color: theme.colors.onSurfaceVariant,
+  },
+});
 
 export default TaskDetailScreen;

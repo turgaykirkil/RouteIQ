@@ -7,7 +7,7 @@ import NewCustomerScreen from '../screens/customers/NewCustomerScreen';
 import EditCustomerScreen from '../screens/customers/EditCustomerScreen';
 import CustomerMapScreen from '../screens/customers/CustomerMapScreen';
 import CustomerAnalyticsScreen from '../screens/analytics/CustomerAnalyticsScreen';
-import MapScreen from '../screens/map/MapScreen';
+import MapScreen from '../screens/main/MapScreen';
 import { CustomerStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();

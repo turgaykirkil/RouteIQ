@@ -169,6 +169,10 @@ const TaskListScreen: React.FC = () => {
       .sort((a, b) => new Date(b.dueDate).getTime() - new Date(a.dueDate).getTime());
   }, [localTasks, searchQuery, selectedFilter]);
 
+  const handleTaskPress = (taskId: string) => {
+    navigation.navigate('TaskDetail', { taskId });
+  };
+
   if (isLoading) {
     return (
       <View style={[styles.container, styles.emptyContainer]}>
@@ -214,7 +218,7 @@ const TaskListScreen: React.FC = () => {
               <TouchableOpacity
                 key={task.id}
                 style={styles.taskItem}
-                onPress={() => navigation.navigate('TaskDetail', { taskId: task.id })}>
+                onPress={() => handleTaskPress(task.id)}>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Text style={styles.taskTitle}>{task.title}</Text>
                   <Chip
