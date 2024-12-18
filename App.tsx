@@ -10,10 +10,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as PaperProvider } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 import store from './src/store/store';
 import AppNavigator from './src/navigation/AppNavigator';
 import theme from './src/theme';
 import { login } from './src/store/authSlice';
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 const App: React.FC = () => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -40,13 +48,15 @@ const App: React.FC = () => {
   }
 
   return (
-    <ReduxProvider store={store}>
-      <PaperProvider theme={theme}>
-        <SafeAreaProvider>
-          <AppNavigator />
-        </SafeAreaProvider>
-      </PaperProvider>
-    </ReduxProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <ReduxProvider store={store}>
+        <PaperProvider theme={theme}>
+          <SafeAreaProvider>
+            <AppNavigator />
+          </SafeAreaProvider>
+        </PaperProvider>
+      </ReduxProvider>
+    </GestureHandlerRootView>
   );
 };
 

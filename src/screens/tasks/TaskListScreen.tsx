@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   StyleSheet,
-  ScrollView,
   SafeAreaView,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {
   Text,
@@ -24,6 +24,7 @@ import { RootState } from '../../store';
 import { Task, formatDate, getPriorityColor } from '../../types/task';
 import { AppDispatch } from '../../store';
 import { taskAPI } from '../../services/api';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const TaskListScreen: React.FC = () => {
   const theme = useTheme();
@@ -67,40 +68,75 @@ const TaskListScreen: React.FC = () => {
           padding: 16,
           backgroundColor: theme.colors.surface,
           elevation: 4,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
         },
         searchBar: {
           marginBottom: 8,
+          elevation: 0,
+          backgroundColor: theme.colors.background,
+          borderWidth: 1,
+          borderColor: theme.colors.outline,
         },
         filterContainer: {
           flexDirection: 'row',
           paddingHorizontal: 16,
-          paddingBottom: 8,
         },
         filterChip: {
+          flex: 1,
           marginRight: 8,
+          height: 32,
+        },
+        chipLabel: {
+          fontSize: 12,
+        },
+        taskListContainer: {
+          paddingVertical: 8,
         },
         taskItem: {
           backgroundColor: theme.colors.surface,
           marginHorizontal: 16,
-          marginVertical: 8,
+          marginVertical: 6,
           padding: 16,
-          borderRadius: 8,
+          borderRadius: 12,
           elevation: 2,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+        },
+        taskHeader: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 8,
         },
         taskTitle: {
-          fontSize: 18,
-          fontWeight: 'bold',
+          fontSize: 16,
+          fontWeight: '600',
           flex: 1,
           marginRight: 8,
           color: theme.colors.onSurface,
         },
         priorityChip: {
-          minWidth: 80,
+          borderRadius: 12,
+          height: 24,
+          paddingHorizontal: 8,
+          minWidth: 65,
+        },
+        priorityLabel: {
+          fontSize: 11,
+          textTransform: 'lowercase',
+          marginVertical: 0,
+          includeFontPadding: false,
         },
         taskDescription: {
           fontSize: 14,
           color: theme.colors.onSurfaceVariant,
-          marginBottom: 8,
+          marginBottom: 12,
+          lineHeight: 20,
         },
         taskFooter: {
           flexDirection: 'row',
@@ -110,6 +146,7 @@ const TaskListScreen: React.FC = () => {
         taskDate: {
           fontSize: 12,
           color: theme.colors.onSurfaceVariant,
+          fontWeight: '500',
         },
         statusContainer: {
           flexDirection: 'row',
@@ -119,11 +156,13 @@ const TaskListScreen: React.FC = () => {
           width: 8,
           height: 8,
           borderRadius: 4,
-          marginRight: 4,
+          marginRight: 6,
         },
         statusText: {
           fontSize: 12,
           color: theme.colors.onSurfaceVariant,
+          fontWeight: '500',
+          textTransform: 'capitalize',
         },
         emptyContainer: {
           flex: 1,
@@ -134,6 +173,12 @@ const TaskListScreen: React.FC = () => {
         emptyText: {
           fontSize: 16,
           color: theme.colors.onSurfaceVariant,
+          textAlign: 'center',
+          marginTop: 8,
+        },
+        emptyIcon: {
+          marginBottom: 12,
+          opacity: 0.7,
         },
         fab: {
           position: 'absolute',
@@ -186,66 +231,117 @@ const TaskListScreen: React.FC = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <Searchbar
-            placeholder="Search tasks"
+            placeholder="Görev ara..."
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={styles.searchBar}
+            iconColor={theme.colors.onSurfaceVariant}
+            placeholderTextColor={theme.colors.onSurfaceVariant}
           />
           <View style={styles.filterContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {['todo', 'in_progress', 'completed'].map(filter => (
-                <Chip
-                  key={filter}
-                  selected={selectedFilter === filter}
-                  onPress={() =>
-                    setSelectedFilter(selectedFilter === filter ? null : filter)
-                  }
-                  style={styles.filterChip}>
-                  {filter.replace('_', ' ').toUpperCase()}
-                </Chip>
-              ))}
-            </ScrollView>
+            <Chip
+              selected={selectedFilter === 'todo'}
+              onPress={() => setSelectedFilter(selectedFilter === 'todo' ? null : 'todo')}
+              style={styles.filterChip}
+              mode="outlined"
+              compact
+              showSelectedCheck={true}
+              selectedColor={theme.colors.primary}
+              textStyle={styles.chipLabel}
+            >
+              To Do
+            </Chip>
+            <Chip
+              selected={selectedFilter === 'in_progress'}
+              onPress={() => setSelectedFilter(selectedFilter === 'in_progress' ? null : 'in_progress')}
+              style={styles.filterChip}
+              mode="outlined"
+              compact
+              showSelectedCheck={true}
+              selectedColor={theme.colors.primary}
+              textStyle={styles.chipLabel}
+            >
+              In Progress
+            </Chip>
+            <Chip
+              selected={selectedFilter === 'completed'}
+              onPress={() => setSelectedFilter(selectedFilter === 'completed' ? null : 'completed')}
+              style={[styles.filterChip, { marginRight: 0 }]}
+              mode="outlined"
+              compact
+              showSelectedCheck={true}
+              selectedColor={theme.colors.primary}
+              textStyle={styles.chipLabel}
+            >
+              Completed
+            </Chip>
           </View>
         </View>
 
         {filteredTasks.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No tasks found</Text>
+            <MaterialCommunityIcons
+              name="clipboard-text-outline"
+              size={48}
+              color={theme.colors.onSurfaceVariant}
+              style={styles.emptyIcon}
+            />
+            <Text style={styles.emptyText}>
+              {searchQuery
+                ? 'Arama sonucu bulunamadı'
+                : selectedFilter
+                ? `${selectedFilter === 'todo' ? 'To Do' : selectedFilter === 'in_progress' ? 'In Progress' : 'Completed'} durumunda görev yok`
+                : 'Henüz görev eklenmemiş'}
+            </Text>
           </View>
         ) : (
-          <ScrollView>
+          <ScrollView style={styles.taskListContainer}>
             {filteredTasks.map(task => (
               <TouchableOpacity
                 key={task.id}
                 style={styles.taskItem}
-                onPress={() => handleTaskPress(task.id)}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text style={styles.taskTitle}>{task.title}</Text>
+                onPress={() => handleTaskPress(task.id)}
+              >
+                <View style={styles.taskHeader}>
+                  <Text style={styles.taskTitle} numberOfLines={1}>
+                    {task.title}
+                  </Text>
                   <Chip
                     mode="outlined"
                     style={[
                       styles.priorityChip,
-                      {borderColor: getPriorityColor(task.priority)},
-                    ]}>
+                      { borderColor: getPriorityColor(task.priority) }
+                    ]}
+                    textStyle={[
+                      styles.priorityLabel,
+                      { color: getPriorityColor(task.priority) }
+                    ]}
+                  >
                     {task.priority}
                   </Chip>
                 </View>
-                {task.description && (
-                  <Text style={styles.taskDescription}>{task.description}</Text>
-                )}
+                
+                <Text style={styles.taskDescription} numberOfLines={2}>
+                  {task.description}
+                </Text>
+
                 <View style={styles.taskFooter}>
                   <Text style={styles.taskDate}>
-                    Due: {formatDate(task.dueDate)}
+                    {`Teslim: ${formatDate(task.dueDate)}`}
                   </Text>
                   <View style={styles.statusContainer}>
                     <View
                       style={[
                         styles.statusDot,
-                        {backgroundColor: getStatusColor(task.status)},
+                        { backgroundColor: getStatusColor(task.status) }
                       ]}
                     />
                     <Text style={styles.statusText}>
-                      {task.status.replace('_', ' ').toUpperCase()}
+                      {task.status === 'todo'
+                        ? 'To Do'
+                        : task.status === 'in_progress'
+                        ? 'In Progress'
+                        : 'Completed'}
                     </Text>
                   </View>
                 </View>
@@ -255,9 +351,9 @@ const TaskListScreen: React.FC = () => {
         )}
 
         <FAB
-          style={styles.fab}
           icon="plus"
-          onPress={() => navigation.navigate('NewTask')}
+          onPress={() => navigation.navigate('CreateTask')}
+          style={styles.fab}
         />
       </View>
     </SafeAreaView>

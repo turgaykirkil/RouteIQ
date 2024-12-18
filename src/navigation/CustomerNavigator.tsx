@@ -7,7 +7,6 @@ import NewCustomerScreen from '../screens/customers/NewCustomerScreen';
 import EditCustomerScreen from '../screens/customers/EditCustomerScreen';
 import CustomerMapScreen from '../screens/customers/CustomerMapScreen';
 import CustomerAnalyticsScreen from '../screens/analytics/CustomerAnalyticsScreen';
-import MapScreen from '../screens/main/MapScreen';
 import { CustomerStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
@@ -66,14 +65,7 @@ const CustomerNavigator = () => {
         name="CustomerAnalytics"
         component={CustomerAnalyticsScreen}
         options={{
-          title: 'Müşteri Analitikleri',
-        }}
-      />
-      <Stack.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: 'Harita',
+          title: 'Müşteri Analizi',
         }}
       />
     </Stack.Navigator>

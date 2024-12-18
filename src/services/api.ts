@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = Platform.select({
-  android: 'http://192.168.1.35:3000', // Bilgisayarınızın yerel IP adresi
-  ios: 'http://192.168.1.35:3000',     // Bilgisayarınızın yerel IP adresi
+  android: 'http://192.168.1.50:3000', // Bilgisayarınızın yerel IP adresi
+  ios: 'http://192.168.1.50:3000',     // Bilgisayarınızın yerel IP adresi
   default: 'http://localhost:3000'
 });
 
@@ -33,6 +33,7 @@ api.interceptors.request.use(
       }
     } catch (error) {
       console.error('❌ Error getting user data:', error);
+      console.error('Request Config:', config);
     }
     return config;
   },
@@ -52,7 +53,10 @@ api.interceptors.response.use(
       url: error.config?.url,
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
+      message: error.message,
+      headers: error.config?.headers,
+      method: error.config?.method,
+      timeout: error.config?.timeout
     });
     return Promise.reject(error);
   }
