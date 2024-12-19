@@ -26,12 +26,12 @@ export const useCustomers = () => {
       if (location) {
         const customersWithDistance = response.map(customer => ({
           ...customer,
-          distance: customer.address?.coordinates ? calculateDistance(
+          distance: customer.address?.coordinates ? Number(calculateDistance(
             location.lat,
             location.lon,
             customer.address.coordinates.lat,
             customer.address.coordinates.lng
-          ) : undefined
+          ).toFixed(1)) : undefined
         }));
         
         // Sort customers by distance

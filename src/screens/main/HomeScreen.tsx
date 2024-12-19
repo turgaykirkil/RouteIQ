@@ -245,22 +245,22 @@ const HomeScreen = () => {
       justifyContent: 'space-between',
       paddingHorizontal: themeWithCustom.spacing.md,
       paddingVertical: themeWithCustom.spacing.sm,
+      height: 130, // Biraz daha yükseklik ekledik
     },
     statsCard: {
       flex: 1,
       marginHorizontal: themeWithCustom.spacing.xs,
-      minHeight: 140,
       height: '100%',
       ...themeWithCustom.shadows.small,
     },
     statsCardContent: {
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: themeWithCustom.spacing.md,
+      justifyContent: 'space-between', // space-between yaptık
+      padding: themeWithCustom.spacing.sm, // padding'i azalttık
+      paddingVertical: themeWithCustom.spacing.md, // Dikey padding ekledik
       height: '100%',
     },
     statsIconContainer: {
-      marginBottom: themeWithCustom.spacing.sm,
       alignItems: 'center',
       paddingTop: themeWithCustom.spacing.xs,
     },
@@ -268,13 +268,11 @@ const HomeScreen = () => {
       ...themeWithCustom.typography.h2,
       fontWeight: 'bold',
       textAlign: 'center',
-      marginVertical: themeWithCustom.spacing.sm,
     },
     statsLabel: {
       ...themeWithCustom.typography.caption,
       color: themeWithCustom.colors.onSurface,
       textAlign: 'center',
-      marginBottom: themeWithCustom.spacing.xs,
     },
     chartContainer: {
       height: 250,

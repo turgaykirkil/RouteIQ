@@ -18,10 +18,11 @@ export type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamLi
 
 export type MainTabParamList = {
   Home: undefined;
-  Tasks: NavigatorScreenParams<TaskStackParamList>;
-  Customers: NavigatorScreenParams<CustomerStackParamList>;
+  Tasks: undefined;
   Map: undefined;
-  Settings: NavigatorScreenParams<SettingsStackParamList>;
+  Route: undefined;
+  Customers: undefined;
+  Settings: undefined;
 };
 
 export type TaskStackParamList = {

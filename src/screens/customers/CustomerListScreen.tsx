@@ -141,6 +141,10 @@ const CustomerListScreen: React.FC = () => {
           alignItems: 'center',
           marginRight: 16,
         },
+        distanceContainer: {
+          marginRight: 0,
+          marginLeft: 'auto',
+        },
         detailIcon: {
           fontSize: 16,
           color: theme.colors.onSurfaceVariant,
@@ -338,12 +342,12 @@ const CustomerListScreen: React.FC = () => {
                         <MaterialCommunityIcons name="phone" style={styles.detailIcon} />
                         <Text style={styles.detailText}>{customer.phone}</Text>
                       </View>
-                      <View style={styles.detailContainer}>
-                        <MaterialCommunityIcons name="map-marker-distance" style={styles.detailIcon} />
-                        <Text style={styles.detailText}>
-                          {customer.distance ? `${customer.distance} km` : 'Mesafe bilgisi yok'}
-                        </Text>
-                      </View>
+                      {customer.distance && (
+                        <View style={[styles.detailContainer, styles.distanceContainer]}>
+                          <MaterialCommunityIcons name="map-marker-distance" style={styles.detailIcon} />
+                          <Text style={styles.detailText}>{`${customer.distance} km`}</Text>
+                        </View>
+                      )}
                     </View>
                   </View>
                 </TouchableOpacity>

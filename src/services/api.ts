@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = Platform.select({
-  android: 'http://192.168.1.50:3000', // Bilgisayarınızın yerel IP adresi
-  ios: 'http://192.168.1.50:3000',     // Bilgisayarınızın yerel IP adresi
+  android: 'http://192.168.1.52:3000', // Bilgisayarınızın yerel IP adresi
+  ios: 'http://192.168.1.52:3000',     // Bilgisayarınızın yerel IP adresi
   default: 'http://localhost:3000'
 });
 

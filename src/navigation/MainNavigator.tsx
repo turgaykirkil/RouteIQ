@@ -1,12 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import HomeScreen from '../screens/main/HomeScreen';
 import TaskNavigator from './TaskNavigator';
 import CustomerNavigator from './CustomerNavigator';
-import MapScreen from '../screens/main/MapScreen';
+import RouteOptimizationScreen from '../screens/route/RouteOptimizationScreen';
 import SettingsNavigator from './SettingsNavigator';
 
 import { MainTabParamList } from './types';
@@ -33,21 +33,21 @@ const MainNavigator = () => {
               iconName = 'home';
               break;
             case 'Tasks':
-              iconName = 'list';
+              iconName = 'clipboard-check';
+              break;
+            case 'Route':
+              iconName = 'map-marker-path';
               break;
             case 'Customers':
-              iconName = 'people';
-              break;
-            case 'Map':
-              iconName = 'map';
+              iconName = 'account-group';
               break;
             case 'Settings':
-              iconName = 'settings';
+              iconName = 'cog';
               break;
             default:
               iconName = 'circle';
           }
-          return <Icon name={iconName} size={size} color={color} />;
+          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
         },
       })}
     >
@@ -62,9 +62,9 @@ const MainNavigator = () => {
         options={{ title: 'Görevler' }} 
       />
       <Tab.Screen 
-        name="Map" 
-        component={MapScreen} 
-        options={{ title: 'Harita' }} 
+        name="Route" 
+        component={RouteOptimizationScreen} 
+        options={{ title: 'Rota' }} 
       />
       <Tab.Screen 
         name="Customers" 
