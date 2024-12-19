@@ -8,8 +8,86 @@
   [![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=for-the-badge&logo=openstreetmap&logoColor=white)](https://www.openstreetmap.org/)
   [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-  <h3>🌟 Saha Satış Ekipleri için Akıllı Rota Optimizasyonu</h3>
+  <h3>🌟 Smart Route Optimization for Field Sales Teams | Saha Satış Ekipleri için Akıllı Rota Optimizasyonu</h3>
 </div>
+
+[English](#english) | [Türkçe](#turkish)
+
+<h2 id="english">English</h2>
+
+## 📱 Features
+
+### Current Features
+- 🏠 **Home Screen**
+  - 📊 Sales Statistics
+  - 📋 Daily Tasks
+  - 📈 Recent Activities
+
+- 👥 **Customer Management**
+  - 📝 Customer List
+  - 🔍 Search and Filter
+  - ➕ Add New Customer
+  - 📍 Location-based Customer View
+
+- 🗺️ **Route Optimization**
+  - 📍 Point Selection on Map
+  - 🔢 Sequential Visit Planning
+  - ⚡ Optimal Route Calculation
+  - ⏱️ Distance and Time Estimates
+
+- ✅ **Task Management**
+  - 📋 Task List
+  - 📝 Task Details
+  - ➕ Create New Task
+
+### 🚀 Upcoming Features
+- 📊 **Customer Analytics**
+- 🛍️ **Sales Management**
+- 🔄 **Synchronization**
+- 📊 **Reporting**
+
+## 🛠️ Technologies
+
+- ⚛️ React Native
+- 📘 TypeScript
+- 🗺️ OpenStreetMap & OSRM
+- 🎨 React Native Paper
+- 📱 React Navigation
+- 🔄 Redux & Redux Toolkit
+- 🌐 Axios
+
+## 🚀 Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/RouteIQ.git
+```
+
+2. Install dependencies:
+```bash
+cd RouteIQ
+yarn install
+```
+
+3. Install pods for iOS:
+```bash
+cd ios
+pod install
+cd ..
+```
+
+4. Run the app:
+```bash
+# For Android
+yarn android
+
+# For iOS
+yarn ios
+```
+
+---
+
+<h2 id="turkish">Türkçe</h2>
 
 ## 📱 Özellikler
 
@@ -38,25 +116,9 @@
 
 ### 🚀 Gelecek Özellikler
 - 📊 **Müşteri Analitikleri**
-  - 📈 Ziyaret Sıklığı Analizi
-  - 💹 Satış Performans Grafikleri
-  - 🎯 Müşteri Segmentasyonu
-
 - 🛍️ **Satış Yönetimi**
-  - 🛒 Satış Siparişi Oluşturma
-  - 📱 Mobil Katalog
-  - 💰 Fiyat Listesi
-  - 📊 Satış Raporları
-
 - 🔄 **Senkronizasyon**
-  - 🔌 Çevrimdışı Çalışma
-  - 🔄 Otomatik Veri Senkronizasyonu
-  - 💾 Yedekleme
-
 - 📊 **Raporlama**
-  - 📑 PDF Rapor Oluşturma
-  - 📊 Excel Export
-  - 📈 Özelleştirilebilir Raporlar
 
 ## 🛠️ Teknolojiler
 
@@ -106,21 +168,22 @@ yarn ios
   <img src="screenshots/tasks.png" width="200" alt="Görevler"/>
 </div>
 
-## 🤝 Katkıda Bulunma
+## 🤝 Katkıda Bulunma | Contributing
 
-1. Bu repoyu fork'layın
-2. Yeni bir branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit'leyin (`git commit -m 'Add some amazing feature'`)
-4. Branch'inizi push'layın (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+1. Fork this repository | Bu repoyu fork'layın
+2. Create a new branch | Yeni bir branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit your changes | Değişikliklerinizi commit'leyin (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch | Branch'inizi push'layın (`git push origin feature/amazing-feature`)
+5. Open a Pull Request | Pull Request oluşturun
 
-## 📝 Lisans
+## 📝 Lisans | License
 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
 
-## 👥 Ekip
+## 👥 Ekip | Team
 
-- 👨‍💻 Turgay KIRKIL - Proje Sahibi & Geliştirici
+- 👨‍💻 Turgay KIRKIL - Project Owner & Developer | Proje Sahibi & Geliştirici
 
 ---
 
