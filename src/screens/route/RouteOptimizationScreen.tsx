@@ -21,9 +21,9 @@ interface SelectedPoint {
   order: number;
 }
 
-const RouteOptimizationScreen = () => {
+const RouteOptimizationScreen: React.FC = () => {
   const theme = useTheme();
-  const { customers } = useCustomers();
+  const { customers, loading: customersLoading, error: customersError } = useCustomers();
   const { location } = useLocation();
   const [selectedPoints, setSelectedPoints] = useState<SelectedPoint[]>([]);
   const [optimizedRoute, setOptimizedRoute] = useState<any>(null);
@@ -47,13 +47,20 @@ const RouteOptimizationScreen = () => {
     }
   }, [location]);
 
+  // Güvenli map fonksiyonu
+  const safeMap = (arr: any[] | null | undefined, mapFn: (item: any) => any) => {
+    if (!arr || !Array.isArray(arr)) {
+      console.error('Geçersiz dizi:', arr);
+      return [];
+    }
+    return arr.map(mapFn);
+  };
+
   const handleMarkerPress = (customer: Customer) => {
     const existingPoint = selectedPoints.find(p => p.customer.id === customer.id);
     
     if (existingPoint) {
-      // Noktayı kaldır
       setSelectedPoints(selectedPoints.filter(p => p.customer.id !== customer.id));
-      // Sıralamayı güncelle
       const updatedPoints = selectedPoints
         .filter(p => p.customer.id !== customer.id)
         .map(p => ({
@@ -62,7 +69,6 @@ const RouteOptimizationScreen = () => {
         }));
       setSelectedPoints(updatedPoints);
     } else {
-      // Yeni nokta ekle
       setSelectedPoints([
         ...selectedPoints,
         { customer, order: selectedPoints.length + 1 }
@@ -71,31 +77,47 @@ const RouteOptimizationScreen = () => {
   };
 
   const calculateRoute = async () => {
-    if (selectedPoints.length < 2) {
-      Alert.alert('Uyarı', 'En az 2 nokta seçmelisiniz.');
-      return;
-    }
-
-    setIsLoading(true);
     try {
-      const startPoint = location ? 
-        { lat: location.lat, lng: location.lon } : 
-        { lat: mapRegion.latitude, lng: mapRegion.longitude };
+      console.log('Rota Hesaplama Başladı');
+      console.log('Seçili Noktalar:', JSON.stringify(selectedPoints, null, 2));
+      console.log('Konum:', location);
 
-      // Seçilen noktaları sıraya göre düzenle
-      const orderedPoints = [...selectedPoints]
-        .sort((a, b) => a.order - b.order)
-        .map(p => p.customer);
+      // Detaylı kontroller
+      if (!selectedPoints || selectedPoints.length === 0) {
+        console.error('Seçili nokta yok');
+        return;
+      }
 
-      const routeDetails = await routeService.calculateOptimalRoute(
-        orderedPoints,
-        startPoint
+      if (!location) {
+        console.error('Konum bilgisi eksik');
+        return;
+      }
+
+      // Seçili noktaları güvenli bir şekilde işle
+      const validPoints = safeMap(selectedPoints, point => {
+        if (!point || !point.customer) {
+          console.error('Geçersiz nokta:', point);
+          return null;
+        }
+        return point.customer;
+      }).filter(Boolean);
+
+      if (validPoints.length === 0) {
+        console.error('Geçerli nokta bulunamadı');
+        return;
+      }
+
+      setIsLoading(true);
+      const result = await routeService.calculateOptimalRoute(
+        validPoints, 
+        { lat: location.lat, lng: location.lon }
       );
 
-      setOptimizedRoute(routeDetails);
+      if (result) {
+        setOptimizedRoute(result);
+      }
     } catch (error) {
-      console.error('Route calculation error:', error);
-      Alert.alert('Hata', 'Rota hesaplanırken bir hata oluştu.');
+      console.error('Rota hesaplama hatası:', error);
     } finally {
       setIsLoading(false);
     }
@@ -188,6 +210,9 @@ const RouteOptimizationScreen = () => {
       fontWeight: 'bold',
     },
   });
+
+  console.log('Seçili Noktalar:', selectedPoints?.length || 0);
+  console.log('Konum:', location);
 
   return (
     <View style={styles.container}>
