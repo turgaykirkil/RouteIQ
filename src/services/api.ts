@@ -1,13 +1,15 @@
 import axios from 'axios';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
+// Statik veya dinamik IP ayarı
 const BASE_URL = Platform.select({
-  android: 'http://192.168.1.22:3000',
-  ios: 'http://192.168.1.22:3000',
+  ios: 'http://localhost:3000',
+  android: 'http://10.0.2.2:3000',
   default: 'http://localhost:3000'
 });
 
+// API oluşturma
 const api = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
@@ -32,61 +34,48 @@ api.interceptors.request.use(
         };
       }
     } catch (error) {
-      console.error('❌ Error getting user data:', error);
-      console.error('Request Config:', config);
+      console.error('Kullanıcı verisi alınamadı:', error);
     }
     return config;
   },
   (error) => {
-    console.error('❌ Request Interceptor Error:', error);
+    console.error('Request Interceptor Hatası:', error);
     return Promise.reject(error);
   }
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('❌ API Response Error:', {
+    console.error('API Yanıt Hatası:', {
       url: error.config?.url,
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message,
-      headers: error.config?.headers,
-      method: error.config?.method,
-      timeout: error.config?.timeout
+      message: error.message
     });
     return Promise.reject(error);
   }
 );
 
+// Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
-      const response = await api.post('/api/login', { email, password });
-      
-      if (response.data.success) {
-        return {
-          user: response.data.user
-        };
-      } else {
-        throw new Error(response.data.message || 'Login failed');
-      }
+      const response = await api.post('/api/auth/login', { email, password });
+      return response.data;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Giriş hatası:', error);
       throw error;
     }
   },
-  
   logout: async () => {
     try {
-      await AsyncStorage.removeItem('userData');
+      await AsyncStorage.removeItem('user');
       return true;
     } catch (error) {
-      console.error('Logout failed:', error);
-      throw error;
+      console.error('Çıkış hatası:', error);
+      return false;
     }
   }
 };
@@ -172,3 +161,5 @@ export const salesAPI = {
     return api.delete(`/api/sales/${id}`);
   },
 };
+
+export default api;

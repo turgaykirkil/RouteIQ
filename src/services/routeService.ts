@@ -33,12 +33,45 @@ const trafficApi = axios.create({
 export const routeService = {
   // Müşteri öncelik skoru hesaplama
   calculateCustomerPriorityScore(customer: Customer): number {
-    const salesScore = customer.totalSales * 0.4;
-    const daysSinceLastVisit = (new Date().getTime() - new Date(customer.lastVisitDate).getTime()) / (1000 * 3600 * 24);
-    const visitScore = Math.max(10 - daysSinceLastVisit, 0) * 0.3;
-    const potentialSalesScore = customer.potentialSales * 0.3;
-    
-    return salesScore + visitScore + potentialSalesScore;
+    // Müşteri öncelik skorunu hesapla
+    let priorityScore = 0;
+
+    // Müşteri notları varsa ekstra puan (güvenli kontrol)
+    if (customer?.notes && customer.notes.toLowerCase().includes('vip')) {
+      priorityScore += 50;
+    }
+
+    // Mesafe bazlı puan hesaplama (güvenli kontrol)
+    if (customer?.distance) {
+      // Mesafe arttıkça öncelik skoru düşsün
+      priorityScore += Math.max(0, 100 - (customer.distance || 0) * 2);
+    }
+
+    // Müşteri oluşturulma tarihi bazlı puan
+    if (customer?.createdAt) {
+      const customerAge = new Date().getTime() - new Date(customer.createdAt).getTime();
+      const daysSinceCreation = customerAge / (1000 * 3600 * 24);
+      
+      // Yeni müşterilere bonus puan
+      if (daysSinceCreation < 30) {
+        priorityScore += 30;
+      }
+    }
+
+    // Şirket bazlı puan
+    if (customer?.company) {
+      const companyKeywords = ['tech', 'metal', 'sanayi', 'ticaret'];
+      const hasKeyword = companyKeywords.some(keyword => 
+        customer.company.toLowerCase().includes(keyword)
+      );
+      
+      if (hasKeyword) {
+        priorityScore += 20;
+      }
+    }
+
+    // Güvenli bir şekilde minimum 0, maksimum 200 arasında skor
+    return Math.min(Math.max(priorityScore, 0), 200);
   },
 
   // Gelişmiş rota optimizasyonu
@@ -49,7 +82,8 @@ export const routeService = {
       return {
         coordinates: [],
         distance: 0,
-        duration: 0
+        duration: 0,
+        optimizationDetails: {}
       };
     }
 
@@ -58,7 +92,8 @@ export const routeService = {
       return {
         coordinates: [],
         distance: 0,
-        duration: 0
+        duration: 0,
+        optimizationDetails: {}
       };
     }
 
@@ -67,7 +102,8 @@ export const routeService = {
       return {
         coordinates: [],
         distance: 0,
-        duration: 0
+        duration: 0,
+        optimizationDetails: {}
       };
     }
 
@@ -76,42 +112,47 @@ export const routeService = {
       return {
         coordinates: [],
         distance: 0,
-        duration: 0
+        duration: 0,
+        optimizationDetails: {}
       };
     }
 
     try {
-      // Müşteri koordinatlarını detaylı olarak kontrol et
-      const validCustomers = customers.filter(customer => {
-        // Müşteri nesnesinin varlığını kontrol et
-        if (!customer) {
-          console.error('Geçersiz müşteri nesnesi');
-          return false;
-        }
+      // Hava durumu ve trafik bilgilerini al
+      const [weatherConditions, trafficConditions] = await Promise.all([
+        this.getWeatherConditions(startPoint),
+        this.getTrafficConditions(startPoint)
+      ]);
 
-        // Adres ve koordinatların varlığını kontrol et
+      // Müşteri koordinatlarını ve önceliklerini hesapla
+      const enrichedCustomers = customers.map(customer => ({
+        ...customer,
+        priorityScore: this.calculateCustomerPriorityScore(customer),
+        weatherPenalty: this.calculateWeatherPenalty(weatherConditions),
+        trafficPenalty: this.calculateTrafficPenalty(trafficConditions)
+      })).sort((a, b) => b.priorityScore - a.priorityScore);
+
+      // Geçerli müşteri kontrolü (koordinat kontrolünü genişlet)
+      const validCustomers = enrichedCustomers.filter(customer => {
         const coords = customer?.address?.coordinates;
-        if (!coords) {
-          console.error('Müşteri koordinatları eksik:', customer);
-          return false;
-        }
-
-        // Koordinat tiplerini kontrol et
-        if (typeof coords.lat !== 'number' || typeof coords.lng !== 'number') {
-          console.error('Geçersiz koordinat tipi:', coords);
-          return false;
-        }
-
-        return true;
+        return coords && 
+               typeof coords.lat === 'number' && 
+               typeof coords.lng === 'number' &&
+               !isNaN(coords.lat) &&
+               !isNaN(coords.lng) &&
+               coords.lat !== 0 &&
+               coords.lng !== 0;
       });
 
-      // Geçerli müşteri kontrolü
       if (validCustomers.length === 0) {
         console.error('Geçerli koordinatlı müşteri bulunamadı');
+        console.error('Müşteri listesi:', JSON.stringify(customers, null, 2));
         return {
           coordinates: [],
           distance: 0,
-          duration: 0
+          duration: 0,
+          optimizationDetails: {},
+          error: 'Geçerli koordinatlı müşteri bulunamadı'
         };
       }
 
@@ -122,25 +163,45 @@ export const routeService = {
       ];
 
       // OSRM rotası hesaplama
-      const response = await this.calculateOSRMRoute(coordinates);
-      
-      // Eğer response null ise boş bir rota döndür
-      if (!response) {
-        return {
-          coordinates: [],
-          distance: 0,
-          duration: 0
-        };
-      }
+      const routeResponse = await this.calculateOSRMRoute(coordinates);
 
-      return response;
+      // Rota optimizasyon detaylarını hesapla
+      const optimizationDetails = {
+        weatherConditions,
+        trafficConditions,
+        customerDetails: validCustomers.map(c => ({
+          id: c.id,
+          name: c.name,
+          priorityScore: c.priorityScore,
+          weatherPenalty: c.weatherPenalty,
+          trafficPenalty: c.trafficPenalty,
+          coordinates: c.address.coordinates
+        }))
+      };
+
+      // Rota maliyetini hesapla
+      const routeCost = this.calculateRouteCost(
+        routeResponse, 
+        validCustomers, 
+        weatherConditions, 
+        trafficConditions
+      );
+
+      return {
+        ...routeResponse,
+        optimizationDetails,
+        routeCost
+      };
 
     } catch (error) {
       console.error('Rota hesaplama sırasında hata:', error);
       return {
         coordinates: [],
         distance: 0,
-        duration: 0
+        duration: 0,
+        optimizationDetails: {},
+        routeCost: Infinity,
+        error: error.message
       };
     }
   },
@@ -262,28 +323,154 @@ export const routeService = {
     }).sort((a, b) => a.adjustedDuration - b.adjustedDuration)[0];
   },
 
-  // Hava durumuna göre rota cezası
-  calculateWeatherPenalty(weatherConditions) {
+  // Hava durumu ceza puanı hesaplama
+  calculateWeatherPenalty(weatherConditions: any): number {
     if (!weatherConditions) return 0;
-    
-    switch (weatherConditions.condition) {
-      case 'Rain': return 0.2;
-      case 'Snow': return 0.3;
-      case 'Thunderstorm': return 0.4;
-      default: return 0;
+
+    let penalty = 0;
+
+    // Sıcaklık bazlı ceza
+    if (weatherConditions.temperature) {
+      const temp = weatherConditions.temperature;
+      if (temp < 0 || temp > 35) {
+        penalty += 30; // Aşırı soğuk veya sıcak
+      } else if (temp < 5 || temp > 30) {
+        penalty += 15; // Orta derecede olumsuz
+      }
     }
+
+    // Yağış durumu
+    if (weatherConditions.condition) {
+      const condition = weatherConditions.condition.toLowerCase();
+      const harshConditions = ['rain', 'snow', 'storm', 'thunderstorm'];
+      if (harshConditions.some(c => condition.includes(c))) {
+        penalty += 40; // Ağır hava koşulları
+      }
+    }
+
+    // Rüzgar hızı
+    if (weatherConditions.windSpeed) {
+      const windSpeed = weatherConditions.windSpeed;
+      if (windSpeed > 50) {
+        penalty += 25; // Çok yüksek rüzgar
+      } else if (windSpeed > 30) {
+        penalty += 15; // Orta derecede yüksek rüzgar
+      }
+    }
+
+    return Math.min(penalty, 100); // Maksimum %100 ceza
   },
 
-  // Trafik durumuna göre rota cezası
-  calculateTrafficPenalty(trafficConditions) {
+  // Trafik ceza puanı hesaplama
+  calculateTrafficPenalty(trafficConditions: any): number {
     if (!trafficConditions) return 0;
-    
-    switch (trafficConditions.congestionLevel) {
-      case 'High': return 0.3;
-      case 'Medium': return 0.15;
-      case 'Low': return 0;
-      default: return 0;
+
+    let penalty = 0;
+
+    // Trafik yoğunluğu
+    if (trafficConditions.congestionLevel) {
+      const congestion = trafficConditions.congestionLevel.toLowerCase();
+      switch(congestion) {
+        case 'high':
+          penalty += 50; // Yüksek yoğunluk
+          break;
+        case 'medium':
+          penalty += 25; // Orta yoğunluk
+          break;
+      }
     }
+
+    // Ortalama hız
+    if (trafficConditions.averageSpeed) {
+      const avgSpeed = trafficConditions.averageSpeed;
+      if (avgSpeed < 20) {
+        penalty += 40; // Çok yavaş trafik
+      } else if (avgSpeed < 40) {
+        penalty += 20; // Orta derecede yavaş trafik
+      }
+    }
+
+    // Trafik olayları
+    if (trafficConditions.incidents && trafficConditions.incidents.length > 0) {
+      penalty += Math.min(trafficConditions.incidents.length * 10, 30);
+    }
+
+    return Math.min(penalty, 100); // Maksimum %100 ceza
+  },
+
+  // Hava durumu skorunu hesaplama
+  calculateWeatherScore(weatherConditions: any): number {
+    if (!weatherConditions) return 0;
+
+    let score = 0;
+
+    // Sıcaklık değerlendirmesi
+    if (weatherConditions.temperature) {
+      const temp = weatherConditions.temperature;
+      if (temp < 0 || temp > 35) {
+        score += 40; // Aşırı soğuk veya sıcak
+      } else if (temp < 5 || temp > 30) {
+        score += 20; // Orta derecede olumsuz
+      }
+    }
+
+    // Yağış ve hava durumu
+    if (weatherConditions.condition) {
+      const condition = weatherConditions.condition.toLowerCase();
+      const harshConditions = ['rain', 'snow', 'storm', 'thunderstorm'];
+      if (harshConditions.some(c => condition.includes(c))) {
+        score += 30; // Olumsuz hava koşulları
+      }
+    }
+
+    // Nem ve rüzgar faktörleri
+    if (weatherConditions.humidity && weatherConditions.windSpeed) {
+      const humidity = weatherConditions.humidity;
+      const windSpeed = weatherConditions.windSpeed;
+
+      if (humidity > 80 || windSpeed > 40) {
+        score += 10; // Nem veya rüzgar fazla
+      }
+    }
+
+    return Math.min(score, 100); // Maksimum %100 skor
+  },
+
+  // Trafik skorunu hesaplama
+  calculateTrafficScore(trafficConditions: any): number {
+    if (!trafficConditions) return 0;
+
+    let score = 0;
+
+    // Trafik yoğunluğu
+    if (trafficConditions.congestionLevel) {
+      const congestion = trafficConditions.congestionLevel.toLowerCase();
+      switch(congestion) {
+        case 'high':
+          score += 50; // Yüksek yoğunluk
+          break;
+        case 'medium':
+          score += 25; // Orta yoğunluk
+          break;
+      }
+    }
+
+    // Ortalama hız
+    if (trafficConditions.averageSpeed) {
+      const avgSpeed = trafficConditions.averageSpeed;
+      if (avgSpeed < 20) {
+        score += 30; // Çok yavaş trafik
+      } else if (avgSpeed < 40) {
+        score += 15; // Orta derecede yavaş trafik
+      }
+    }
+
+    // Trafik olayları
+    if (trafficConditions.incidents && trafficConditions.incidents.length > 0) {
+      score += Math.min(trafficConditions.incidents.length * 5, 20);
+    }
+
+    return Math.min(score, 100); // Maksimum %100 skor
   },
 
   // Adres arama
@@ -455,65 +642,137 @@ export const routeService = {
 
   deg2rad(deg) {
     return deg * (Math.PI/180)
-  }
+  },
+
+  // Rota maliyet hesaplama fonksiyonu
+  calculateRouteCost(
+    routeResponse: { distance: number; duration: number }, 
+    customers: Customer[], 
+    weatherConditions: any, 
+    trafficConditions: any
+  ): number {
+    // Temel rota maliyeti (mesafe ve süre)
+    let baseCost = routeResponse.distance * 1 + routeResponse.duration * 0.1;
+
+    // Hava durumu maliyet çarpanı
+    const weatherPenalty = this.calculateWeatherScore(weatherConditions);
+    baseCost *= (1 + weatherPenalty / 100);
+
+    // Trafik maliyet çarpanı
+    const trafficPenalty = this.calculateTrafficScore(trafficConditions);
+    baseCost *= (1 + trafficPenalty / 100);
+
+    // Müşteri öncelik düzeltmesi
+    const customerPriorityAdjustment = customers.reduce((total, customer) => {
+      const priorityScore = this.calculateCustomerPriorityScore(customer);
+      return total + priorityScore;
+    }, 0);
+
+    // Müşteri önceliğine göre maliyeti düzelt
+    baseCost /= (1 + customerPriorityAdjustment / 1000);
+
+    return baseCost;
+  },
+
+  // En kısa rotayı hesapla
+  calculateShortestRoute(customers: Customer[]) {
+    // Eğer müşteri sayısı 1 veya daha azsa direkt olarak müşteriyi döndür
+    if (customers.length <= 1) return customers;
+
+    // Tüm müşterilerin koordinatlarını al
+    const coordinates = customers.map(customer => ({
+      id: customer.id,
+      lat: customer.address.coordinates.lat,
+      lng: customer.address.coordinates.lng
+    }));
+
+    // Öklid mesafesine göre en yakın müşterileri sırala
+    const sortedCustomers = coordinates.sort((a, b) => {
+      const distanceA = Math.sqrt(
+        Math.pow(a.lat - coordinates[0].lat, 2) + 
+        Math.pow(a.lng - coordinates[0].lng, 2)
+      );
+      const distanceB = Math.sqrt(
+        Math.pow(b.lat - coordinates[0].lat, 2) + 
+        Math.pow(b.lng - coordinates[0].lng, 2)
+      );
+      return distanceA - distanceB;
+    });
+
+    // Sıralanmış müşterileri orijinal müşteri listesinden bul
+    return sortedCustomers.map(sortedCustomer => 
+      customers.find(customer => customer.id === sortedCustomer.id)
+    );
+  },
+
+  // Koordinatlar arası mesafe hesaplama (Haversine formülü)
+  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Dünya yarıçapı (km)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  },
+
+  // Konuma göre müşterileri sırala
+  sortCustomersByDistance(customers: Customer[], currentLat: number, currentLng: number): Customer[] {
+    return customers.sort((a, b) => {
+      const distanceA = this.calculateDistance(
+        currentLat, 
+        currentLng, 
+        a.address.coordinates.lat, 
+        a.address.coordinates.lng
+      );
+      const distanceB = this.calculateDistance(
+        currentLat, 
+        currentLng, 
+        b.address.coordinates.lat, 
+        b.address.coordinates.lng
+      );
+      return distanceA - distanceB;
+    });
+  },
+
+  // Rota optimizasyonu için yeni metod
+  calculateOptimizedRoute(customers: Customer[]) {
+    try {
+      // Mevcut rota hesaplama mantığını buraya taşıyalım
+      const weatherConditions = {
+        temperature: 22,
+        condition: 'Açık',
+        humidity: 65,
+        windSpeed: 10
+      };
+
+      const trafficConditions = {
+        congestionLevel: 'Orta',
+        averageSpeed: 40,
+        incidents: []
+      };
+
+      // Müşterilere öncelik skoru hesaplama
+      const customerDetails = customers.map((customer, index) => ({
+        ...customer,
+        priorityScore: Math.random() * 10, // Örnek öncelik skoru
+        weatherPenalty: Math.random(), // Hava durumu etkisi
+        trafficPenalty: Math.random(), // Trafik etkisi
+        order: index + 1
+      }));
+
+      return {
+        weatherConditions,
+        trafficConditions,
+        customerDetails,
+        totalDistance: customers.length * 10, // Örnek mesafe
+        estimatedTime: customers.length * 15 // Örnek süre
+      };
+    } catch (error) {
+      console.error('Rota optimizasyonu hatası:', error);
+      throw new Error('Rota hesaplanamadı');
+    }
+  },
 };
-
-function calculateWeatherScore(weatherConditions: {
-  temperature: number;
-  feelsLike: number;
-  condition: string;
-  description: string;
-  windSpeed: number;
-  humidity: number;
-  pressure: number;
-  cloudiness: number;
-}): number {
-  // Hava durumu skorlama algoritması
-  let score = 100;
-
-  // Sıcaklık etkisi (-20 ile +20 arasında)
-  const tempDiff = Math.abs(weatherConditions.temperature - 20);
-  score -= tempDiff;
-
-  // Rüzgar hızı etkisi
-  if (weatherConditions.windSpeed > 10) {
-    score -= (weatherConditions.windSpeed - 10) * 2;
-  }
-
-  // Bulutluluk etkisi
-  score -= weatherConditions.cloudiness / 2;
-
-  // Nem etkisi
-  if (weatherConditions.humidity > 70) {
-    score -= (weatherConditions.humidity - 70) / 2;
-  }
-
-  return Math.max(0, Math.min(100, score));
-}
-
-function calculateTrafficScore(trafficConditions: {
-  congestionLevel: string;
-  averageSpeed: number;
-  incidents: any[];
-}): number {
-  // Trafik skorlama algoritması
-  let score = 100;
-
-  // Trafik yoğunluğu etkisi
-  switch (trafficConditions.congestionLevel) {
-    case 'High': score -= 30; break;
-    case 'Medium': score -= 15; break;
-    case 'Low': score -= 0; break;
-    default: score -= 0; break;
-  }
-
-  // Ortalama hız etkisi
-  if (trafficConditions.averageSpeed < 40) {
-    score -= (40 - trafficConditions.averageSpeed) * 2;
-  }
-
-  // Olay etkisi
-  score -= trafficConditions.incidents.length * 5;
-
-  return Math.max(0, Math.min(100, score));
-}
