@@ -6,180 +6,146 @@ import { TrafficService } from './trafficService';
 import { CacheService } from './cacheService'; 
 import { Alert } from 'react-native';
 
-const NOMINATIM_API_URL = 'https://nominatim.openstreetmap.org';
-const OSRM_API_URL = 'https://router.project-osrm.org';
-const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
-const TRAFFIC_API_URL = 'https://traffic.api.example.com';
-
-const nominatimApi = axios.create({
-  baseURL: NOMINATIM_API_URL,
-  headers: {
-    'User-Agent': 'RouteIQ Mobile App',
+// Güvenli ve yapılandırılabilir API URL'leri
+const API_CONFIGS = {
+  NOMINATIM: {
+    URL: 'https://nominatim.openstreetmap.org',
+    TIMEOUT: 10000,
+    USER_AGENT: 'RouteIQ Mobile App/1.0'
+  },
+  OSRM: {
+    URL: 'https://router.project-osrm.org',
+    TIMEOUT: 15000
+  },
+  WEATHER: {
+    URL: 'https://api.openweathermap.org/data/2.5/weather',
+    TIMEOUT: 8000
+  },
+  TRAFFIC: {
+    URL: 'https://traffic.api.example.com',
+    TIMEOUT: 8000
   }
-});
+};
 
-const osrmApi = axios.create({
-  baseURL: OSRM_API_URL,
-});
+// Güvenli API instance oluşturma fonksiyonu
+const createSafeApiInstance = (config) => {
+  return axios.create({
+    baseURL: config.URL,
+    timeout: config.TIMEOUT,
+    headers: {
+      ...(config.USER_AGENT ? { 'User-Agent': config.USER_AGENT } : {}),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  });
+};
 
-const weatherApi = axios.create({
-  baseURL: WEATHER_API_URL,
-});
-
-const trafficApi = axios.create({
-  baseURL: TRAFFIC_API_URL,
-});
+const nominatimApi = createSafeApiInstance(API_CONFIGS.NOMINATIM);
+const osrmApi = createSafeApiInstance(API_CONFIGS.OSRM);
+const weatherApi = createSafeApiInstance(API_CONFIGS.WEATHER);
+const trafficApi = createSafeApiInstance(API_CONFIGS.TRAFFIC);
 
 export const routeService = {
-  // Müşteri öncelik skoru hesaplama
+  // Müşteri öncelik skoru hesaplama (Performans ve güvenlik optimizasyonu)
   calculateCustomerPriorityScore(customer: Customer): number {
-    // Müşteri öncelik skorunu hesapla
+    // Güvenli ve detaylı kontroller
+    if (!customer) return 0;
+
     let priorityScore = 0;
 
-    // Müşteri notları varsa ekstra puan (güvenli kontrol)
-    if (customer?.notes && customer.notes.toLowerCase().includes('vip')) {
+    // Güvenli dize kontrolü
+    const hasVIPNote = customer.notes?.toLowerCase().includes('vip') ?? false;
+    if (hasVIPNote) {
       priorityScore += 50;
     }
 
-    // Mesafe bazlı puan hesaplama (güvenli kontrol)
-    if (customer?.distance) {
-      // Mesafe arttıkça öncelik skoru düşsün
-      priorityScore += Math.max(0, 100 - (customer.distance || 0) * 2);
+    // Güvenli mesafe hesaplama
+    const distance = customer.distance ?? 0;
+    priorityScore += Math.max(0, 100 - distance * 2);
+
+    // Tarih kontrolü
+    const customerAge = customer.createdAt 
+      ? new Date().getTime() - new Date(customer.createdAt).getTime() 
+      : Infinity;
+    const daysSinceCreation = customerAge / (1000 * 3600 * 24);
+    
+    if (daysSinceCreation < 30) {
+      priorityScore += 30;
     }
 
-    // Müşteri oluşturulma tarihi bazlı puan
-    if (customer?.createdAt) {
-      const customerAge = new Date().getTime() - new Date(customer.createdAt).getTime();
-      const daysSinceCreation = customerAge / (1000 * 3600 * 24);
-      
-      // Yeni müşterilere bonus puan
-      if (daysSinceCreation < 30) {
-        priorityScore += 30;
-      }
+    // Şirket anahtar kelime kontrolü
+    const companyKeywords = ['tech', 'metal', 'sanayi', 'ticaret'];
+    const hasCompanyKeyword = companyKeywords.some(keyword => 
+      customer.company?.toLowerCase().includes(keyword) ?? false
+    );
+    
+    if (hasCompanyKeyword) {
+      priorityScore += 20;
     }
 
-    // Şirket bazlı puan
-    if (customer?.company) {
-      const companyKeywords = ['tech', 'metal', 'sanayi', 'ticaret'];
-      const hasKeyword = companyKeywords.some(keyword => 
-        customer.company.toLowerCase().includes(keyword)
-      );
-      
-      if (hasKeyword) {
-        priorityScore += 20;
-      }
-    }
-
-    // Güvenli bir şekilde minimum 0, maksimum 200 arasında skor
+    // Güvenli skor sınırlandırması
     return Math.min(Math.max(priorityScore, 0), 200);
   },
 
   // Gelişmiş rota optimizasyonu
-  async calculateOptimalRoute(customers: Customer[] = [], startPoint: { lat: number; lng: number }) {
-    // Giriş parametrelerinin detaylı kontrolü
-    if (!customers) {
-      console.error('Müşteri listesi null');
-      return {
-        coordinates: [],
-        distance: 0,
-        duration: 0,
-        optimizationDetails: {}
-      };
-    }
-
-    if (!Array.isArray(customers)) {
-      console.error('Müşteri listesi dizi değil:', typeof customers);
-      return {
-        coordinates: [],
-        distance: 0,
-        duration: 0,
-        optimizationDetails: {}
-      };
-    }
-
-    if (customers.length === 0) {
-      console.error('Müşteri listesi boş');
-      return {
-        coordinates: [],
-        distance: 0,
-        duration: 0,
-        optimizationDetails: {}
-      };
+  async calculateOptimalRoute(customers: Customer[] = [], startPoint?: { lat: number; lng: number }) {
+    // Detaylı giriş parametresi kontrolü
+    if (!customers || !Array.isArray(customers) || customers.length === 0) {
+      console.error('Geçersiz müşteri listesi');
+      return this.createEmptyRouteResponse('Geçersiz müşteri listesi');
     }
 
     if (!startPoint || typeof startPoint.lat !== 'number' || typeof startPoint.lng !== 'number') {
-      console.error('Geçersiz başlangıç noktası:', startPoint);
-      return {
-        coordinates: [],
-        distance: 0,
-        duration: 0,
-        optimizationDetails: {}
-      };
+      console.error('Geçersiz başlangıç noktası');
+      return this.createEmptyRouteResponse('Geçersiz başlangıç noktası');
     }
 
     try {
-      // Hava durumu ve trafik bilgilerini al
-      const [weatherConditions, trafficConditions] = await Promise.all([
+      // Performans için paralel API çağrıları
+      const [weatherConditions, trafficConditions] = await Promise.allSettled([
         this.getWeatherConditions(startPoint),
         this.getTrafficConditions(startPoint)
-      ]);
+      ]).then(results => 
+        results.map(result => 
+          result.status === 'fulfilled' ? result.value : null
+        )
+      );
 
-      // Müşteri koordinatlarını ve önceliklerini hesapla
-      const enrichedCustomers = customers.map(customer => ({
-        ...customer,
-        priorityScore: this.calculateCustomerPriorityScore(customer),
-        weatherPenalty: this.calculateWeatherPenalty(weatherConditions),
-        trafficPenalty: this.calculateTrafficPenalty(trafficConditions)
-      })).sort((a, b) => b.priorityScore - a.priorityScore);
+      // Müşterileri zenginleştir ve önceliklendir
+      const enrichedCustomers = customers
+        .map(customer => ({
+          ...customer,
+          priorityScore: this.calculateCustomerPriorityScore(customer),
+          weatherPenalty: this.calculateWeatherPenalty(weatherConditions),
+          trafficPenalty: this.calculateTrafficPenalty(trafficConditions)
+        }))
+        .sort((a, b) => b.priorityScore - a.priorityScore);
 
-      // Geçerli müşteri kontrolü (koordinat kontrolünü genişlet)
-      const validCustomers = enrichedCustomers.filter(customer => {
-        const coords = customer?.address?.coordinates;
-        return coords && 
-               typeof coords.lat === 'number' && 
-               typeof coords.lng === 'number' &&
-               !isNaN(coords.lat) &&
-               !isNaN(coords.lng) &&
-               coords.lat !== 0 &&
-               coords.lng !== 0;
-      });
+      // Gelişmiş koordinat doğrulama
+      const validCustomers = enrichedCustomers.filter(this.isValidCustomerCoordinate);
 
       if (validCustomers.length === 0) {
         console.error('Geçerli koordinatlı müşteri bulunamadı');
-        console.error('Müşteri listesi:', JSON.stringify(customers, null, 2));
-        return {
-          coordinates: [],
-          distance: 0,
-          duration: 0,
-          optimizationDetails: {},
-          error: 'Geçerli koordinatlı müşteri bulunamadı'
-        };
+        return this.createEmptyRouteResponse('Geçerli koordinatlı müşteri bulunamadı');
       }
 
-      // OSRM için koordinat dizisi oluştur
+      // Koordinat dizisi oluşturma
       const coordinates: [number, number][] = [
         [startPoint.lng, startPoint.lat],
         ...validCustomers.map(c => [c.address.coordinates.lng, c.address.coordinates.lat])
       ];
 
-      // OSRM rotası hesaplama
+      // Rota hesaplama
       const routeResponse = await this.calculateOSRMRoute(coordinates);
 
-      // Rota optimizasyon detaylarını hesapla
+      // Detaylı optimizasyon bilgileri
       const optimizationDetails = {
         weatherConditions,
         trafficConditions,
-        customerDetails: validCustomers.map(c => ({
-          id: c.id,
-          name: c.name,
-          priorityScore: c.priorityScore,
-          weatherPenalty: c.weatherPenalty,
-          trafficPenalty: c.trafficPenalty,
-          coordinates: c.address.coordinates
-        }))
+        customerDetails: validCustomers.map(this.extractCustomerOptimizationDetails)
       };
 
-      // Rota maliyetini hesapla
+      // Rota maliyeti hesaplama
       const routeCost = this.calculateRouteCost(
         routeResponse, 
         validCustomers, 
@@ -194,16 +160,44 @@ export const routeService = {
       };
 
     } catch (error) {
-      console.error('Rota hesaplama sırasında hata:', error);
-      return {
-        coordinates: [],
-        distance: 0,
-        duration: 0,
-        optimizationDetails: {},
-        routeCost: Infinity,
-        error: error.message
-      };
+      console.error('Rota hesaplama hatası:', error);
+      return this.createEmptyRouteResponse('Rota hesaplama sırasında beklenmeyen hata');
     }
+  },
+
+  // Müşteri koordinat doğrulama
+  isValidCustomerCoordinate(customer: Customer): boolean {
+    const coords = customer?.address?.coordinates;
+    return coords && 
+           typeof coords.lat === 'number' && 
+           typeof coords.lng === 'number' &&
+           !isNaN(coords.lat) &&
+           !isNaN(coords.lng) &&
+           coords.lat !== 0 &&
+           coords.lng !== 0;
+  },
+
+  // Müşteri optimizasyon detayları çıkarma
+  extractCustomerOptimizationDetails(customer: Customer) {
+    return {
+      id: customer.id,
+      name: customer.name,
+      priorityScore: customer.priorityScore,
+      weatherPenalty: customer.weatherPenalty,
+      trafficPenalty: customer.trafficPenalty,
+      coordinates: customer.address.coordinates
+    };
+  },
+
+  // Boş rota yanıtı oluşturma
+  createEmptyRouteResponse(errorMessage: string = 'Bilinmeyen hata') {
+    return {
+      coordinates: [],
+      distance: 0,
+      duration: 0,
+      optimizationDetails: {},
+      error: errorMessage
+    };
   },
 
   // OSRM rotası hesaplama

@@ -28,7 +28,21 @@ export type NewTaskInput = Omit<
   'id' | 'status' | 'progress' | 'createdAt' | 'updatedAt'
 >;
 
-export const getPriorityColor = (priority: TaskPriority): string => {
+// Memoization için basit bir yardımcı fonksiyon
+function memoize<T extends (...args: any[]) => any>(fn: T): T {
+  const cache = new Map();
+  return function(this: any, ...args: any[]) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    return result;
+  } as T;
+}
+
+export const getPriorityColor = memoize((priority: TaskPriority): string => {
   switch (priority) {
     case 'high':
       return '#dc3545'; // error red
@@ -39,9 +53,9 @@ export const getPriorityColor = (priority: TaskPriority): string => {
     default:
       return '#6c757d'; // gray
   }
-};
+});
 
-export const getStatusColor = (status: Task['status']): string => {
+export const getStatusColor = memoize((status: Task['status']): string => {
   switch (status) {
     case 'completed':
       return '#28a745'; // success green
@@ -52,27 +66,20 @@ export const getStatusColor = (status: Task['status']): string => {
     default:
       return '#6c757d';
   }
-};
+});
 
-export const calculateProgress = (task: Task): number => {
-  if (!task.checklist.length) return task.status === 'completed' ? 100 : 0;
+export const calculateProgress = memoize((task: Task): number => {
+  if (!task.checklist || task.checklist.length === 0) return 0;
   
   const completedItems = task.checklist.filter(item => item.completed).length;
   return Math.round((completedItems / task.checklist.length) * 100);
-};
+});
 
-export const formatDate = (date: Date | string): string => {
-  if (typeof date === 'string') {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  } else {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  }
-};
+export const formatDate = memoize((date: Date | string): string => {
+  const parsedDate = typeof date === 'string' ? new Date(date) : date;
+  return parsedDate.toLocaleDateString('tr-TR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+});

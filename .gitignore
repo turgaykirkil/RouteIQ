@@ -44,3 +44,4 @@ coverage/
 # Proje Özel Kurallar
 screenshots/local/
 db.local.json
+RULES.md

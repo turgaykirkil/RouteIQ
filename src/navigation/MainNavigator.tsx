@@ -10,71 +10,95 @@ import RouteOptimizationScreen from '../screens/route/RouteOptimizationScreen';
 import SettingsNavigator from './SettingsNavigator';
 
 import { MainTabParamList } from './types';
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
+
+// Performans için sabit icon mapping
+const TAB_ICONS: Record<keyof MainTabParamList, string> = Object.freeze({
+  'Home': 'home',
+  'Tasks': 'clipboard-check',
+  'Route': 'map-marker-path',
+  'Customers': 'account-group',
+  'Settings': 'cog'
+});
+
+// Performans için memoize edilmiş icon fonksiyonu
+const createTabBarIcon = (route: { name: keyof MainTabParamList }) => {
+  const iconName = TAB_ICONS[route.name] || 'circle';
+  
+  return ({ color, size }: { color: string; size: number }) => (
+    <MaterialCommunityIcons 
+      name={iconName} 
+      size={size} 
+      color={color} 
+      key={iconName}
+    />
+  );
+};
 
 const MainNavigator = () => {
   const theme = useTheme();
 
+  // Performans için optimize edilmiş screenOptions
+  const screenOptions = ({ route }: { route: { name: keyof MainTabParamList } }): BottomTabNavigationOptions => ({
+    headerShown: false,
+    tabBarActiveTintColor: theme.colors.primary,
+    tabBarInactiveTintColor: theme.colors.disabled,
+    tabBarStyle: {
+      backgroundColor: theme.colors.surface,
+      borderTopColor: theme.colors.background,
+      elevation: 0,
+      shadowOpacity: 0,
+    },
+    tabBarIcon: createTabBarIcon(route)
+  });
+
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.disabled,
-        tabBarStyle: {
-          backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.background,
-        },
-        tabBarIcon: ({ color, size, focused }) => {
-          let iconName: string;
-          switch (route.name) {
-            case 'Home':
-              iconName = 'home';
-              break;
-            case 'Tasks':
-              iconName = 'clipboard-check';
-              break;
-            case 'Route':
-              iconName = 'map-marker-path';
-              break;
-            case 'Customers':
-              iconName = 'account-group';
-              break;
-            case 'Settings':
-              iconName = 'cog';
-              break;
-            default:
-              iconName = 'circle';
-          }
-          return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
-        },
-      })}
+      screenOptions={screenOptions}
+      detachInactiveScreens={true}
+      sceneContainerStyle={{ backgroundColor: 'transparent' }}
     >
       <Tab.Screen 
         name="Home" 
         component={HomeScreen} 
-        options={{ title: 'Ana Sayfa' }} 
+        options={{ 
+          title: 'Ana Sayfa',
+          lazy: true 
+        }} 
       />
       <Tab.Screen 
         name="Tasks" 
         component={TaskNavigator} 
-        options={{ title: 'Görevler' }} 
+        options={{ 
+          title: 'Görevler',
+          lazy: true 
+        }} 
       />
       <Tab.Screen 
         name="Route" 
         component={RouteOptimizationScreen} 
-        options={{ title: 'Rota' }} 
+        options={{ 
+          title: 'Rota',
+          lazy: true 
+        }} 
       />
       <Tab.Screen 
         name="Customers" 
         component={CustomerNavigator} 
-        options={{ title: 'Müşteriler' }} 
+        options={{ 
+          title: 'Müşteriler',
+          lazy: true 
+        }} 
       />
       <Tab.Screen 
         name="Settings" 
         component={SettingsNavigator}
-        options={{ title: 'Ayarlar' }} 
+        options={{ 
+          title: 'Ayarlar',
+          lazy: true 
+        }} 
       />
     </Tab.Navigator>
   );

@@ -81,13 +81,25 @@ const HomeScreen = () => {
       const salesResponse = await salesAPI.getAll();
       const defaultSalesData = [20, 45, 28, 80, 99, 43];
       let newSalesData = defaultSalesData;
+      let salesList: Sale[] = [];
 
-      if (salesResponse?.data) {
-        newSalesData = Array.isArray(salesResponse.data)
-          ? salesResponse.data.map(sale => sale.amount)
-          : defaultSalesData;
+      // Farklı API yanıt formatlarını ele al
+      if (salesResponse) {
+        if (Array.isArray(salesResponse)) {
+          salesList = salesResponse;
+          newSalesData = salesResponse.map(sale => sale.amount || 0);
+        } else if (salesResponse.data) {
+          if (Array.isArray(salesResponse.data)) {
+            salesList = salesResponse.data;
+            newSalesData = salesResponse.data.map(sale => sale.amount || 0);
+          } else if (salesResponse.data.data && Array.isArray(salesResponse.data.data)) {
+            salesList = salesResponse.data.data;
+            newSalesData = salesResponse.data.data.map(sale => sale.amount || 0);
+          }
+        }
       }
 
+      // Güvenli veri dönüşümü
       newSalesData = newSalesData.map((value, index) => {
         const numValue = Number(value);
         return !numValue || numValue <= 0
@@ -95,7 +107,7 @@ const HomeScreen = () => {
           : numValue;
       });
 
-      setSales(salesResponse?.data);
+      setSales(salesList);
 
     } catch (error) {
       console.error(' Data fetching error:', error);
@@ -126,15 +138,30 @@ const HomeScreen = () => {
 
   // Satış verilerini çeyrek bazında gruplandıran fonksiyon
   const groupSalesByQuarter = (sales: Sale[]) => {
+    // Boş veya geçersiz veri durumunda varsayılan değer
+    if (!sales || sales.length === 0) {
+      return {
+        labels: ['Veri Yok'],
+        datasets: [{
+          data: [0],
+          color: () => themeWithCustom.colors.disabled,
+          strokeWidth: 3
+        }]
+      };
+    }
+
     const quarterMap: { [key: string]: number } = {};
 
     sales.forEach(sale => {
-      const date = new Date(sale.date);
-      const year = date.getFullYear();
-      const quarter = Math.floor(date.getMonth() / 3) + 1;
+      // Güvenli tarih kontrolü
+      const saleDate = sale.date ? new Date(sale.date) : new Date();
+      const year = saleDate.getFullYear();
+      const quarter = Math.floor(saleDate.getMonth() / 3) + 1;
       const quarterKey = `${year} Q${quarter}`;
 
-      quarterMap[quarterKey] = (quarterMap[quarterKey] || 0) + sale.amount;
+      // Güvenli miktar hesaplaması
+      const saleAmount = sale.amount && !isNaN(sale.amount) ? sale.amount : 0;
+      quarterMap[quarterKey] = (quarterMap[quarterKey] || 0) + saleAmount;
     });
 
     // Sıralı çeyrek anahtarları oluştur
@@ -163,10 +190,24 @@ const HomeScreen = () => {
 
   // Veri hazırlama fonksiyonunu çeyrek bazında güncelledim
   const prepareChartData = () => {
+    // Boş veya geçersiz veri durumunda varsayılan değer
+    if (!sales || sales.length === 0) {
+      return {
+        labels: ['Veri Yok'],
+        datasets: [{
+          data: [0],
+          color: () => themeWithCustom.colors.disabled,
+          strokeWidth: 3
+        }]
+      };
+    }
+
     // Tüm satışları tarihe göre sırala
-    const sortedSales = sales.sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+    const sortedSales = sales
+      .filter(sale => sale && sale.date && sale.amount)
+      .sort((a, b) => 
+        new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
 
     // Son 12 ayın verilerini al (yaklaşık 4 çeyrek)
     const last12MonthsSales = sortedSales.slice(-12);

@@ -11,10 +11,10 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1C673272353399A03ECCC6FF /* libPods-RouteIQ.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */; };
-		3349A6CC0C6078B6CCCF2BDC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8905A668ACF231F71562AF51 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		ADB41E78C01CB961CC59D7FC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 24D8AB49CC520150499B5BC6 /* libPods-RouteIQ-RouteIQTests.a */; };
+		BCE9A8E5ADBE571C9B9EE481 /* libPods-RouteIQ.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 086EFE50562871A9F3FA6C2D /* libPods-RouteIQ.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,7 +31,7 @@
 		00E356EE1AD99517003FC87E /* RouteIQTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RouteIQTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* RouteIQTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RouteIQTests.m; sourceTree = "<group>"; };
-		0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.debug.xcconfig"; sourceTree = "<group>"; };
+		086EFE50562871A9F3FA6C2D /* libPods-RouteIQ.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07F961A680F5B00A75B9A /* RouteIQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RouteIQ.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RouteIQ/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = RouteIQ/AppDelegate.mm; sourceTree = "<group>"; };
@@ -39,12 +39,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RouteIQ/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RouteIQ/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = RouteIQ/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.release.xcconfig"; sourceTree = "<group>"; };
-		3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.release.xcconfig"; sourceTree = "<group>"; };
+		24D8AB49CC520150499B5BC6 /* libPods-RouteIQ-RouteIQTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ-RouteIQTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RouteIQ/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ-RouteIQTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RouteIQ.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.debug.xcconfig"; sourceTree = "<group>"; };
+		8C8845CFD48615E0155B8CF9 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.release.xcconfig"; sourceTree = "<group>"; };
+		9DA24ACB3B5754EE53B8DD39 /* Pods-RouteIQ.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.debug.xcconfig"; sourceTree = "<group>"; };
+		C3106B0538B6B3C729673306 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ-RouteIQTests.debug.xcconfig"; path = "Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D01546415844585AB07FA520 /* Pods-RouteIQ.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RouteIQ.release.xcconfig"; path = "Target Support Files/Pods-RouteIQ/Pods-RouteIQ.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -53,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3349A6CC0C6078B6CCCF2BDC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */,
+				ADB41E78C01CB961CC59D7FC /* libPods-RouteIQ-RouteIQTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,7 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1C673272353399A03ECCC6FF /* libPods-RouteIQ.a in Frameworks */,
+				BCE9A8E5ADBE571C9B9EE481 /* libPods-RouteIQ.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,8 +103,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				9274EA223DC4701C9F1D189B /* libPods-RouteIQ.a */,
-				841E2D78B779AF6B35EF9715 /* libPods-RouteIQ-RouteIQTests.a */,
+				086EFE50562871A9F3FA6C2D /* libPods-RouteIQ.a */,
+				24D8AB49CC520150499B5BC6 /* libPods-RouteIQ-RouteIQTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -143,10 +143,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */,
-				3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */,
-				9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */,
-				33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */,
+				9DA24ACB3B5754EE53B8DD39 /* Pods-RouteIQ.debug.xcconfig */,
+				D01546415844585AB07FA520 /* Pods-RouteIQ.release.xcconfig */,
+				C3106B0538B6B3C729673306 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */,
+				8C8845CFD48615E0155B8CF9 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -158,12 +158,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RouteIQTests" */;
 			buildPhases = (
-				E63A2B67F1CB33871727745B /* [CP] Check Pods Manifest.lock */,
+				AE1B271B230C52BF88B2484C /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				21CF27EF3539B84868FDDFCB /* [CP] Embed Pods Frameworks */,
-				E01F32242F1D32A22B9F9D8C /* [CP] Copy Pods Resources */,
+				70501661571433EA2C5F6E43 /* [CP] Embed Pods Frameworks */,
+				830F731363844BEE753357F6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -179,13 +179,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RouteIQ" */;
 			buildPhases = (
-				89E6F1DCD053CC99B6A5D96C /* [CP] Check Pods Manifest.lock */,
+				64E34E60CA4FFD4452DFAF52 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00D255D88B1D556C1C5EAC5F /* [CP] Embed Pods Frameworks */,
-				B9065962D85F44B11C3838A5 /* [CP] Copy Pods Resources */,
+				694E9F4C8871BADA1CA68DEA /* [CP] Embed Pods Frameworks */,
+				A075997A951404CF1328A223 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -254,23 +254,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		00D255D88B1D556C1C5EAC5F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -287,24 +270,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		21CF27EF3539B84868FDDFCB /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		89E6F1DCD053CC99B6A5D96C /* [CP] Check Pods Manifest.lock */ = {
+		64E34E60CA4FFD4452DFAF52 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -326,24 +292,41 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B9065962D85F44B11C3838A5 /* [CP] Copy Pods Resources */ = {
+		694E9F4C8871BADA1CA68DEA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E01F32242F1D32A22B9F9D8C /* [CP] Copy Pods Resources */ = {
+		70501661571433EA2C5F6E43 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		830F731363844BEE753357F6 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -360,7 +343,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ-RouteIQTests/Pods-RouteIQ-RouteIQTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E63A2B67F1CB33871727745B /* [CP] Check Pods Manifest.lock */ = {
+		A075997A951404CF1328A223 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RouteIQ/Pods-RouteIQ-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AE1B271B230C52BF88B2484C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -415,7 +415,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9C1A1D2D8985A58C1D0C24C3 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */;
+			baseConfigurationReference = C3106B0538B6B3C729673306 /* Pods-RouteIQ-RouteIQTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -443,7 +443,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 33F9C3CA1889D199ACA3A3E8 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */;
+			baseConfigurationReference = 8C8845CFD48615E0155B8CF9 /* Pods-RouteIQ-RouteIQTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -468,7 +468,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0AECE910B90627E7D9EBA3C7 /* Pods-RouteIQ.debug.xcconfig */;
+			baseConfigurationReference = 9DA24ACB3B5754EE53B8DD39 /* Pods-RouteIQ.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -499,7 +499,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3C6014FD9D4D9E57DC98E3F2 /* Pods-RouteIQ.release.xcconfig */;
+			baseConfigurationReference = D01546415844585AB07FA520 /* Pods-RouteIQ.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

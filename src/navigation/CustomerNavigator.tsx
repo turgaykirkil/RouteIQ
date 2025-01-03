@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from 'react-native-paper';
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+
 import CustomerListScreen from '../screens/customers/CustomerListScreen';
 import CustomerDetailScreen from '../screens/customers/CustomerDetailScreen';
 import NewCustomerScreen from '../screens/customers/NewCustomerScreen';
@@ -11,65 +13,76 @@ import { CustomerStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<CustomerStackParamList>();
 
-const CustomerNavigator = () => {
+// Sabit ekran konfigürasyonları
+const CUSTOMER_SCREEN_CONFIG = Object.freeze({
+  CustomerList: {
+    title: 'Müşteriler',
+    component: CustomerListScreen
+  },
+  CustomerDetail: {
+    title: 'Müşteri Detayı',
+    component: CustomerDetailScreen
+  },
+  NewCustomer: {
+    title: 'Yeni Müşteri',
+    component: NewCustomerScreen
+  },
+  EditCustomer: {
+    title: 'Müşteri Düzenle',
+    component: EditCustomerScreen
+  },
+  CustomerMap: {
+    title: 'Müşteri Haritası',
+    component: CustomerMapScreen
+  },
+  CustomerAnalytics: {
+    title: 'Müşteri Analizi',
+    component: CustomerAnalyticsScreen
+  }
+});
+
+const CustomerNavigator = React.memo(() => {
   const theme = useTheme();
+
+  // Navigator seçeneklerini memoize et
+  const navigatorScreenOptions = useMemo<NativeStackNavigationOptions>(() => ({
+    headerStyle: {
+      backgroundColor: theme.colors.primary,
+    },
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
+    // Performans için ek ayarlar
+    animation: 'slide_from_right',
+    gestureEnabled: true,
+    detachInactiveScreens: true
+  }), [theme]);
+
+  // Ekran tanımlamalarını memoize et
+  const CustomerScreens = useMemo(() => (
+    Object.entries(CUSTOMER_SCREEN_CONFIG).map(([name, config]) => (
+      <Stack.Screen
+        key={name}
+        name={name as keyof CustomerStackParamList}
+        component={config.component}
+        options={{
+          title: config.title,
+          lazy: true
+        }}
+      />
+    ))
+  ), []);
 
   return (
     <Stack.Navigator
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.colors.primary,
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle: {
-          fontWeight: 'bold',
-        },
-      }}
+      screenOptions={navigatorScreenOptions}
+      // Performans için ek ayarlar
+      sceneContainerStyle={{ backgroundColor: 'transparent' }}
     >
-      <Stack.Screen
-        name="CustomerList"
-        component={CustomerListScreen}
-        options={{
-          title: 'Müşteriler',
-        }}
-      />
-      <Stack.Screen
-        name="CustomerDetail"
-        component={CustomerDetailScreen}
-        options={{
-          title: 'Müşteri Detayı',
-        }}
-      />
-      <Stack.Screen
-        name="NewCustomer"
-        component={NewCustomerScreen}
-        options={{
-          title: 'Yeni Müşteri',
-        }}
-      />
-      <Stack.Screen
-        name="EditCustomer"
-        component={EditCustomerScreen}
-        options={{
-          title: 'Müşteri Düzenle',
-        }}
-      />
-      <Stack.Screen
-        name="CustomerMap"
-        component={CustomerMapScreen}
-        options={{
-          title: 'Müşteri Haritası',
-        }}
-      />
-      <Stack.Screen
-        name="CustomerAnalytics"
-        component={CustomerAnalyticsScreen}
-        options={{
-          title: 'Müşteri Analizi',
-        }}
-      />
+      {CustomerScreens}
     </Stack.Navigator>
   );
-};
+});
 
 export default CustomerNavigator;
