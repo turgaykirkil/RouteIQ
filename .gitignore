@@ -41,6 +41,10 @@ coverage/
 *~
 .tmp/
 
+# Xcode
+*.xcuserstate
+ios/RouteIQ.xcworkspace/xcuserdata/
+
 # Proje Özel Kurallar
 screenshots/local/
 db.local.json
