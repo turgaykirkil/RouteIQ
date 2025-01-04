@@ -28,6 +28,22 @@ export type NewTaskInput = Omit<
   'id' | 'status' | 'progress' | 'createdAt' | 'updatedAt'
 >;
 
+export type TaskFormValues = {
+  title: string;
+  description: string;
+  dueDate: Date;
+  priority: 'low' | 'medium' | 'high';
+  customerId: string;
+  customerName: string;
+  assignedTo: string;
+  assigneeName: string;
+  checklist: Array<{
+    id: string;
+    title: string;
+    completed: boolean;
+  }>;
+};
+
 // Memoization için basit bir yardımcı fonksiyon
 function memoize<T extends (...args: any[]) => any>(fn: T): T {
   const cache = new Map();

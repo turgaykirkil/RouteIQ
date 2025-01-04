@@ -223,12 +223,15 @@ const createCRUDOperations = <T>(endpoint: string) => ({
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
+      console.log('Login attempt:', { email }); // Debug log
       const response = await api.post('/api/auth/login', { email, password });
+      
+      console.log('Login response:', response.data); // Debug log
       
       // Token ve kullanıcı bilgilerini güvenli şekilde kaydet
       await AsyncStorage.multiSet([
-        ['authToken', response.data.token],
-        ['user', JSON.stringify(response.data.user)]
+        ['authToken', response.data.token || ''],
+        ['user', JSON.stringify(response.data.user || {})]
       ]);
       
       return response.data;

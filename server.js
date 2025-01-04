@@ -24,14 +24,18 @@ const readDatabase = () => {
 };
 
 // Login endpoint
-app.post('/api/login', (req, res) => {
+app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
+
+  console.log('Login request:', { email, password }); // Debug log
 
   const db = readDatabase();
   const user = db.users.find(u => 
     u.email === email && 
     u.password === password
   );
+
+  console.log('Found user:', user); // Debug log
 
   if (user) {
     res.json({

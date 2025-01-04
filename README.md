@@ -110,6 +110,13 @@ yarn ios  # veya yarn android
 - **Performans İyileştirmeleri**: Uygulama hızı ve kaynak kullanımının optimize edilmesi
 - **Düzenli Güvenlik Güncellemeleri**
 
+#### 🔄 Son Güncellemeler
+
+- Görev ve müşteri listesi arama çubuğu modernleştirildi
+- Görev listesi filtre mekanizması geliştirildi
+- TaskDetailHeader bileşeni kaldırıldı
+- Arama ve filtreleme özellikleri optimize edildi
+
 ### 🌈 Vizyonumuz
 RouteIQ olarak amacımız, sahada çalışan profesyonellerin iş verimliliğini artırmak ve müşteri memnuniyetini en üst seviyeye çıkarmaktır. Sürekli öğrenen, uyarlanan ve gelişen bir çözüm sunmayı hedefliyoruz.
 
@@ -237,6 +244,13 @@ yarn ios  # or yarn android
 - **Advanced Data Encryption**: Enhanced protection for customer information
 - **Performance Improvements**: Optimized application speed and resource usage
 - **Regular Security Updates**
+
+#### 🔄 Latest Updates
+
+- Task and customer list search bar modernized
+- Task list filter mechanism improved
+- TaskDetailHeader component removed
+- Search and filtering features optimized
 
 ### 🌈 Our Vision
 At RouteIQ, our goal is to increase the productivity of field professionals and maximize customer satisfaction. We aim to provide a continuously learning, adapting, and improving solution.

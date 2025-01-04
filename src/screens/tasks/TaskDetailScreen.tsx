@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Text, Button, Menu, Portal, Dialog, TextInput, useTheme, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, Menu, useTheme, ActivityIndicator } from 'react-native-paper';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { TaskStackNavigationProp, TaskStackParamList } from '../../navigation/types';
 import { MainTabParamList } from '../../navigation/types';
@@ -10,6 +10,9 @@ import { useTaskActions } from '../../hooks/useTaskActions';
 import { TaskHeader } from '../../components/task/TaskHeader';
 import { TaskDetails } from '../../components/task/TaskDetails';
 import { getDisplayValue } from '../../utils/display';
+
+import TaskDeleteDialog from '../../components/tasks/TaskDeleteDialog';
+import TaskProgressDialog from '../../components/tasks/TaskProgressDialog';
 
 // Define route prop types
 interface TaskDetailScreenRouteProp extends RouteProp<TaskStackParamList, 'TaskDetail'> {}
@@ -52,6 +55,13 @@ const TaskDetailScreen = ({ route }: TaskDetailScreenProps) => {
     });
   };
 
+  const onDeleteConfirm = async () => {
+    const success = await handleDelete();
+    if (success) {
+      navigation.goBack();
+    }
+  };
+
   if (loading) {
     return (
       <View style={[styles.centerContainer, { backgroundColor: theme.colors.background }]}>
@@ -78,15 +88,9 @@ const TaskDetailScreen = ({ route }: TaskDetailScreenProps) => {
     );
   }
 
-  const onDeleteConfirm = async () => {
-    const success = await handleDelete();
-    if (success) {
-      navigation.goBack();
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      
       <ScrollView showsVerticalScrollIndicator={false}>
         <TaskHeader
           title={getDisplayValue(task.title)}
@@ -104,69 +108,49 @@ const TaskDetailScreen = ({ route }: TaskDetailScreenProps) => {
         />
       </ScrollView>
 
-      <Portal>
-        <Menu
-          visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={menuAnchor}
-        >
-          <Menu.Item 
-            onPress={() => {
-              setMenuVisible(false);
-              setProgressDialogVisible(true);
-            }} 
-            title="İlerleme Güncelle" 
-          />
-          <Menu.Item 
-            onPress={() => handleStatusChange('completed')} 
-            title="Tamamlandı" 
-          />
-          <Menu.Item 
-            onPress={() => handleStatusChange('in_progress')} 
-            title="Devam Ediyor" 
-          />
-          <Menu.Item 
-            onPress={() => {
-              setMenuVisible(false);
-              setDeleteDialogVisible(true);
-            }} 
-            title="Sil" 
-          />
-        </Menu>
+      <Menu
+        visible={menuVisible}
+        onDismiss={() => setMenuVisible(false)}
+        anchor={menuAnchor}
+      >
+        <Menu.Item 
+          onPress={() => {
+            setMenuVisible(false);
+            setProgressDialogVisible(true);
+          }} 
+          title="İlerleme Güncelle" 
+        />
+        <Menu.Item 
+          onPress={() => handleStatusChange('completed')} 
+          title="Tamamlandı" 
+        />
+        <Menu.Item 
+          onPress={() => handleStatusChange('in_progress')} 
+          title="Devam Ediyor" 
+        />
+        <Menu.Item 
+          onPress={() => {
+            setMenuVisible(false);
+            setDeleteDialogVisible(true);
+          }} 
+          title="Sil" 
+        />
+      </Menu>
 
-        <Dialog
-          visible={deleteDialogVisible}
-          onDismiss={() => setDeleteDialogVisible(false)}
-        >
-          <Dialog.Title>Görevi Sil</Dialog.Title>
-          <Dialog.Content>
-            <Text>Bu görevi silmek istediğinizden emin misiniz?</Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setDeleteDialogVisible(false)}>İptal</Button>
-            <Button onPress={onDeleteConfirm}>Sil</Button>
-          </Dialog.Actions>
-        </Dialog>
+      <TaskDeleteDialog
+        visible={deleteDialogVisible}
+        onDismiss={() => setDeleteDialogVisible(false)}
+        onDelete={onDeleteConfirm}
+        taskTitle={task.title}
+      />
 
-        <Dialog
-          visible={progressDialogVisible}
-          onDismiss={() => setProgressDialogVisible(false)}
-        >
-          <Dialog.Title>İlerleme Güncelle</Dialog.Title>
-          <Dialog.Content>
-            <TextInput
-              label="İlerleme (%)"
-              value={progress}
-              onChangeText={setProgress}
-              keyboardType="numeric"
-            />
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setProgressDialogVisible(false)}>İptal</Button>
-            <Button onPress={handleProgressUpdate}>Güncelle</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      <TaskProgressDialog
+        visible={progressDialogVisible}
+        onDismiss={() => setProgressDialogVisible(false)}
+        onUpdate={handleProgressUpdate}
+        progress={progress}
+        onProgressChange={setProgress}
+      />
     </View>
   );
 };
