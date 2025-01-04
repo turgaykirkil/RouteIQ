@@ -44,6 +44,7 @@ RouteIQ, işletmelerin ve saha çalışanlarının rota optimizasyonunu akıllı
 <p align="center">
   <img src="screenshots/home.png" width="250" alt="Ana Sayfa">
   <img src="screenshots/route.png" width="250" alt="Rota Optimizasyon Ekranı">
+  <img src="screenshots/route_detail.png" width="250" alt="Rota Detayları">
   <img src="screenshots/customers.png" width="250" alt="Müşteri Listesi">
   <img src="screenshots/tasks.png" width="250" alt="Görevler Ekranı">
 </p>
@@ -171,6 +172,7 @@ RouteIQ is an advanced mobile application that enables businesses and field work
 <p align="center">
   <img src="screenshots/home.png" width="250" alt="Home Screen">
   <img src="screenshots/route.png" width="250" alt="Route Optimization Screen">
+  <img src="screenshots/route_detail.png" width="250" alt="Route Details">
   <img src="screenshots/customers.png" width="250" alt="Customer List">
   <img src="screenshots/tasks.png" width="250" alt="Tasks Screen">
 </p>

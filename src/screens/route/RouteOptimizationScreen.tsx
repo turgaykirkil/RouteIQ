@@ -21,12 +21,12 @@ import {
 import { Text, useTheme } from 'react-native-paper';
 import MapView, { Marker, Polyline, PROVIDER_OPENSTREETMAP, Callout } from 'react-native-maps';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Geolocation from '@react-native-community/geolocation';
 import { useCustomers } from '../../hooks/useCustomers';
 import { useLocation } from '../../hooks/useLocation';
 import { Customer } from '../../types/customer';
 import { routeService } from '../../services/routeService';
-import Icon from 'react-native-vector-icons/Ionicons';
 import theme from '../../theme';
 
 const { width, height } = Dimensions.get('window');
@@ -34,6 +34,12 @@ const { width, height } = Dimensions.get('window');
 interface SelectedPoint {
   customer: Customer;
   order: number;
+}
+
+interface RouteDetails {
+  customers: Customer[];
+  distance: number;
+  duration: number;
 }
 
 const RouteOptimizationScreen = () => {
@@ -46,11 +52,32 @@ const RouteOptimizationScreen = () => {
   
   const { location } = useLocation();
   
-  const [selectedPoints, setSelectedPoints] = useState<SelectedPoint[]>([]);
+  const [selectedPoints, setSelectedPoints] = useState<Array<{customer: Customer, order: number}>>([]);
   const [optimizedRoute, setOptimizedRoute] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [routeDetails, setRouteDetails] = useState<any | null>(null);
-  const [isRouteDetailsModalVisible, setIsRouteDetailsModalVisible] = useState(false);
+  const [routeDetailsModalVisible, setRouteDetailsModalVisible] = useState(false);
+  const [routeDetails, setRouteDetails] = useState<RouteDetails | null>(null);
+
+  const MAX_MODAL_HEIGHT = Dimensions.get('window').height * 0.8;
+  const ROUTE_OVERVIEW_HEIGHT = 120; // Toplam mesafe ve süre kartlarının yüksekliği
+  const SECTION_TITLE_HEIGHT = 50; // Müşteri Sırası başlığının yüksekliği
+  const CUSTOMER_ITEM_HEIGHT = 100; // Her müşteri item'ının yüksekliği (padding dahil)
+  const MODAL_HEADER_HEIGHT = 60; // Modal başlık yüksekliği
+  const MODAL_FOOTER_HEIGHT = 80; // Modal footer yüksekliği
+  const MODAL_VERTICAL_PADDING = 32; // Modal içerik dikey padding'i
+
+  const calculateModalHeight = useCallback((customerCount: number) => {
+    const customerListHeight = customerCount * CUSTOMER_ITEM_HEIGHT;
+    const totalHeight = (
+      MODAL_HEADER_HEIGHT + 
+      ROUTE_OVERVIEW_HEIGHT + 
+      SECTION_TITLE_HEIGHT + 
+      customerListHeight + 
+      MODAL_FOOTER_HEIGHT + 
+      MODAL_VERTICAL_PADDING
+    );
+    return Math.min(totalHeight, MAX_MODAL_HEIGHT);
+  }, []);
 
   const initialMapRegion = useRef({
     latitude: 41.0082,
@@ -72,7 +99,7 @@ const RouteOptimizationScreen = () => {
     }
   }, [location]);
 
-  const updateSelectedPoints = useCallback((newSelectedPoints: SelectedPoint[]) => {
+  const updateSelectedPoints = useCallback((newSelectedPoints: Array<{customer: Customer, order: number}>) => {
     setSelectedPoints(newSelectedPoints);
 
     if (optimizedRoute) {
@@ -88,7 +115,7 @@ const RouteOptimizationScreen = () => {
       const updatedPoints = selectedPoints.filter(point => point.customer.id !== customer.id);
       updateSelectedPoints(updatedPoints);
     } else {
-      const newSelectedPoint: SelectedPoint = {
+      const newSelectedPoint: {customer: Customer, order: number} = {
         customer,
         order: selectedPoints.length + 1
       };
@@ -98,99 +125,362 @@ const RouteOptimizationScreen = () => {
     }
   }, [selectedPoints, updateSelectedPoints]);
 
-  const calculateRoute = useCallback(() => {
+  const validateCustomerCoordinates = useCallback((customer: Customer): boolean => {
+    const { coordinates } = customer.address;
+    const isValid = coordinates && coordinates.lat && coordinates.lng;
+    return !!isValid;
+  }, []);
+
+  const filterValidCustomers = useCallback((customers: Customer[]) => {
+    if (!customers || customers.length === 0) return [];
+    
+    return customers.filter(customer => {
+      const hasValidCoordinates = 
+        customer?.address?.coordinates?.lat && 
+        customer?.address?.coordinates?.lng;
+      return hasValidCoordinates;
+    });
+  }, []);
+
+  const handleCustomerPress = useCallback((customer: Customer) => {
+    const isSelected = selectedPoints.some(point => point.customer.id === customer.id);
+    
+    if (isSelected) {
+      const updatedPoints = selectedPoints.filter(point => point.customer.id !== customer.id);
+      updateSelectedPoints(updatedPoints);
+    } else {
+      const newSelectedPoint = {
+        customer,
+        order: selectedPoints.length + 1
+      };
+      updateSelectedPoints([...selectedPoints, newSelectedPoint]);
+    }
+  }, [selectedPoints, updateSelectedPoints]);
+
+  const calculateRoute = useCallback(async () => {
     try {
       setIsLoading(true);
       
-      const calculatedRoute = routeService.calculateOptimizedRoute(
-        selectedPoints.map(point => point.customer)
-      );
+      if (!selectedPoints || selectedPoints.length < 2) {
+        Alert.alert('Uyarı', 'Rota hesaplaması için en az 2 müşteri seçmelisiniz.');
+        return;
+      }
+
+      const validCustomers = filterValidCustomers(selectedPoints.map(point => point.customer));
       
-      setRouteDetails(calculatedRoute);
-      setOptimizedRoute(calculatedRoute);
-      setIsRouteDetailsModalVisible(true);
-      setIsLoading(false);
+      if (validCustomers.length < 2) {
+        Alert.alert('Uyarı', 'Seçilen müşterilerin koordinatları geçersiz. Lütfen başka müşteriler seçin.');
+        return;
+      }
+
+      const optimizedRoute = await routeService.calculateOptimizedRoute(validCustomers);
+      
+      if (!optimizedRoute) {
+        throw new Error('Rota hesaplanamadı');
+      }
+
+      setRouteDetails({
+        customers: validCustomers,
+        distance: optimizedRoute.totalDistance || 0,
+        duration: optimizedRoute.estimatedTime || 0
+      });
+
+      setRouteDetailsModalVisible(true);
     } catch (error) {
-      console.error('Rota hesaplanırken hata:', error);
+      Alert.alert('Hata', 'Rota hesaplanırken bir hata oluştu. Lütfen tekrar deneyin.');
+    } finally {
       setIsLoading(false);
-      Alert.alert(
-        'Rota Hesaplama Hatası', 
-        'Rotanız hesaplanamadı. Lütfen tekrar deneyin.',
-        [{ text: 'Tamam' }]
-      );
     }
-  }, [selectedPoints]);
+  }, [selectedPoints, filterValidCustomers, routeService]);
 
   const closeRouteDetailsModal = useCallback(() => {
-    setIsRouteDetailsModalVisible(false);
-    setSelectedPoints([]); 
+    setRouteDetailsModalVisible(false);
+    setRouteDetails(null);
+    setSelectedPoints([]);
+    setOptimizedRoute(null);
   }, []);
 
-  useEffect(() => {
-    console.log('Müşteri Sayısı:', customers?.length);
-    console.log('İlk Müşteri Koordinatları:', 
-      customers && customers[0]?.address?.coordinates
-    );
-  }, [customers])
+  const handleShowOnMap = useCallback(() => {
+    if (routeDetails?.customers) {
+      // Haritada göster işlemleri
+      setRouteDetailsModalVisible(false);
+    }
+  }, [routeDetails]);
 
-  return (
-    <View style={styles.container}>
+  const renderRouteOptimizationModal = useCallback(() => {
+    return (
       <Modal
         animationType="slide"
         transparent={true}
-        visible={isRouteDetailsModalVisible}
+        visible={routeDetailsModalVisible}
         onRequestClose={closeRouteDetailsModal}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
+        <TouchableOpacity 
+          style={styles.modal} 
+          activeOpacity={1} 
+          onPress={closeRouteDetailsModal}
+        >
+          <TouchableOpacity 
+            style={styles.modalContent} 
+            activeOpacity={1} 
+            onPress={e => e.stopPropagation()}
+          >
+            {/* Header */}
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Rota Detayları</Text>
+              <Text style={styles.modalTitle}>Rota Optimizasyonu</Text>
               <TouchableOpacity onPress={closeRouteDetailsModal}>
-                <Icon name="close" size={24} color={theme.colors.text} />
+                <Ionicons name="close" size={24} color={theme.colors.text} />
               </TouchableOpacity>
             </View>
-            
-            <ScrollView style={styles.modalContent}>
+
+            {/* Content */}
+            <View style={styles.modalContent}>
               {routeDetails && (
-                <View>
-                  <View style={styles.detailSection}>
-                    <Text style={styles.sectionTitle}>Toplam Mesafe</Text>
-                    <Text>{routeDetails.totalDistance} km</Text>
+                <>
+                  <View style={styles.overviewContainer}>
+                    <View style={styles.overviewCard}>
+                      <Text style={styles.overviewTitle}>Toplam Mesafe</Text>
+                      <Text style={styles.overviewValue}>
+                        {routeDetails.distance.toFixed(0)} km
+                      </Text>
+                    </View>
+                    <View style={styles.overviewCard}>
+                      <Text style={styles.overviewTitle}>Tahmini Süre</Text>
+                      <Text style={styles.overviewValue}>
+                        {routeDetails.duration.toFixed(0)} dk
+                      </Text>
+                    </View>
                   </View>
-                  
-                  <View style={styles.detailSection}>
-                    <Text style={styles.sectionTitle}>Müşteri Sırası</Text>
+
+                  <Text style={styles.sectionTitle}>Müşteri Sırası</Text>
+                  <ScrollView 
+                    style={styles.customerListScroll}
+                    showsVerticalScrollIndicator={false}
+                    nestedScrollEnabled={true}
+                    scrollEnabled={true}
+                  >
                     {routeDetails.customers.map((customer, index) => (
-                      <View key={customer.id} style={styles.customerDetailItem}>
-                        <Text style={styles.customerName}>{index + 1}. {customer.name}</Text>
-                        <Text>{customer.address.street}, {customer.address.city}</Text>
+                      <View key={customer.id} style={styles.customerItem}>
+                        <View style={styles.customerItemContent}>
+                          <Text style={styles.customerOrder}>{index + 1}.</Text>
+                          <View style={styles.customerInfo}>
+                            <Text style={styles.customerName}>{customer.name}</Text>
+                            <Text style={styles.customerAddress}>
+                              {customer.address.street}, {customer.address.city}
+                            </Text>
+                          </View>
+                        </View>
                       </View>
                     ))}
-                  </View>
-                </View>
+                  </ScrollView>
+                </>
               )}
-            </ScrollView>
-            
-            <View style={styles.modalActionContainer}>
+            </View>
+            {/* Footer */}
+            <View style={styles.modalFooter}>
               <TouchableOpacity 
-                style={[styles.modalActionButton, styles.modalCancelButton]} 
+                style={[styles.footerButton, styles.showOnMapButton]} 
+                onPress={handleShowOnMap}
+              >
+                <MaterialCommunityIcons 
+                  name="map-marker" 
+                  size={20} 
+                  color={theme.colors.onPrimary} 
+                />
+                <Text style={styles.buttonText}>Haritada Göster</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.footerButton, styles.cancelButton]} 
                 onPress={closeRouteDetailsModal}
               >
-                <Text style={styles.modalActionButtonText}>Kapat</Text>
+                <MaterialCommunityIcons 
+                  name="close" 
+                  size={20} 
+                  color={theme.colors.onPrimary} 
+                />
+                <Text style={styles.buttonText}>Rotadan Vazgeç</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        </TouchableOpacity>
       </Modal>
+    );
+  }, [routeDetails, routeDetailsModalVisible, closeRouteDetailsModal, handleShowOnMap, theme.colors]);
 
-      {/* Müşteri listesi kaldırıldı */}
-      
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    map: {
+      width: '100%',
+      height: '100%',
+    },
+    calculateRouteButton: {
+      position: 'absolute',
+      bottom: 20,
+      alignSelf: 'center',
+      backgroundColor: theme.colors.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 24,
+      borderRadius: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    calculateRouteButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    modal: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: theme.colors.background,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      padding: 16,
+      maxHeight: Dimensions.get('window').height * 0.8,
+      width: '100%'
+    },
+    modalContainer: {
+      flex: 1,
+      padding: 16,
+    },
+    customerListContainer: {
+      maxHeight: 300,
+      overflow: 'hidden'
+    },
+    customerListScroll: {
+      maxHeight: 300,
+      height: 300
+    },
+    customerListContent: {
+      paddingBottom: 16
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.disabled,
+    },
+    modalTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+    },
+    overviewContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      padding: 16,
+      gap: 16,
+    },
+    overviewCard: {
+      flex: 1,
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 12,
+      padding: 16,
+    },
+    overviewTitle: {
+      fontSize: 14,
+      color: theme.colors.primary,
+      marginBottom: 8,
+    },
+    overviewValue: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: theme.colors.primary,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: theme.colors.text,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    customerItem: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 8,
+      marginBottom: 12,
+      padding: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    customerItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    customerOrder: {
+      width: 30,
+      marginRight: 12,
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: theme.colors.text,
+      textAlign: 'center',
+    },
+    customerInfo: {
+      flex: 1,
+    },
+    customerName: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: theme.colors.text,
+      marginBottom: 4,
+    },
+    customerAddress: {
+      fontSize: 14,
+      color: theme.colors.text,
+    },
+    modalFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      paddingBottom: 24,
+      backgroundColor: theme.colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: theme.colors.disabled,
+    },
+    footerButton: {
+      flex: 1,
+      marginHorizontal: 8,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    showOnMapButton: {
+      backgroundColor: theme.colors.primary,
+    },
+    cancelButton: {
+      backgroundColor: theme.colors.error,
+    },
+    buttonText: {
+      color: theme.colors.onPrimary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+
+  return (
+    <View style={styles.container}>
+      {renderRouteOptimizationModal()}
       <MapView
-        provider={PROVIDER_OPENSTREETMAP}
         style={styles.map}
-        region={mapRegion}
-        showsUserLocation
-        showsMyLocationButton
+        initialRegion={initialMapRegion.current}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
       >
         {/* Müşteri markerları */}
         {customers && customers.map(customer => (
@@ -201,7 +491,7 @@ const RouteOptimizationScreen = () => {
                 latitude: customer.address.coordinates.lat,
                 longitude: customer.address.coordinates.lng,
               }}
-              onPress={() => handleCustomerSelection(customer)}
+              onPress={() => handleCustomerPress(customer)}
             >
               <MaterialCommunityIcons
                 name="map-marker"
@@ -213,206 +503,22 @@ const RouteOptimizationScreen = () => {
             </Marker>
           )
         ))}
-        
-        {selectedPoints.map((point, index) => (
-          <Marker
-            key={point.customer.id}
-            coordinate={{
-              latitude: point.customer.address.coordinates.lat,
-              longitude: point.customer.address.coordinates.lng
-            }}
-            title={point.customer.name}
-            description={`Sıra: ${point.order}`}
-          >
-            <MaterialCommunityIcons 
-              name="map-marker" 
-              size={40} 
-              color={theme.colors.primary} 
-            />
-          </Marker>
-        ))}
-
-        {optimizedRoute?.coordinates && (
-          <Polyline
-            coordinates={optimizedRoute.coordinates}
-            strokeColor={theme.colors.primary}
-            strokeWidth={4}
-          />
-        )}
       </MapView>
 
-      {/* Rota Hesapla Butonu */}
-      {selectedPoints.length > 0 && (
+      {/* Rota Hesaplama Butonu */}
+      {selectedPoints.length >= 1 && (
         <TouchableOpacity 
-          style={styles.calculateRouteButton}
+          style={styles.calculateRouteButton} 
           onPress={calculateRoute}
           disabled={isLoading}
         >
           <Text style={styles.calculateRouteButtonText}>
-            {isLoading ? 'Hesaplanıyor...' : 'Rota Hesapla'}
+            {isLoading ? 'Hesaplanıyor...' : 'Rotayı Hesapla'}
           </Text>
         </TouchableOpacity>
-      )}
-
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <Text>Rota hesaplanıyor...</Text>
-        </View>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  map: {
-    flex: 1,
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-  markerContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderColor: theme.colors.primary,
-    borderWidth: 2,
-  },
-  orderBadge: {
-    position: 'absolute',
-    top: -10,
-    right: -10,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  orderText: {
-    color: theme.colors.onPrimary,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  calloutWrapper: {
-    width: 300,
-    backgroundColor: 'transparent',
-  },
-  calloutContainer: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.outline,
-    borderWidth: 1,
-    minWidth: 200,
-    maxWidth: 300,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-  },
-  calloutTitle: {
-    color: theme.colors.onSurface,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  calloutText: {
-    color: theme.colors.onSurfaceVariant,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  calculateRouteButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    backgroundColor: theme.colors.primary,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  calculateRouteButtonText: {
-    color: theme.colors.background,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    width: '90%',
-    maxHeight: '85%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#e0e0e0',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  modalContent: {
-    maxHeight: '70%',
-    padding: 15,
-  },
-  detailSection: {
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-  },
-  customerDetailItem: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-  },
-  modalActionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 15,
-    borderTopWidth: 0.5,
-    borderTopColor: '#e0e0e0',
-  },
-  modalActionButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  modalActionButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  modalCancelButton: {
-    backgroundColor: '#4CAF50',
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default React.memo(RouteOptimizationScreen);
