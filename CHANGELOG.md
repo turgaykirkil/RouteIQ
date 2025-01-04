@@ -33,6 +33,9 @@
   * NewTaskAssigneeSelect.tsx: Atanan kişi seçim komponenti
   * NewTaskPrioritySelect.tsx: Öncelik seçim komponenti
   * NewTaskDatePicker.tsx: Tarih seçim komponenti
+- RouteOptimizationScreen bileşenlere ayrıldı
+- Rota optimizasyon ekranı alt bileşenlere bölündü (RouteMapView, CustomerSelectionList, RouteDetailsModal, RouteActionButtons)
+- Kod modülerliği ve okunabilirliği artırıldı
 
 ### Changed
 - TaskDetailHeader bileşeni kaldırıldı
@@ -50,6 +53,15 @@
 - Müşteri listesi arama çubuğu modernleştirildi
 - Müşteri listesi arama çubuğundan filtreler kaldırıldı
 - Müşteri arama çubuğu görsel stilleri iyileştirildi
+- Rota optimizasyon ekranından müşteri listesi kaldırıldı
+- Harita üzerinden doğrudan müşteri seçimi aktif hale getirildi
+- Rota optimizasyon ekranı tam ekran haline getirildi
+- RouteActionButtons bottom navigation'ın hemen üstüne taşındı
+- RouteActionButtons RouteMapView içine taşındı
+- Rota hesaplama ve seçimi temizleme işlevleri RouteMapView'a entegre edildi
+- RouteActionButtons arka planı şeffaf hale getirildi
+- Rota hesaplama işlevi RouteOptimizationScreen ve RouteMapView arasında düzenlendi
+- Modal açılması için gerekli state güncellemeleri yapıldı
 
 ### Fixed
 - Logo import yolu düzeltildi: `../../assets/logo.png` → `../../assets/images/logo.png`
@@ -60,4 +72,22 @@
 - Ekran kodları sadeleştirildi
 
 ### Added
-- [formatDate](cci:1://file:///Users/turgaykirkil/Documents/Applications/RouteIQ/src/utils/display.ts:7:0-28:2) fonksiyonu eklendi: Tarih biçimlendirme için yardımcı fonksiyon
+- [formatDate](cci:1://file:///Users/turgaykirkil/Documents/Applications/RouteIQ/src/utils/display.ts:7:0-28:2) function: Helper function for date formatting
+- "Show on Map" and "Cancel Route" buttons added to RouteDetailsModal
+- Improved button styles and layout in the modal
+
+### Changed
+- Removed unnecessary "Close" button from RouteDetailsModal
+- Added spacing between customer list and buttons
+- Restored modal closing functionality with the close (x) button
+- RouteActionButtons background color set to transparent
+- Adjusted button layout in RouteActionButtons
+
+### Removed
+- Customer list removed from the Route Optimization screen
+- Unnecessary background color from RouteActionButtons
+
+### Improved
+- Route Optimization screen now uses full screen
+- Direct customer selection on the map
+- Modular component structure for Route Optimization screen
