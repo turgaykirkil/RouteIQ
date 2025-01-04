@@ -259,4 +259,4 @@ Distributed under the MIT License.
 ---
 
 **Contact:** Turgay Kırkıl - turgaykirkil@me.com
-**Project Link:** [RouteIQ GitHub Repository](https://github.com/username/RouteIQ)
+**Project Link:** [RouteIQ GitHub Repository](https://github.com/turgaykirkil/RouteIQ)
