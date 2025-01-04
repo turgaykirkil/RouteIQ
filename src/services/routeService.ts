@@ -5,6 +5,13 @@ import { WeatherService } from './weatherService';
 import { TrafficService } from './trafficService'; 
 import { CacheService } from './cacheService'; 
 import { Alert } from 'react-native';
+import { calculateDistance } from '../utils/geoUtils';
+
+interface RouteResponse {
+  customerDetails: Customer[];
+  totalDistance: number;
+  estimatedTime: number;
+}
 
 // Güvenli ve yapılandırılabilir API URL'leri
 const API_CONFIGS = {
@@ -91,12 +98,10 @@ export const routeService = {
   async calculateOptimalRoute(customers: Customer[] = [], startPoint?: { lat: number; lng: number }) {
     // Detaylı giriş parametresi kontrolü
     if (!customers || !Array.isArray(customers) || customers.length === 0) {
-      console.error('Geçersiz müşteri listesi');
       return this.createEmptyRouteResponse('Geçersiz müşteri listesi');
     }
 
     if (!startPoint || typeof startPoint.lat !== 'number' || typeof startPoint.lng !== 'number') {
-      console.error('Geçersiz başlangıç noktası');
       return this.createEmptyRouteResponse('Geçersiz başlangıç noktası');
     }
 
@@ -125,7 +130,6 @@ export const routeService = {
       const validCustomers = enrichedCustomers.filter(this.isValidCustomerCoordinate);
 
       if (validCustomers.length === 0) {
-        console.error('Geçerli koordinatlı müşteri bulunamadı');
         return this.createEmptyRouteResponse('Geçerli koordinatlı müşteri bulunamadı');
       }
 
@@ -160,21 +164,45 @@ export const routeService = {
       };
 
     } catch (error) {
-      console.error('Rota hesaplama hatası:', error);
       return this.createEmptyRouteResponse('Rota hesaplama sırasında beklenmeyen hata');
     }
   },
 
   // Müşteri koordinat doğrulama
   isValidCustomerCoordinate(customer: Customer): boolean {
-    const coords = customer?.address?.coordinates;
-    return coords && 
-           typeof coords.lat === 'number' && 
-           typeof coords.lng === 'number' &&
-           !isNaN(coords.lat) &&
-           !isNaN(coords.lng) &&
-           coords.lat !== 0 &&
-           coords.lng !== 0;
+    // Müşteri nesnesinin varlığını kontrol et
+    if (!customer) {
+      return false;
+    }
+
+    // Adres ve koordinatların varlığını kontrol et
+    if (!customer.address || !customer.address.coordinates) {
+      return false;
+    }
+
+    const coords = customer.address.coordinates;
+
+    // Koordinatların farklı formatlarını kontrol et
+    const lat = Array.isArray(coords) 
+      ? coords[0] 
+      : coords.lat;
+    
+    const lng = Array.isArray(coords) 
+      ? coords[1] 
+      : coords.lng;
+
+    // Koordinatların geçerliliğini kontrol et
+    const isValid = 
+      lat !== undefined && 
+      lng !== undefined && 
+      typeof lat === 'number' && 
+      typeof lng === 'number' &&
+      !isNaN(lat) &&
+      !isNaN(lng) &&
+      lat !== 0 &&
+      lng !== 0;
+
+    return isValid;
   },
 
   // Müşteri optimizasyon detayları çıkarma
@@ -208,7 +236,6 @@ export const routeService = {
       const routes = response.data?.routes;
 
       if (!routes || routes.length === 0) {
-        console.error('OSRM rotası bulunamadı');
         return {
           coordinates: coordinates,
           distance: 0,
@@ -225,7 +252,6 @@ export const routeService = {
         duration: optimalRoute.duration / 60 // saniyeyi dakikaya çevir
       };
     } catch (error) {
-      console.error('OSRM rotası hesaplama hatası:', error);
       return {
         coordinates: coordinates,
         distance: 0,
@@ -246,11 +272,6 @@ export const routeService = {
         }
       });
       
-      // Detaylı hata kontrolü
-      if (!response.data || !response.data.main || !response.data.weather) {
-        throw new Error('Geçersiz hava durumu verisi');
-      }
-
       return {
         temperature: response.data.main.temp,
         feelsLike: response.data.main.feels_like,
@@ -262,16 +283,6 @@ export const routeService = {
         cloudiness: response.data.clouds?.all || 0
       };
     } catch (error) {
-      console.error('Hava durumu hatası:', error.response?.data || error.message);
-      
-      // Detaylı hata bilgisi
-      if (error.response) {
-        console.error('API Yanıt Hatası:', error.response.data);
-        console.error('API Durum Kodu:', error.response.status);
-      } else if (error.request) {
-        console.error('Yanıt Alınamadı');
-      }
-
       return {
         temperature: 20,
         feelsLike: 20,
@@ -295,7 +306,6 @@ export const routeService = {
         incidents: []
       };
     } catch (error) {
-      console.error('Trafik bilgisi hatası:', error);
       return {
         congestionLevel: 'Low',
         averageSpeed: 60,
@@ -480,7 +490,6 @@ export const routeService = {
       });
       return response.data;
     } catch (error) {
-      console.error('Address search error:', error);
       throw error;
     }
   },
@@ -586,9 +595,6 @@ export const routeService = {
   },
 
   handleApiError(error: any, defaultMessage: string) {
-    console.error(defaultMessage, error);
-    
-    // Kullanıcıya bildirim
     Alert.alert(
       'Bağlantı Hatası', 
       'Şu anda bazı hizmetler kullanılamıyor. Lütfen daha sonra tekrar deneyin.'
@@ -630,12 +636,100 @@ export const routeService = {
       Math.sin(dLat/2) * Math.sin(dLat/2) +
       Math.cos(this.deg2rad(point1.lat)) * Math.cos(this.deg2rad(point2.lat)) * 
       Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
   },
 
   deg2rad(deg) {
     return deg * (Math.PI/180)
+  },
+
+  // Rota optimizasyonu için yeni metod
+  async calculateOptimizedRoute(customers: Customer[]): Promise<RouteResponse | null> {
+    try {
+      if (!customers || customers.length < 2) {
+        return null;
+      }
+
+      // En yakın komşu algoritması ile rota optimizasyonu
+      let remainingCustomers = [...customers];
+      let optimizedRoute = [];
+      let currentCustomer = remainingCustomers.shift()!;
+      optimizedRoute.push(currentCustomer);
+
+      let totalDistance = 0;
+      let estimatedTime = 0;
+
+      while (remainingCustomers.length > 0) {
+        let nearestCustomer = null;
+        let minDistance = Infinity;
+
+        for (const customer of remainingCustomers) {
+          const distance = calculateDistance(
+            currentCustomer.address.coordinates.lat,
+            currentCustomer.address.coordinates.lng,
+            customer.address.coordinates.lat,
+            customer.address.coordinates.lng
+          );
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestCustomer = customer;
+          }
+        }
+
+        if (nearestCustomer) {
+          optimizedRoute.push(nearestCustomer);
+          totalDistance += minDistance;
+          remainingCustomers = remainingCustomers.filter(c => c.id !== nearestCustomer!.id);
+          currentCustomer = nearestCustomer;
+        }
+      }
+
+      // Ortalama hız: 40 km/saat varsayılarak
+      // 1 km = 1.5 dakika olarak hesaplanır
+      estimatedTime = totalDistance * 1.5;
+
+      return {
+        customerDetails: optimizedRoute,
+        totalDistance,
+        estimatedTime
+      };
+    } catch (error) {
+      return null;
+    }
+  },
+
+  // Koordinatlar arası mesafe hesaplama (Haversine formülü)
+  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371; // Dünya yarıçapı (km)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  },
+
+  // Konuma göre müşterileri sırala
+  sortCustomersByDistance(customers: Customer[], currentLat: number, currentLng: number): Customer[] {
+    return customers.sort((a, b) => {
+      const distanceA = this.calculateDistance(
+        currentLat, 
+        currentLng, 
+        a.address.coordinates.lat, 
+        a.address.coordinates.lng
+      );
+      const distanceB = this.calculateDistance(
+        currentLat, 
+        currentLng, 
+        b.address.coordinates.lat, 
+        b.address.coordinates.lng
+      );
+      return distanceA - distanceB;
+    });
   },
 
   // Rota maliyet hesaplama fonksiyonu
@@ -697,76 +791,5 @@ export const routeService = {
     return sortedCustomers.map(sortedCustomer => 
       customers.find(customer => customer.id === sortedCustomer.id)
     );
-  },
-
-  // Koordinatlar arası mesafe hesaplama (Haversine formülü)
-  calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Dünya yarıçapı (km)
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  },
-
-  // Konuma göre müşterileri sırala
-  sortCustomersByDistance(customers: Customer[], currentLat: number, currentLng: number): Customer[] {
-    return customers.sort((a, b) => {
-      const distanceA = this.calculateDistance(
-        currentLat, 
-        currentLng, 
-        a.address.coordinates.lat, 
-        a.address.coordinates.lng
-      );
-      const distanceB = this.calculateDistance(
-        currentLat, 
-        currentLng, 
-        b.address.coordinates.lat, 
-        b.address.coordinates.lng
-      );
-      return distanceA - distanceB;
-    });
-  },
-
-  // Rota optimizasyonu için yeni metod
-  calculateOptimizedRoute(customers: Customer[]) {
-    try {
-      // Mevcut rota hesaplama mantığını buraya taşıyalım
-      const weatherConditions = {
-        temperature: 22,
-        condition: 'Açık',
-        humidity: 65,
-        windSpeed: 10
-      };
-
-      const trafficConditions = {
-        congestionLevel: 'Orta',
-        averageSpeed: 40,
-        incidents: []
-      };
-
-      // Müşterilere öncelik skoru hesaplama
-      const customerDetails = customers.map((customer, index) => ({
-        ...customer,
-        priorityScore: Math.random() * 10, // Örnek öncelik skoru
-        weatherPenalty: Math.random(), // Hava durumu etkisi
-        trafficPenalty: Math.random(), // Trafik etkisi
-        order: index + 1
-      }));
-
-      return {
-        weatherConditions,
-        trafficConditions,
-        customerDetails,
-        totalDistance: customers.length * 10, // Örnek mesafe
-        estimatedTime: customers.length * 15 // Örnek süre
-      };
-    } catch (error) {
-      console.error('Rota optimizasyonu hatası:', error);
-      throw new Error('Rota hesaplanamadı');
-    }
   },
 };

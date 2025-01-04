@@ -6,6 +6,7 @@ import axios, {
 } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 
 // Daha spesifik ve güvenli tip tanımları
 interface User {
@@ -25,11 +26,17 @@ interface APIParams {
   limit?: number;
 }
 
+// IP adresini al ve değişkene ata
+let DEVICE_IP: string | null = null;
+NetInfo.fetch().then(state => {
+  DEVICE_IP = state.details?.ipAddress || null;
+});
+
 // Güvenli ve esnek BASE_URL yapılandırması
 const BASE_URL = Platform.select({
-  ios: __DEV__ ? 'http://localhost:3000' : 'https://api.routeiq.com',
-  android: __DEV__ ? 'http://10.0.2.2:3000' : 'https://api.routeiq.com',
-  default: 'https://api.routeiq.com'
+  ios: __DEV__ ? (DEVICE_IP ? `http://${DEVICE_IP}:3000` : 'http://localhost:3000') : `https://${DEVICE_IP || 'api.routeiq.com'}`,
+  android: __DEV__ ? (DEVICE_IP ? `http://${DEVICE_IP}:3000` : 'http://10.0.2.2:3000') : `https://${DEVICE_IP || 'api.routeiq.com'}`,
+  default: `https://${DEVICE_IP || 'api.routeiq.com'}`
 });
 
 // Gelişmiş ve detaylı hata yönetimi
