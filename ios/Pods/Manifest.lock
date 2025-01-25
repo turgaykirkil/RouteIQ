@@ -1079,13 +1079,13 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.21.2):
+  - RNGestureHandler (2.14.1):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
-  - RNLocalize (3.3.0):
+  - RNLocalize (3.4.1):
     - React-Core
-  - RNPermissions (5.2.1):
+  - RNPermissions (5.2.4):
     - React-Core
   - RNScreens (3.35.0):
     - glog
@@ -1373,9 +1373,9 @@ SPEC CHECKSUMS:
   RNCCheckbox: 450ce156f3e29e25efa0315c96cfbabe5a39ded1
   RNDateTimePicker: 818460dc31b0dc5ec58289003e27dd8d022fb79c
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 9b70568fe6eb9d68396328a4677b8e6f4f7a1049
-  RNLocalize: d024afa9204c13885e61dc88b8190651bcaabac9
-  RNPermissions: 61ce234d00582b8042d680aa8268a1596682f08f
+  RNGestureHandler: dd5543af5c344cb2bdd8de81a8ec85adb5ec4b4b
+  RNLocalize: 15463c4d79c7da45230064b4adcf5e9bb984667e
+  RNPermissions: 36d2f716a2f6b72554f07c3226d5163ef7bb43f0
   RNScreens: 30e365555fd36db9d8ede5542127e3d25e8f904e
   RNSVG: 4cab00c621b328a4a2fedaaedc15d8822216723e
   RNVectorIcons: 76364622e6f8e55bb456705582cde20f55ef889c
@@ -1384,4 +1384,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 63c78dfc2a38ad8865d0d2733467be738b0d3334
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
