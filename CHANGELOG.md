@@ -37,6 +37,10 @@
 - Rota optimizasyon ekranı alt bileşenlere bölündü (RouteMapView, CustomerSelectionList, RouteDetailsModal, RouteActionButtons)
 - Kod modülerliği ve okunabilirliği artırıldı
 
+### Build
+- iOS deployment target 13.4'e yükseltildi (React Native 0.73.11 gereksinimleri için)
+- Pod'lar temizlendi ve yeniden yüklendi
+
 ### Changed
 - TaskDetailHeader bileşeni kaldırıldı
 - TaskHeader'a menu açma özelliği eklendi
@@ -91,3 +95,57 @@
 - Route Optimization screen now uses full screen
 - Direct customer selection on the map
 - Modular component structure for Route Optimization screen
+
+## Uygulama Çalışma Ağacı
+
+- **src/**
+  - **components/**
+    - UI bileşenleri
+    - Tekrar kullanılabilir bileşenler
+  - **hooks/**
+    - Özel hook'lar
+    - API çağrıları için hook'lar
+  - **navigation/**
+    - Navigasyon yapısı
+    - Stack ve Tab navigatörleri
+  - **screens/**
+    - **analytics/**
+      - CustomerAnalyticsScreen
+      - LoadingScreen
+    - **auth/**
+      - LoginScreen
+      - RegisterScreen
+      - ForgotPasswordScreen
+    - **customers/**
+      - CustomerDetailScreen
+      - CustomerListScreen
+    - **main/**
+      - HomeScreen
+      - ProfileScreen
+    - **route/**
+      - RouteOptimizationScreen
+    - **tasks/**
+      - TaskListScreen
+      - TaskDetailScreen
+      - EditTaskScreen
+      - NewTaskScreen
+  - **services/**
+    - API servisleri
+    - Route, Traffic, Weather servisleri
+  - **store/**
+    - Redux durumu yönetimi
+    - Slice'lar ve reducer'lar
+  - **theme/**
+    - Tema ayarları
+    - Renk ve stil ayarları
+  - **types/**
+    - TypeScript tür tanımlamaları
+    - Customer ve Task türleri
+  - **utils/**
+    - Yardımcı fonksiyonlar
+    - Genel yardımcı işlevler
+  - **mocks/**
+    - Mock veriler
+    - Test verileri
+  - **assets/**
+    - Görseller ve diğer varlıklar

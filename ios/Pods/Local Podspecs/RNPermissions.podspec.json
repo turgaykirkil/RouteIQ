@@ -19,8 +19,6 @@
   },
   "source_files": "ios/*.{h,mm}",
   "dependencies": {
-    "React-Core": [
-
-    ]
+    "React-Core": []
   }
 }

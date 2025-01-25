@@ -18,8 +18,6 @@
   "requires_arc": true,
   "exclude_files": "ios/fabric",
   "dependencies": {
-    "React-Core": [
-
-    ]
+    "React-Core": []
   }
 }

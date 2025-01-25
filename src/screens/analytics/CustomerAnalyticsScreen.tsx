@@ -102,6 +102,24 @@ const CustomerAnalyticsScreen = () => {
     }, {} as Record<string, number>);
   };
 
+  const calculateCostData = () => {
+    if (!customers?.length) return null;
+    
+    // Örnek maliyet verisi - gerçek verilerinize göre düzenleyin
+    const costData = customers.map(customer => {
+      return Math.floor(Math.random() * 1000); // Örnek sabit maliyet
+    });
+    
+    return {
+      labels: customers.map(customer => customer.name),
+      datasets: [
+        {
+          data: costData,
+        },
+      ],
+    };
+  };
+
   const chartConfig = {
     backgroundGradientFrom: theme.colors.surface,
     backgroundGradientTo: theme.colors.surface,
@@ -125,6 +143,7 @@ const CustomerAnalyticsScreen = () => {
   const statusData = calculateCustomerStatusData();
   const orderData = calculateOrderDistribution();
   const activityData = calculateActivityData();
+  const costData = calculateCostData();
 
   return (
     <ScrollView style={styles.container}>
@@ -201,6 +220,23 @@ const CustomerAnalyticsScreen = () => {
         </Card>
       )}
 
+      {costData && (
+        <Card style={styles.card}>
+          <Card.Content>
+            <Text variant="titleMedium" style={styles.chartTitle}>
+              Maliyet Analizi
+            </Text>
+            <BarChart
+              data={costData}
+              width={width - 40}
+              height={220}
+              chartConfig={chartConfig}
+              style={styles.chart}
+            />
+          </Card.Content>
+        </Card>
+      )}
+
       <Card style={[styles.card, styles.lastCard]}>
         <Card.Content>
           <Text variant="titleMedium" style={styles.chartTitle}>
@@ -228,31 +264,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    padding: 16,
+  },
+  card: {
+    marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    elevation: 4,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  chart: {
+    borderRadius: 12,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: {
-    margin: 10,
-    elevation: 4,
-  },
-  lastCard: {
-    marginBottom: 20,
+  segmentedButtons: {
+    marginVertical: 16,
   },
   sectionTitle: {
-    marginBottom: 16,
-  },
-  chartTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
     marginBottom: 12,
-  },
-  segmentedButtons: {
-    marginTop: 8,
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
   },
 });
 

@@ -19,9 +19,7 @@
   "source_files": "ios/**/*.{h,m,swift}",
   "swift_versions": "5.0",
   "dependencies": {
-    "React": [
-
-    ]
+    "React": []
   },
   "swift_version": "5.0"
 }
